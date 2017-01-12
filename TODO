@@ -1,0 +1,51 @@
+CRITICAL:
+	Fix connection problem (like generating print-outs before robot is connected to a driver station or any other solution that might/will work)
+
+	
+HIGH PRIORITY:
+	- Drive base 
+	- Autonomous:
+		- Simple one that only crosses the base line
+
+
+NOT AS HIGH PRIORITY:
+	- Fix talon srx initialization: separate address for CANs and accessing index for them in the talon_srx_controls array
+	- Logging
+	- Laptop configuration
+		-ssh config:
+			-Fix the "rm ~/.ssh/known_hosts" problem
+			-add "StrictHostKeyChecking no/UserKnownHostsFile=/dev/null" for robot
+
+
+NICE THINGS TO HAVE:
+	- Expand testing of the different robot modes
+	- Log Analysis
+	- Clean-up stuff:
+		- Deploy script
+		- Use enum class more places
+		- Use std::array in place of C arrays in several places
+	- Clean up panel interpret more
+	- Meta IO information
+		- Add a function that will discover which IOs different parts use (and make a nice list)
+		- Make a data type to talk about different inputs
+	
+	
+LOG LIST:
+	-RIO Time			10chars 
+	-RIO mode			4chars
+	-OI inputs (panel)		50chars
+	-PDP currents			120chars
+	-Robot Outputs			130chars
+	-Robot Inputs			30chars
+	-Driver inputs			120chars
+	-RIO Connection status and ip	12chars
+	-DriverStation outputs		4chars
+					488 chars total
+
+
+Eric's random thoughts:
+	-Nav stuff should be a little more collected together
+	-Sim stuff could benefit from using Monitor
+	-Some of the nav types aren't following the naming convention
+	-There shouldn't be seperate "panel output" and driver station output
+	-There's a better way to do SLOW_PRINT
