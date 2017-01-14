@@ -3,6 +3,7 @@ CRITICAL:
 
 	
 HIGH PRIORITY:
+	- Add in a Control struct that is set by either the panel or the gamepad to make teleop decisions based on user input easier
 	- Drive base 
 	- Autonomous:
 		- Simple one that only crosses the base line
@@ -11,6 +12,7 @@ HIGH PRIORITY:
 NOT AS HIGH PRIORITY:
 	- Fix talon srx initialization: separate address for CANs and accessing index for them in the talon_srx_controls array
 	- Logging
+	- Add in a way to run runall with bazel arguments
 	- Laptop configuration
 		-ssh config:
 			-Fix the "rm ~/.ssh/known_hosts" problem
