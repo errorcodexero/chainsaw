@@ -1,0 +1,56 @@
+Driver:
+ A          - Backward nudge
+ B          - Right nudge
+ X          - Left nudge
+ Y          - Forward nudge
+ Start      - 
+ Back       - 
+ RB         - Clockwise nudge
+ LB         - Counter-clockwise nudge
+ RT         - Slow
+ LT         - Turbo
+ L_Joy:
+  X Axis    - Left/right
+  Y Axis    - Forward/backward
+  Pushed in -
+ R_Joy:
+  X Axis    - Turning
+  Y Axis    -
+  Pushed in -
+ POV        - 
+
+
+Gunner:
+ A          - Arm all the way down
+ B          - Open grabber
+ X          - Close grabber
+ Y          - Arm all the way up
+ Start      - 
+ Back       - 
+ RB         - Single shot
+ LB         - Burst shot
+ RT         - Shoot
+ LT         - Rev
+ L_Joy:
+  Up        - 
+  Down      - 
+  Left      -
+  Right     -
+  Pushed in - 
+ R_Joy:
+  Up        - 
+  Down      - 
+  Left      - 
+  Right     - 
+  Pushed in - 
+ POV        
+  Center     -
+  Up         - 
+  Up_left    -
+  Left       - 
+  Down_left  -
+  Down       -
+  Down_right -
+  Right      - 
+  Up_right   -
+
