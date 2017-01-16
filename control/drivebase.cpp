@@ -274,7 +274,7 @@ bool operator!=(Drivebase const& a,Drivebase const& b){
 	return !(a==b);
 }
 
-Drivebase::Output control(Drivebase::Status status,Drivebase::Goal goal){
+Drivebase::Output control(Drivebase::Status /*status*/,Drivebase::Goal goal){
 	return Drivebase::Output{goal.left,goal.right};
 }
 

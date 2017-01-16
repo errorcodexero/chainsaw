@@ -10,6 +10,8 @@ g++ -std=c++14 -Wall -Wextra -DSIM_TEST \
 	../control/pump.cpp \
 	../control/winch.cpp \
 	grabber.cpp \
+	arm.cpp \
+	gun.cpp \
 	../control/motor_check.cpp \
 	../control/nop.cpp \
 	-o sim 2>&1 && ./sim

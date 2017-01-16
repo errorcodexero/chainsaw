@@ -97,7 +97,8 @@ ostream& operator<<(ostream& o,Toplevel::Output_applicator const&){
 }
 
 Toplevel::Output::Output():
-	drive(0.0,0.0)
+	drive(0.0,0.0),
+	pump(Pump::Output::AUTO)
 {}
 
 bool operator<(Toplevel::Output const& a,Toplevel::Output const& b){
