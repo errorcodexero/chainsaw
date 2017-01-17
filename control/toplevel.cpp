@@ -98,7 +98,11 @@ ostream& operator<<(ostream& o,Toplevel::Output_applicator const&){
 
 Toplevel::Output::Output():
 	drive(0.0,0.0),
-	pump(Pump::Output::AUTO)
+	pump(Pump::Output::AUTO),
+	gun(Gun::Output::OFF),
+	winch(Winch::Output::STOP),
+	grabber(Grabber::Output::OPEN),
+	arm(Arm::Output::DOWN)
 {}
 
 bool operator<(Toplevel::Output const& a,Toplevel::Output const& b){

@@ -10,7 +10,9 @@ Executive Auto_test::next_mode(Next_mode_info info){
 
 Toplevel::Goal Auto_test::run(Run_info){
 	Toplevel::Goal goals;
-	goals.drive.y = .1;
+	const double POWER = .1;
+	goals.drive.left = POWER;
+	goals.drive.right = POWER;
 	return goals;
 }
 
