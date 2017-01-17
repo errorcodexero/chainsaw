@@ -146,21 +146,6 @@ cc_test(
 )
 
 cc_library(
-	name="nav2",
-	srcs=["util/nav2.cpp"],
-	hdrs=["util/nav2.h"],
-	deps=[":nav"]
-)
-
-cc_test(
-	name="nav2_test",
-	srcs=["util/nav2.cpp","util/nav2.h"],
-	copts=["-DNAV2_TEST"],
-	deps=[":nav"],
-	timeout="short"
-)
-
-cc_library(
 	name="string_utils",
 	srcs=["util/string_utils.cpp"],
 	hdrs=["util/string_utils.h"]
@@ -275,20 +260,6 @@ cc_test(
 )
 
 cc_library(
-	name="nav",
-	srcs=["util/nav.cpp"],
-	hdrs=["util/nav.h"]
-)
-
-cc_test(
-	name="nav_test",
-	srcs=["util/nav.cpp","util/nav.h"],
-	copts=["-DNAV_TEST"],
-	deps=[],
-	timeout="short"
-)
-
-cc_library(
 	name="output",
 	srcs=["util/output.cpp"],
 	hdrs=["util/output.h"],
@@ -396,14 +367,14 @@ cc_library(
 	name="main",
 	srcs=["control/main.cpp"],
 	hdrs=["control/main.h"],
-	deps=[":force_interface",":posedge_toggle",":perf_tracker",":countdown_timer",":countup_timer",":toplevel",":panel",":nav",":nav2",":log",":posedge_trigger_debounce",":motion_profile",":executive_impl"]
+	deps=[":force_interface",":posedge_toggle",":perf_tracker",":countdown_timer",":countup_timer",":toplevel",":panel",":log",":posedge_trigger_debounce",":motion_profile",":executive_impl"]
 )
 
 cc_test(
 	name="main_test",
 	srcs=["control/main.cpp","control/main.h"],
 	copts=["-DMAIN_TEST"],
-	deps=[":force_interface",":toplevel",":posedge_toggle",":perf_tracker",":countup_timer",":panel",":nav2",":log",":posedge_trigger_debounce",":motion_profile",":monitor"],
+	deps=[":force_interface",":toplevel",":posedge_toggle",":perf_tracker",":countup_timer",":panel",":log",":posedge_trigger_debounce",":motion_profile",":monitor"],
 	timeout="short"
 )
 
