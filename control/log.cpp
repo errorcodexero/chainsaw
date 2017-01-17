@@ -194,21 +194,11 @@ void visit(Func f,int i){
 	f.terminal(i);
 }
 
-template<typename Func>
-void visit(Func f,Arm::Status const& a){
-	f.terminal(a);
-}
 
 template<typename Func>
 void visit(Func f,Winch::Status const& a){
 	f.terminal(a);
 }
-
-template<typename Func>
-void visit(Func f,Grabber::Status const& a){
-	f.terminal(a);
-}
-
 
 template<typename Func>
 void visit(Func f,Drivebase::Encoder_ticks const& a){
@@ -227,11 +217,6 @@ void visit(Func f,Drivebase::Status const& r){
 
 template<typename Func>
 void visit(Func f,Pump::Status const& a){
-	f.terminal(a);
-}
-
-template<typename Func>
-void visit(Func f,Gun::Status const& a){
 	f.terminal(a);
 }
 
