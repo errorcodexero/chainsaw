@@ -77,12 +77,12 @@ Toplevel::Goal Teleop::run(Run_info info) {
 		}());
 		goals.drive.right=clip([&]{
 			if(!nudges[Nudges::FORWARD].timer.done()) return -NUDGE_POWER;
-                        if(!nudges[Nudges::BACKWARD].timer.done()) return NUDGE_POWER;
-                        if(!nudges[Nudges::CLOCKWISE].timer.done()) return -ROTATE_NUDGE_POWER;
-                        if(!nudges[Nudges::COUNTERCLOCKWISE].timer.done()) return ROTATE_NUDGE_POWER;
-                        double  power=set_drive_speed(info.main_joystick.axis[Gamepad_axis::LEFTY],boost,slow);
-                        if(spin) power+=set_drive_speed(-info.main_joystick.axis[Gamepad_axis::RIGHTX],boost,slow);
-                        return power;
+			if(!nudges[Nudges::BACKWARD].timer.done()) return NUDGE_POWER;
+			if(!nudges[Nudges::CLOCKWISE].timer.done()) return -ROTATE_NUDGE_POWER;	
+			if(!nudges[Nudges::COUNTERCLOCKWISE].timer.done()) return ROTATE_NUDGE_POWER;
+			double  power=set_drive_speed(info.main_joystick.axis[Gamepad_axis::LEFTY],boost,slow);
+			if(spin) power+=set_drive_speed(-info.main_joystick.axis[Gamepad_axis::RIGHTX],boost,slow);
+			return power;
 		}());
 	}
 
