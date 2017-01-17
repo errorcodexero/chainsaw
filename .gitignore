@@ -1,0 +1,12 @@
+*.out
+*.obj
+*.jar
+*.o
+tobj/
+*~
+*.tmp
+t.mk
+*.swp
+*.a
+FRCUserProgram
+bazel-*
