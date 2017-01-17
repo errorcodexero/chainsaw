@@ -48,8 +48,6 @@ LOG LIST:
 
 
 Eric's random thoughts:
-	-Nav stuff should be a little more collected together
 	-Sim stuff could benefit from using Monitor
-	-Some of the nav types aren't following the naming convention
 	-There shouldn't be seperate "panel output" and driver station output
 	-There's a better way to do SLOW_PRINT

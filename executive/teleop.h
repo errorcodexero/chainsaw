@@ -14,7 +14,6 @@ struct Teleop : Executive_impl<Teleop> {
 		Countdown_timer timer;
 	};
 
-
 	#define TELEOP_ITEMS(X)\
 		X(SINGLE_ARG(std::array<Nudge,NUDGES>),nudges) 
 	STRUCT_MEMBERS(TELEOP_ITEMS)

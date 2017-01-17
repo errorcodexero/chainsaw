@@ -5,12 +5,6 @@
 
 using namespace std;
 
-ostream& operator<<(ostream& o,Teleop::Nudge const& ){
-	o<<"Nudge(";
-	o<<"...";
-	return o<<")";
-}
-
 double set_drive_speed(double axis,double boost,double slow){
 	static const float MAX_SPEED=1;//Change this value to change the max power the robot will achieve with full boost (cannot be larger than 1.0)
 	static const float DEFAULT_SPEED=.4;//Change this value to change the default power
@@ -45,8 +39,8 @@ Executive Teleop::next_mode(Next_mode_info info) {
 
 IMPL_STRUCT(Teleop::Teleop,TELEOP_ITEMS)
 
-Teleop::Teleop(){
-}
+Teleop::Teleop(){}
+
 Toplevel::Goal Teleop::run(Run_info info) {
 	Toplevel::Goal goals;
 	
@@ -68,7 +62,7 @@ Toplevel::Goal Teleop::run(Run_info info) {
 			if(!nudges[Nudges::BACKWARD].timer.done()) return NUDGE_POWER;
 			if(!nudges[Nudges::CLOCKWISE].timer.done()) return -ROTATE_NUDGE_POWER;
 			if(!nudges[Nudges::COUNTERCLOCKWISE].timer.done()) return ROTATE_NUDGE_POWER;
-			double  power=set_drive_speed(info.main_joystick.axis[Gamepad_axis::LEFTY],boost,slow);
+			double power=set_drive_speed(info.main_joystick.axis[Gamepad_axis::LEFTY],boost,slow);
 			if(spin) power+=set_drive_speed(-info.main_joystick.axis[Gamepad_axis::RIGHTX],boost,slow);
 			return power;
 		}());
@@ -77,7 +71,7 @@ Toplevel::Goal Teleop::run(Run_info info) {
 			if(!nudges[Nudges::BACKWARD].timer.done()) return NUDGE_POWER;
 			if(!nudges[Nudges::CLOCKWISE].timer.done()) return -ROTATE_NUDGE_POWER;	
 			if(!nudges[Nudges::COUNTERCLOCKWISE].timer.done()) return ROTATE_NUDGE_POWER;
-			double  power=set_drive_speed(info.main_joystick.axis[Gamepad_axis::LEFTY],boost,slow);
+			double power=set_drive_speed(info.main_joystick.axis[Gamepad_axis::LEFTY],boost,slow);
 			if(spin) power+=set_drive_speed(-info.main_joystick.axis[Gamepad_axis::RIGHTX],boost,slow);
 			return power;
 		}());
@@ -87,7 +81,7 @@ Toplevel::Goal Teleop::run(Run_info info) {
 }
 
 #define TELEOP_ITEMS_NO_TYPE(X)\
-	X(nudges)\
+	X(nudges)
 
 bool Teleop::operator<(Teleop const& a)const{
 	#define X(NAME) if(NAME<a.NAME) return 1; if(a.NAME<NAME) return 0;
