@@ -99,10 +99,7 @@ ostream& operator<<(ostream& o,Toplevel::Output_applicator const&){
 Toplevel::Output::Output():
 	drive(0.0,0.0),
 	pump(Pump::Output::AUTO),
-	gun(Gun::Output::OFF),
-	winch(Winch::Output::STOP),
-	grabber(Grabber::Output::OPEN),
-	arm(Arm::Output::DOWN)
+	winch(Winch::Output::STOP)
 {}
 
 bool operator<(Toplevel::Output const& a,Toplevel::Output const& b){
@@ -158,10 +155,7 @@ Toplevel::Status::Status():
 		{0,0}
 	),
 	pump(Pump::Status::NOT_FULL),
-	gun({Gun::Status::Rev_mode::OFF,0}),
-	winch(Winch::Status::DOWN),
-	grabber(Grabber::Status::OPEN),
-	arm(Arm::Status::DOWN)
+	winch(Winch::Status::DOWN)
 {}
 
 bool operator==(Toplevel::Status a,Toplevel::Status b){
@@ -337,10 +331,7 @@ set<Toplevel::Status_detail> examples(Toplevel::Status_detail*){
 	return {Toplevel::Status_detail{
 		*examples((Drivebase::Status_detail*)0).begin(),
 		Pump::Status_detail{Pump::Status::FULL},
-		*examples((Gun::Status_detail*)0).begin(),
-		*examples((Winch::Status_detail*)0).begin(),
-		*examples((Grabber::Status_detail*)0).begin(),
-		*examples((Arm::Status_detail*)0).begin()
+		*examples((Winch::Status_detail*)0).begin()
 	}};
 }
 
@@ -356,10 +347,7 @@ set<Toplevel::Input> examples(Toplevel::Input*){
 	Toplevel::Input a{
 		*examples((Drivebase::Input*)0).begin(),
 		Pump::Input{},
-		*examples((Gun::Input*)0).begin(),
-		*examples((Winch::Input*)0).begin(),
-		*examples((Grabber::Input*)0).begin(),
-		*examples((Arm::Input*)0).begin()
+		*examples((Winch::Input*)0).begin()
 	};
 	return {a};
 }

@@ -146,21 +146,6 @@ cc_test(
 )
 
 cc_library(
-	name="nav2",
-	srcs=["util/nav2.cpp"],
-	hdrs=["util/nav2.h"],
-	deps=[":nav"]
-)
-
-cc_test(
-	name="nav2_test",
-	srcs=["util/nav2.cpp","util/nav2.h"],
-	copts=["-DNAV2_TEST"],
-	deps=[":nav"],
-	timeout="short"
-)
-
-cc_library(
 	name="string_utils",
 	srcs=["util/string_utils.cpp"],
 	hdrs=["util/string_utils.h"]
@@ -275,20 +260,6 @@ cc_test(
 )
 
 cc_library(
-	name="nav",
-	srcs=["util/nav.cpp"],
-	hdrs=["util/nav.h"]
-)
-
-cc_test(
-	name="nav_test",
-	srcs=["util/nav.cpp","util/nav.h"],
-	copts=["-DNAV_TEST"],
-	deps=[],
-	timeout="short"
-)
-
-cc_library(
 	name="output",
 	srcs=["util/output.cpp"],
 	hdrs=["util/output.h"],
@@ -396,14 +367,14 @@ cc_library(
 	name="main",
 	srcs=["control/main.cpp"],
 	hdrs=["control/main.h"],
-	deps=[":force_interface",":posedge_toggle",":perf_tracker",":countdown_timer",":countup_timer",":toplevel",":panel",":nav",":nav2",":log",":posedge_trigger_debounce",":motion_profile",":executive_impl"]
+	deps=[":force_interface",":posedge_toggle",":perf_tracker",":countdown_timer",":countup_timer",":toplevel",":panel",":log",":posedge_trigger_debounce",":motion_profile",":executive_impl"]
 )
 
 cc_test(
 	name="main_test",
 	srcs=["control/main.cpp","control/main.h"],
 	copts=["-DMAIN_TEST"],
-	deps=[":force_interface",":toplevel",":posedge_toggle",":perf_tracker",":countup_timer",":panel",":nav2",":log",":posedge_trigger_debounce",":motion_profile",":monitor"],
+	deps=[":force_interface",":toplevel",":posedge_toggle",":perf_tracker",":countup_timer",":panel",":log",":posedge_trigger_debounce",":motion_profile",":monitor"],
 	timeout="short"
 )
 
@@ -452,35 +423,6 @@ cc_test(
 	timeout="short"
 )
 
-cc_library(
-	name="grabber",
-	srcs=["control/grabber.cpp"],
-	hdrs=["control/grabber.h"],
-	deps=[":interface",":countdown_timer"]
-)
-
-cc_test(
-	name="grabber_test",
-	srcs=["control/grabber.cpp","control/grabber.h","control/formal.h"],
-	copts=["-DGRABBER_TEST"],
-	deps=[":interface",":countdown_timer"],
-	timeout="short"
-)
-
-cc_library(
-	name="arm",
-	srcs=["control/arm.cpp"],
-	hdrs=["control/arm.h"],
-	deps=[":interface",":countdown_timer"]
-)
-
-cc_test(
-	name="arm_test",
-	srcs=["control/arm.cpp","control/arm.h","control/formal.h"],
-	copts=["-DARM_TEST"],
-	deps=[":interface",":countdown_timer"],
-	timeout="short"
-)
 
 cc_library(
 	name="force",
@@ -504,33 +446,19 @@ cc_test(
 	timeout="short"
 )
 
-cc_library(
-	name="gun",
-	srcs=["control/gun.cpp"],
-	hdrs=["control/gun.h"],
-	deps=[":interface",":countdown_timer"]
-)
-
-cc_test(
-	name="gun_test",
-	srcs=["control/gun.cpp","control/gun.h","control/formal.h"],
-	copts=["-DGUN_TEST"],
-	deps=[":interface",":countdown_timer"],
-	timeout="short"
-)
 
 cc_library(
 	name="toplevel",
 	srcs=["control/toplevel.cpp"],
 	hdrs=["control/toplevel.h"],
-	deps=[":arm",":gun",":pump",":drivebase",":winch",":grabber",":input"]
+	deps=[":pump",":drivebase",":winch",":input"]
 )
 
 cc_test(
 	name="toplevel_test",
 	srcs=["control/toplevel.cpp","control/toplevel.h","control/formal.h"],
 	copts=["-DTOPLEVEL_TEST"],
-	deps=[":arm",":gun",":pump",":drivebase",":grabber",":winch",":input",":output"],
+	deps=[":pump",":drivebase",":winch",":input",":output"],
 	timeout="short"
 )
 

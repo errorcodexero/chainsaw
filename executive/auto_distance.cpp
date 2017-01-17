@@ -21,8 +21,7 @@ Executive Auto_distance::next_mode(Next_mode_info info){
 	
 	if(ticks_to_inches(encoder_differences.l) >= TARGET_DISTANCE-TOLERANCE && ticks_to_inches(encoder_differences.l) <= TARGET_DISTANCE+TOLERANCE){
 		in_range.update(info.in.now,info.in.robot_mode.enabled);
-	}
-	else{
+	} else {
 		const double IN_RANGE_TIME = 2.0;//seconds - the time that the robot needs to be within a certain distance from the target
 		in_range.set(IN_RANGE_TIME);
 	}

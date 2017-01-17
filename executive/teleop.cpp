@@ -5,12 +5,6 @@
 
 using namespace std;
 
-ostream& operator<<(ostream& o,Teleop::Nudge const& ){
-	o<<"Nudge(";
-	o<<"...";
-	return o<<")";
-}
-
 double set_drive_speed(double axis,double boost,double slow){
 	static const float MAX_SPEED=1;//Change this value to change the max power the robot will achieve with full boost (cannot be larger than 1.0)
 	static const float DEFAULT_SPEED=.4;//Change this value to change the default power
@@ -42,13 +36,10 @@ Executive Teleop::next_mode(Next_mode_info info) {
 	return Executive{t};
 }
 
-Teleop::Teleop(){
-	arm_goal=Arm::Goal::DOWN;
-	grabber_goal=Grabber::Goal::CLOSE;
-	active_gun_mode=Active_gun_mode::OTHER;
-}
 
 IMPL_STRUCT(Teleop::Teleop,TELEOP_ITEMS)
+
+Teleop::Teleop(){}
 
 Toplevel::Goal Teleop::run(Run_info info) {
 	Toplevel::Goal goals;
@@ -71,7 +62,7 @@ Toplevel::Goal Teleop::run(Run_info info) {
 			if(!nudges[Nudges::BACKWARD].timer.done()) return NUDGE_POWER;
 			if(!nudges[Nudges::CLOCKWISE].timer.done()) return -ROTATE_NUDGE_POWER;
 			if(!nudges[Nudges::COUNTERCLOCKWISE].timer.done()) return ROTATE_NUDGE_POWER;
-			double  power=set_drive_speed(info.main_joystick.axis[Gamepad_axis::LEFTY],boost,slow);
+			double power=set_drive_speed(info.main_joystick.axis[Gamepad_axis::LEFTY],boost,slow);
 			if(spin) power+=set_drive_speed(-info.main_joystick.axis[Gamepad_axis::RIGHTX],boost,slow);
 			return power;
 		}());
@@ -80,88 +71,17 @@ Toplevel::Goal Teleop::run(Run_info info) {
 			if(!nudges[Nudges::BACKWARD].timer.done()) return NUDGE_POWER;
 			if(!nudges[Nudges::CLOCKWISE].timer.done()) return -ROTATE_NUDGE_POWER;	
 			if(!nudges[Nudges::COUNTERCLOCKWISE].timer.done()) return ROTATE_NUDGE_POWER;
-			double  power=set_drive_speed(info.main_joystick.axis[Gamepad_axis::LEFTY],boost,slow);
+			double power=set_drive_speed(info.main_joystick.axis[Gamepad_axis::LEFTY],boost,slow);
 			if(spin) power+=set_drive_speed(-info.main_joystick.axis[Gamepad_axis::RIGHTX],boost,slow);
 			return power;
 		}());
 	}
 
-	if (info.panel.in_use) {
-		const int BURST_SHOTS=3,SINGLE_SHOTS=1;
-		gun_prep.update(info.panel.prep);
-		if(active_gun_mode==Active_gun_mode::SINGLE && info.toplevel_status.gun.shots_fired>=SINGLE_SHOTS) active_gun_mode=Active_gun_mode::OTHER;
-		if(active_gun_mode==Active_gun_mode::BURST && info.toplevel_status.gun.shots_fired>=BURST_SHOTS) active_gun_mode=Active_gun_mode::OTHER;
-		goals.gun=[&]{
-			if(gun_prep.get()) {
-				if (info.panel.shoot) {
-					switch(info.panel.gun_mode){
-						case Panel::Gun_mode::CONTINUOUS:
-							return Gun::Goal::shoot();
-						case Panel::Gun_mode::SINGLE:
-							active_gun_mode=Active_gun_mode::SINGLE;
-							break;
-						case Panel::Gun_mode::BURST:
-							active_gun_mode=Active_gun_mode::BURST;
-							break;
-						default: assert(0);
-					}
-				}
-				if (active_gun_mode==Active_gun_mode::SINGLE) return Gun::Goal::numbered_shoot(SINGLE_SHOTS);	
-				if (active_gun_mode==Active_gun_mode::BURST) return Gun::Goal::numbered_shoot(BURST_SHOTS);
-				return Gun::Goal::rev();
-			}
-			return Gun::Goal::off();
-		}();
-
-		arm_goal=[&]{
-			if(info.panel.arm_pos) return Arm::Goal::UP;
-			return Arm::Goal::DOWN;
-		}();
-		goals.arm=arm_goal;
-
-		grabber_goal=[&]{
-			if(info.panel.grabber_open) return Grabber::Goal::OPEN;
-			if(info.panel.grabber_close) return Grabber::Goal::CLOSE;
-			return grabber_goal;
-		}();
-		goals.grabber=grabber_goal;
-	} else {
-		const int BURST_SHOTS=3,SINGLE_SHOTS=1;
-		if(active_gun_mode==Active_gun_mode::BURST && info.toplevel_status.gun.shots_fired>=BURST_SHOTS) active_gun_mode=Active_gun_mode::OTHER;
-		if(active_gun_mode==Active_gun_mode::SINGLE && info.toplevel_status.gun.shots_fired>=SINGLE_SHOTS) active_gun_mode=Active_gun_mode::OTHER;
-
-		if(info.gunner_joystick.button[Gamepad_button::LB]) active_gun_mode=Active_gun_mode::BURST;
-		if(info.gunner_joystick.button[Gamepad_button::RB]) active_gun_mode=Active_gun_mode::SINGLE;
-
-		goals.gun=[&]{
-			if(info.gunner_joystick.axis[Gamepad_axis::LTRIGGER]>.9){
-				if(active_gun_mode==Active_gun_mode::SINGLE) return Gun::Goal::numbered_shoot(1);
-				if(active_gun_mode==Active_gun_mode::BURST) return Gun::Goal::numbered_shoot(5);
-				if(info.gunner_joystick.axis[Gamepad_axis::RTRIGGER]>.9) return Gun::Goal::shoot();
-				return Gun::Goal::rev();
-			}
-			return Gun::Goal::off();
-		}();
-	
-		arm_goal=[&]{
-			if(info.gunner_joystick.button[Gamepad_button::Y]) return Arm::Goal::UP;
-			if(info.gunner_joystick.button[Gamepad_button::A]) return Arm::Goal::DOWN;
-			return arm_goal;
-		}();
-		goals.arm=arm_goal;
-
-		grabber_goal=[&]{
-			if(info.gunner_joystick.button[Gamepad_button::B]) return Grabber::Goal::OPEN;
-			if(info.gunner_joystick.button[Gamepad_button::X]) return Grabber::Goal::CLOSE;
-			return grabber_goal;
-		}();
-		goals.grabber=grabber_goal;
-	}
 	return goals;
 }
 
 #define TELEOP_ITEMS_NO_TYPE(X)\
-	X(nudges)\
+	X(nudges)
 
 bool Teleop::operator<(Teleop const& a)const{
 	#define X(NAME) if(NAME<a.NAME) return 1; if(a.NAME<NAME) return 0;
