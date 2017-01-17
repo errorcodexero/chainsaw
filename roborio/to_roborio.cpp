@@ -105,9 +105,7 @@ Joystick_data read_joystick(DriverStation& ds,int port){
 	return r;
 }
 
-int read_joysticks(Robot_inputs &r){
-	DriverStation &ds=DriverStation::GetInstance();
-	//if(!ds) return 4;
+int read_joysticks(Robot_inputs &r, DriverStation& ds){
 	for(unsigned i=0;i<r.JOYSTICKS;i++){
 		r.joystick[i]=read_joystick(ds,i);
 	}
@@ -234,9 +232,9 @@ class To_crio
 	//Gyro *gyro;
 	PowerDistributionPanel *power;
 	Compressor *compressor;
-	DriverStation *driver_station;
+	DriverStation& driver_station;
 public:
-	To_crio():error_code(0),skipped(0)//,gyro(NULL)
+	To_crio():error_code(0),skipped(0),driver_station(DriverStation::GetInstance())//,gyro(NULL)
 	{
 		power = new PowerDistributionPanel();
 		// Wake the NUC by sending a Wake-on-LAN magic UDP packet:
@@ -301,9 +299,6 @@ public:
 			error_code|=512;
 		}
 		
-		driver_station=&DriverStation::GetInstance();
-		if(!driver_station) error_code|=1024;
-
 		//Slave
 		
 		cout<<"Initialization Complete."<<endl<<flush;
@@ -321,20 +316,32 @@ public:
 		return error;
 	}
 
-	bool read_ds_connected(){
-		return driver_station->IsDSAttached();
+	DS_info read_ds_info(){
+		DS_info ds_info;
+		ds_info.connected=driver_station.IsDSAttached();
+		DriverStation::Alliance ds_alliance=driver_station.GetAlliance();
+		ds_info.alliance=[&]{
+			switch(ds_alliance){
+				case DriverStation::Alliance::kRed: return Alliance::RED;
+				case DriverStation::Alliance::kBlue: return Alliance::BLUE;
+				case DriverStation::Alliance::kInvalid: return Alliance::INVALID;
+				default: assert(0);
+			}
+		}();
+		ds_info.location=driver_station.GetLocation();
+		return ds_info;
 	}
 
 	pair<Robot_inputs,int> read(Robot_mode robot_mode){
 		int error_code=0;
 		Robot_inputs r;
 		r.robot_mode=robot_mode;
-		r.now=Timer::GetFPGATimestamp();
-		error_code|=read_joysticks(r);
+		r.now=Timer::GetFPGATimestamp();	
+		r.ds_info=read_ds_info();
+		error_code|=read_joysticks(r, driver_station);
 		error_code|=read_analog(r);
 		//error_code|=read_driver_station(r.driver_station);
 		r.current=read_currents();
-		r.ds_connected=read_ds_connected();
 		return make_pair(r,error_code);
 	}
 	//PowerDistributionPanel power;
@@ -509,7 +516,7 @@ public:
 		static int print_num=0;
 		Robot_outputs out=main(in);
 		const int PRINT_SPEED=10;
-		if(in.ds_connected && (print_num%PRINT_SPEED)==0){
+		if(in.ds_info.connected && (print_num%PRINT_SPEED)==0){
 			cout<<"in: "<<in<<"\n";
 			cout<<"main: "<<main<<"\n";
 			cout<<"out: "<<out<<"\n";

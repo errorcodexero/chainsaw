@@ -164,6 +164,13 @@ bool operator==(Robot_mode,Robot_mode);
 bool operator!=(Robot_mode,Robot_mode);
 std::ostream& operator<<(std::ostream&,Robot_mode);
 
+enum class Alliance{RED,BLUE,INVALID};
+struct DS_info{
+	bool connected;
+	Alliance alliance;
+	int location;
+};
+
 enum class Digital_in{OUTPUT,_0,_1,ENCODER};
 std::ostream& operator<<(std::ostream&,Digital_in);
 std::set<Digital_in> examples(Digital_in*);
@@ -188,7 +195,8 @@ typedef double Rad; //radians, clockwise
 struct Robot_inputs{
 	Robot_mode robot_mode;
 	Time now;//time since boot.
-	bool ds_connected;
+
+	DS_info ds_info;
 
 	static const unsigned JOYSTICKS=3; //limitation of FRC coms was 4, now highter
 	Checked_array<Joystick_data,JOYSTICKS> joystick;
@@ -206,7 +214,7 @@ struct Robot_inputs{
 	Driver_station_input driver_station;
 	Rad orientation;
 		
-	static const unsigned CURRENT =16;
+	static const unsigned CURRENT=16;
 	Checked_array<double,CURRENT> current;
 	bool pump;
 

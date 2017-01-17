@@ -502,6 +502,27 @@ ostream& operator<<(ostream& o,Robot_mode m){
 	return o<<")";
 }
 
+ostream& operator<<(ostream& o,Alliance a){
+	o<<"Alliance(";
+	#define X(value) case value: o<<#value; break;
+	switch(a){
+		X(Alliance::RED)
+		X(Alliance::BLUE)
+		X(Alliance::INVALID)
+		default: assert(0);
+	}
+	#undef X
+	return o<<")";
+}
+
+ostream& operator<<(ostream& o,DS_info d){
+	o<<"DS_info(";
+	o<<"connected:"<<d.connected;
+	o<<" alliance:"<<d.alliance;
+	o<<" location:"<<d.location;
+	return o<<")";
+}
+
 Digital_in random(Digital_in* d){
 	return choose_random(examples(d));
 }
@@ -656,6 +677,7 @@ ostream& operator<<(ostream& o,Robot_inputs a){
 	o<<"Robot_inputs(\n";
 	o<<"  mode="<<a.robot_mode<<"\n";
 	o<<"  now="<<a.now<<"\n";
+	o<<"  ds_info:"<<a.ds_info<<"\n";
 	//o<<"joysticks:";
 	for(unsigned i=0;i<a.JOYSTICKS;i++){
 		o<<"  "<<a.joystick[i]<<"\n";
