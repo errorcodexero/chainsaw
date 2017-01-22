@@ -2,6 +2,7 @@
 #define GEAR_GRASPER_H
 
 #include "nop.h"
+#include "../util/countdown_timer.h"
 
 struct Gear_grasper{
 	using Input=Nop::Input;
@@ -26,7 +27,7 @@ struct Gear_grasper{
 	Output_applicator output_applicator;
 
 	//using Status_detail=Nop::Status_detail;
-	#define GEAR_GRASPER_STATUSES(X) X(OPEN) X(CLOSE) X(OPENING) X(CLOSING)
+	#define GEAR_GRASPER_STATUSES(X) X(OPEN) X(CLOSED) X(OPENING) X(CLOSING)
 	#define X(A) A, 
 	enum class Status_detail{GEAR_GRASPER_STATUSES(X)};
 	#undef X

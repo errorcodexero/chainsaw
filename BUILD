@@ -416,6 +416,22 @@ cc_test(
 	timeout="short"
 )
 
+cc_test(
+	name="ball_collector_lift",
+	srcs=["control/ball_collector_lift.h","control/ball_collector_lift.cpp","control/formal.h"],
+	copts=["-DBALL_COLLECTOR_LIFT_TEST"],
+	deps=[":interface",":nop",":countdown_timer"],
+	timeout="short"
+)
+
+cc_test(
+	name="ball_collector_belts",
+	srcs=["control/ball_collector_belts.h","control/ball_collector_belts.cpp","control/formal.h"],
+	copts=["-DBALL_COLLECTOR_BELTS_TEST"],
+	deps=[":interface",":nop",":countdown_timer"],
+	timeout="short"
+)
+
 cc_library(
 	name="drivebase",
 	srcs=["control/drivebase.cpp"],

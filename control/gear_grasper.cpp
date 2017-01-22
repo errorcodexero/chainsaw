@@ -45,7 +45,7 @@ Gear_grasper::Output Gear_grasper::Output_applicator::operator()(Robot_outputs r
 	return robot_outputs.solenoid[GEAR_GRASPER_SOLENOID]?Gear_grasper::Output::OPEN:Gear_grasper::Output::CLOSE;
 }
 
-Gear_grasper::Output control(Gear_grasper::Status_detail,Gear_grasper::Goal goal){
+Gear_grasper::Output control(Gear_grasper::Status_detail status,Gear_grasper::Goal goal){
 	switch(goal){
 		case Gear_grasper::Goal::OPEN:
 			return Gear_grasper::Output::OPEN;
@@ -72,7 +72,7 @@ bool ready(Gear_grasper::Status status,Gear_grasper::Goal goal){
 		case Gear_grasper::Goal::OPEN:
 			return status==Gear_grasper::Status::OPEN;
 		case Gear_grasper::Goal::CLOSE:
-			return status==Gear_grasper::Status::CLOSE;
+			return status==Gear_grasper::Status::CLOSED;
 		case Gear_grasper::Goal::X:
 			return 1;
 		default:
@@ -101,7 +101,7 @@ Gear_grasper::Estimator::Estimator():
 	last_output(Gear_grasper::Output::CLOSE)
 {}
 
-Gear_grasper::Estimator::update(Time now,Input,Output output){
+void Gear_grasper::Estimator::update(Time now,Input,Output output){
 	until_finish.update(now,1);
 	if(output!=last_output){
 		until_finish.set(.3);//time to open or close, totally made up.
@@ -109,7 +109,7 @@ Gear_grasper::Estimator::update(Time now,Input,Output output){
 	last_output=output;
 }
 
-Gear_grasper::Estimator::get()const{
+Gear_grasper::Status_detail Gear_grasper::Estimator::get()const{
 	if(until_finish.done()){
 		if(last_output==Output::OPEN){
 			return Status::OPEN;
