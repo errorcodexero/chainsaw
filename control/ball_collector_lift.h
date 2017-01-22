@@ -15,6 +15,10 @@ struct Ball_collector_lift{
 	#undef X
 
 	struct Output_applicator{
+		int solenoid;
+
+		explicit Output_applicator(int);
+
 		Robot_outputs operator()(Robot_outputs,Output)const;
 		Output operator()(Robot_outputs)const;
 	};
@@ -42,6 +46,8 @@ struct Ball_collector_lift{
 		Status_detail get()const;
 	};
 	Estimator estimator;
+
+	Ball_collector_lift();
 };
 
 std::ostream& operator<<(std::ostream& o,Ball_collector_lift const&);
@@ -52,7 +58,11 @@ std::ostream& operator<<(std::ostream&,Ball_collector_lift::Goal);
 std::set<Ball_collector_lift::Output> examples(const Ball_collector_lift::Output*);
 std::ostream& operator<<(std::ostream&,Ball_collector_lift::Output);
 
+std::set<Ball_collector_lift::Status_detail> examples(const Ball_collector_lift::Status_detail*);
+std::ostream& operator<<(std::ostream&,Ball_collector_lift::Status_detail);
+
 Ball_collector_lift::Output control(Ball_collector_lift::Status_detail,Ball_collector_lift::Goal);
 bool ready(Ball_collector_lift::Status,Ball_collector_lift::Goal);
+Ball_collector_lift::Status status(Ball_collector_lift::Status_detail);
 
 #endif

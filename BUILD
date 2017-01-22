@@ -409,26 +409,48 @@ cc_test(
 )
 
 cc_test(
-	name="gear_grasper",
+	name="gear_grasper_test",
 	srcs=["control/gear_grasper.h","control/gear_grasper.cpp","control/formal.h"],
 	copts=["-DGEAR_GRASPER_TEST"],
 	deps=[":interface",":toplevel",":nop"],
 	timeout="short"
 )
 
-cc_test(
+cc_library(
 	name="ball_collector_lift",
+	srcs=["control/ball_collector_lift.cpp"],
+	hdrs=["control/ball_collector_lift.h"],
+	deps=[":interface",":nop",":countdown_timer"],
+)
+
+cc_test(
+	name="ball_collector_lift_test",
 	srcs=["control/ball_collector_lift.h","control/ball_collector_lift.cpp","control/formal.h"],
 	copts=["-DBALL_COLLECTOR_LIFT_TEST"],
 	deps=[":interface",":nop",":countdown_timer"],
 	timeout="short"
 )
 
-cc_test(
+cc_library(
 	name="ball_collector_belts",
+	srcs=["control/ball_collector_belts.cpp"],
+	hdrs=["control/ball_collector_belts.h"],
+	deps=[":interface",":nop",":countdown_timer"]
+)
+
+cc_test(
+	name="ball_collector_belts_test",
 	srcs=["control/ball_collector_belts.h","control/ball_collector_belts.cpp","control/formal.h"],
 	copts=["-DBALL_COLLECTOR_BELTS_TEST"],
 	deps=[":interface",":nop",":countdown_timer"],
+	timeout="short"
+)
+
+cc_test(
+	name="gear_lift",
+	srcs=["control/gear_lift.h","control/gear_lift.cpp","control/formal.h"],
+	copts=["-DGEAR_LIFT_TEST"],
+	deps=[":ball_collector_lift"],
 	timeout="short"
 )
 

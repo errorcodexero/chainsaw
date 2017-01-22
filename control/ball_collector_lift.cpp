@@ -114,13 +114,19 @@ set<T::Output> examples(const T::Output*){
 
 static const int BALL_COLLECTOR_LIFT_SOLENOID=2;
 
+T::T():output_applicator(BALL_COLLECTOR_LIFT_SOLENOID){}
+
+T::Output_applicator::Output_applicator(int i):
+	solenoid(i) //could check that this is a reasonable number.
+{}
+
 Robot_outputs T::Output_applicator::operator()(Robot_outputs robot_outputs,T::Output output)const{
-	robot_outputs.solenoid[BALL_COLLECTOR_LIFT_SOLENOID]=(output==Output::DOWN);
+	robot_outputs.solenoid[solenoid]=(output==Output::DOWN);
 	return robot_outputs;
 }
 
 T::Output T::Output_applicator::operator()(Robot_outputs robot_outputs)const{
-	return robot_outputs.solenoid[BALL_COLLECTOR_LIFT_SOLENOID]?Output::DOWN:Output::UP;
+	return robot_outputs.solenoid[solenoid]?Output::DOWN:Output::UP;
 	nyi
 }
 
