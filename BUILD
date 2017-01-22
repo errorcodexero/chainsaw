@@ -408,6 +408,14 @@ cc_test(
 	timeout="short"
 )
 
+cc_test(
+	name="gear_grasper",
+	srcs=["control/gear_grasper.h","control/gear_grasper.cpp","control/formal.h"],
+	copts=["-DGEAR_GRASPER_TEST"],
+	deps=[":interface",":toplevel",":nop"],
+	timeout="short"
+)
+
 cc_library(
 	name="drivebase",
 	srcs=["control/drivebase.cpp"],

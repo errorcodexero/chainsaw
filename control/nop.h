@@ -20,12 +20,14 @@ struct Nop{
 		Robot_outputs operator()(Robot_outputs,Output)const;
 	};
 
-	struct Estimator{
+	template<typename Status_detail>
+	struct Estimator_nop{
 		template<typename Input,typename Output>
 		void update(Time,Input,Output){}
 
-		Status_detail get()const;
+		Status_detail get()const{ return {}; }
 	};
+	using Estimator=Estimator_nop<Status_detail>;
 
 	Input_reader input_reader;
 	Output_applicator output_applicator;
@@ -41,7 +43,11 @@ std::ostream& operator<<(std::ostream&,Nop::Input const&);
 bool operator==(Nop::Input_reader,Nop::Input_reader);
 bool operator==(Nop::Output_applicator,Nop::Output_applicator);
 
-bool operator==(Nop::Estimator,Nop::Estimator);
+template<typename T>
+bool operator==(Nop::Estimator_nop<T>,Nop::Estimator_nop<T>){
+	return 1;
+}
+
 bool operator!=(Nop::Estimator,Nop::Estimator);
 
 std::ostream& operator<<(std::ostream&,Nop const&);
