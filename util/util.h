@@ -66,6 +66,18 @@ double sum(std::vector<double> const&);
 double mean(std::vector<double> const&);
 double stddev(std::vector<double> const&);
 
+template<size_t LEN>
+double sum(std::array<double,LEN> const& a){
+	double r=0;
+	for(auto elem:a) r+=elem;
+	return r;
+}
+
+template<size_t LEN>
+double mean(std::array<double,LEN> const& a){
+	return sum(a)/LEN;
+}
+
 template<typename T>
 std::string as_string(T const& t){
 	std::stringstream ss;

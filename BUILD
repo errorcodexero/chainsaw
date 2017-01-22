@@ -394,6 +394,21 @@ cc_test(
 )
 
 cc_library(
+	name="gear_shifter",
+	srcs=["control/gear_shifter.cpp"],
+	hdrs=["control/gear_shifter.h"],
+	deps=[":drivebase",":nop"]
+)
+
+cc_test(
+	name="gear_shifter_test",
+	srcs=["control/gear_shifter.cpp","control/gear_shifter.h","control/formal.h"],
+	copts=["-DGEAR_SHIFTER_TEST"],
+	deps=[":interface",":countdown_timer",":drivebase",":nop"],
+	timeout="short"
+)
+
+cc_library(
 	name="drivebase",
 	srcs=["control/drivebase.cpp"],
 	hdrs=["control/drivebase.h","util/quick.h"],
