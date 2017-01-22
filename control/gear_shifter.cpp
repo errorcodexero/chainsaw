@@ -117,7 +117,7 @@ Gear_shifter::Output Gear_shifter::Output_applicator::operator()(Robot_outputs r
 	return robot_outputs.solenoid[SHIFTER_SOLENOID]?Gear_shifter::Output::HIGH:Gear_shifter::Output::LOW;
 }
 
-set<bool> examples(bool*){ return {0,1}; }
+set<bool> examples(const bool*){ return {0,1}; }
 
 set<Gear_shifter::Goal> examples(const Gear_shifter::Goal*){
 	#define X(A) Gear_shifter::Goal::A,

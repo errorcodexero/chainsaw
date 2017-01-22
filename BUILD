@@ -455,6 +455,21 @@ cc_test(
 )
 
 cc_library(
+	name="agitator",
+	srcs=["control/agitator.cpp"],
+	hdrs=["control/agitator.h"],
+	deps=[":nop",":gear_shifter"]
+)
+
+cc_test(
+	name="agitator_test",
+	srcs=["control/agitator.cpp","control/agitator.h","control/formal.h"],
+	copts=["-DAGITATOR_TEST"],
+	deps=[":nop",":gear_shifter"],
+	timeout="short"
+)
+
+cc_library(
 	name="drivebase",
 	srcs=["control/drivebase.cpp"],
 	hdrs=["control/drivebase.h","util/quick.h"],
