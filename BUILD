@@ -423,6 +423,20 @@ cc_test(
 	timeout="short"
 )
 
+cc_library(
+	name="intake",
+	srcs=["control/intake.cpp","control/nop.cpp"],
+	hdrs=["control/intake.h","control/nop.h"],
+	deps=[":interface"]
+)
+
+cc_test(
+	name="intake_test",
+	srcs=["control/intake.cpp","control/intake.h","control/nop.h","control/nop.cpp","control/formal.h"],
+	copts=["-DINTAKE_TEST"],
+	deps=[":interface"],
+	timeout="short"
+)
 
 cc_library(
 	name="force",
@@ -451,14 +465,14 @@ cc_library(
 	name="toplevel",
 	srcs=["control/toplevel.cpp"],
 	hdrs=["control/toplevel.h"],
-	deps=[":pump",":drivebase",":winch",":input"]
+	deps=[":pump",":drivebase",":winch",":intake",":input"]
 )
 
 cc_test(
 	name="toplevel_test",
 	srcs=["control/toplevel.cpp","control/toplevel.h","control/formal.h"],
 	copts=["-DTOPLEVEL_TEST"],
-	deps=[":pump",":drivebase",":winch",":input",":output"],
+	deps=[":pump",":drivebase",":winch",":intake",":input",":output"],
 	timeout="short"
 )
 

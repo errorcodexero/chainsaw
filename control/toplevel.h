@@ -5,12 +5,14 @@
 #include "pump.h"
 #include "drivebase.h"
 #include "winch.h"
+#include "intake.h"
 
 #define TOPLEVEL_ITEMS \
 	X(Drivebase,drive,)\
 	X(Pump,pump,Pump::Goal::AUTO)\
 	X(Winch,winch,Winch::Goal::STOP) \
-
+	X(Intake,intake,Intake::Goal::OFF)
+	
 class Toplevel{
 	public:
 
