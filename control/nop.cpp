@@ -42,9 +42,9 @@ Robot_outputs Nop::Output_applicator::operator()(Robot_outputs a,Nop::Output)con
 	return a;
 }
 
-bool operator==(Nop::Estimator,Nop::Estimator){ return 1; }
+/*bool operator==(Nop::Estimator,Nop::Estimator){ return 1; }
 bool operator!=(Nop::Estimator,Nop::Estimator){ return 0; }
-Nop::Status_detail Nop::Estimator::get()const{ return {}; }
+Nop::Status_detail Nop::Estimator::get()const{ return {}; }*/
 
 Nop::Status status(Nop::Status_detail a){ return a; }
 Nop::Output control(Nop::Status_detail,Nop::Goal){ return {}; }

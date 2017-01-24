@@ -394,6 +394,97 @@ cc_test(
 )
 
 cc_library(
+	name="gear_shifter",
+	srcs=["control/gear_shifter.cpp"],
+	hdrs=["control/gear_shifter.h"],
+	deps=[":drivebase",":nop"]
+)
+
+cc_test(
+	name="gear_shifter_test",
+	srcs=["control/gear_shifter.cpp","control/gear_shifter.h","control/formal.h"],
+	copts=["-DGEAR_SHIFTER_TEST"],
+	deps=[":interface",":countdown_timer",":drivebase",":nop"],
+	timeout="short"
+)
+
+cc_test(
+	name="gear_grasper_test",
+	srcs=["control/gear_grasper.h","control/gear_grasper.cpp","control/formal.h"],
+	copts=["-DGEAR_GRASPER_TEST"],
+	deps=[":interface",":toplevel",":nop"],
+	timeout="short"
+)
+
+cc_library(
+	name="ball_collector_lift",
+	srcs=["control/ball_collector_lift.cpp"],
+	hdrs=["control/ball_collector_lift.h"],
+	deps=[":interface",":nop",":countdown_timer"],
+)
+
+cc_test(
+	name="ball_collector_lift_test",
+	srcs=["control/ball_collector_lift.h","control/ball_collector_lift.cpp","control/formal.h"],
+	copts=["-DBALL_COLLECTOR_LIFT_TEST"],
+	deps=[":interface",":nop",":countdown_timer"],
+	timeout="short"
+)
+
+cc_library(
+	name="ball_collector_belts",
+	srcs=["control/ball_collector_belts.cpp"],
+	hdrs=["control/ball_collector_belts.h"],
+	deps=[":interface",":nop",":countdown_timer"]
+)
+
+cc_test(
+	name="ball_collector_belts_test",
+	srcs=["control/ball_collector_belts.h","control/ball_collector_belts.cpp","control/formal.h"],
+	copts=["-DBALL_COLLECTOR_BELTS_TEST"],
+	deps=[":interface",":nop",":countdown_timer"],
+	timeout="short"
+)
+
+cc_test(
+	name="gear_lift",
+	srcs=["control/gear_lift.h","control/gear_lift.cpp","control/formal.h"],
+	copts=["-DGEAR_LIFT_TEST"],
+	deps=[":ball_collector_lift"],
+	timeout="short"
+)
+
+cc_library(
+	name="agitator",
+	srcs=["control/agitator.cpp"],
+	hdrs=["control/agitator.h"],
+	deps=[":nop",":gear_shifter"]
+)
+
+cc_test(
+	name="agitator_test",
+	srcs=["control/agitator.cpp","control/agitator.h","control/formal.h"],
+	copts=["-DAGITATOR_TEST"],
+	deps=[":nop",":gear_shifter"],
+	timeout="short"
+)
+
+cc_library(
+	name="shooter",
+	srcs=["control/shooter.cpp"],
+	hdrs=["control/shooter.h","util/quick.h"],
+	deps=[":interface",":countdown_timer"]
+)
+
+cc_test(
+	name="shooter_test",
+	srcs=["control/shooter.cpp","control/shooter.h","control/formal.h","util/quick.h"],
+	copts=["-DSHOOTER_TEST"],
+	deps=[":interface",":countdown_timer"],
+	timeout="short"
+)
+
+cc_library(
 	name="drivebase",
 	srcs=["control/drivebase.cpp"],
 	hdrs=["control/drivebase.h","util/quick.h"],

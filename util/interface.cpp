@@ -515,6 +515,12 @@ ostream& operator<<(ostream& o,Alliance a){
 	return o<<")";
 }
 
+DS_info::DS_info():
+	connected(0),
+	alliance(Alliance::RED),
+	location(1)
+{}
+
 ostream& operator<<(ostream& o,DS_info d){
 	o<<"DS_info(";
 	o<<"connected:"<<d.connected;
