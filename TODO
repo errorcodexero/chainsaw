@@ -7,6 +7,10 @@ HIGH PRIORITY:
 	- Drive base
 		- Add in gear shifting
 		- Auto gear shifting
+	- Ball collector
+		- Lift
+		- Arm
+		- Intake
 	- Autonomous:
 		- Simple one that only crosses the base line
 	- Add in a Control struct that is set by either the panel or the gamepad to make teleop decisions based on user input easier?
