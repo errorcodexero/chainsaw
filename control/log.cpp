@@ -201,6 +201,11 @@ void visit(Func f,Winch::Status const& a){
 }
 
 template<typename Func>
+void visit(Func f,Nop::Status const& a){
+	f.terminal(a);
+}
+
+template<typename Func>
 void visit(Func f,Drivebase::Encoder_ticks const& a){
 	f.terminal(a);
 }
