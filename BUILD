@@ -470,6 +470,21 @@ cc_test(
 )
 
 cc_library(
+	name="shooter",
+	srcs=["control/shooter.cpp"],
+	hdrs=["control/shooter.h","util/quick.h"],
+	deps=[":interface",":countdown_timer"]
+)
+
+cc_test(
+	name="shooter_test",
+	srcs=["control/shooter.cpp","control/shooter.h","control/formal.h","util/quick.h"],
+	copts=["-DSHOOTER_TEST"],
+	deps=[":interface",":countdown_timer"],
+	timeout="short"
+)
+
+cc_library(
 	name="drivebase",
 	srcs=["control/drivebase.cpp"],
 	hdrs=["control/drivebase.h","util/quick.h"],
