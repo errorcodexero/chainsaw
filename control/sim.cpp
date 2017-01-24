@@ -57,6 +57,7 @@ ostream& operator<<(ostream& o,Nop_sim<T> const& a){
 using Drivebase_sim=Nop_sim<Drivebase::Input>;
 using Pump_sim=Nop_sim<Pump::Input>;
 using Winch_sim=Nop_sim<Winch::Input>;
+using Intake_sim=Nop_sim<Intake::Input>;
 
 struct Toplevel_sim{
 	using Input=Toplevel::Input;
