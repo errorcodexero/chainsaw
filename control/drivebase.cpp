@@ -7,8 +7,12 @@
 using namespace std;
 
 // talon locations are -1
-#define R_MOTOR_LOC 0
-#define L_MOTOR_LOC 1
+#define R_MOTOR_LOC_1 0
+#define R_MOTOR_LOC_2 1
+#define R_MOTOR_LOC_3 2
+#define L_MOTOR_LOC_1 3
+#define L_MOTOR_LOC_2 4
+#define L_MOTOR_LOC_3 5
 
 unsigned pdb_location(Drivebase::Motor m){
 	#define X(NAME,INDEX) if(m==Drivebase::NAME) return INDEX;
@@ -215,9 +219,12 @@ void Drivebase::Estimator::update(Time now,Drivebase::Input in,Drivebase::Output
 
 Robot_outputs Drivebase::Output_applicator::operator()(Robot_outputs robot,Drivebase::Output b)const{
 	//cout<<"\nOutputs: "<<b<<"\n";
-	robot.pwm[R_MOTOR_LOC] = b.r;
-	robot.pwm[L_MOTOR_LOC] = b.l;
-
+	robot.pwm[R_MOTOR_LOC_1] = b.r;
+	robot.pwm[R_MOTOR_LOC_2] = b.r;
+	robot.pwm[R_MOTOR_LOC_3] = b.r;
+	robot.pwm[L_MOTOR_LOC_1] = b.l;
+	robot.pwm[L_MOTOR_LOC_2] = b.l;
+	robot.pwm[L_MOTOR_LOC_3] = b.l;
 
 	auto set_encoder=[&](unsigned int a, unsigned int b,unsigned int loc){
 		robot.digital_io[a] = Digital_out::encoder(loc,1);
@@ -238,8 +245,8 @@ Robot_outputs Drivebase::Output_applicator::operator()(Robot_outputs robot,Drive
 Drivebase::Output Drivebase::Output_applicator::operator()(Robot_outputs robot)const{
 	//assuming both motors on the same side are set to the same value//FIXME ?
 	return Drivebase::Output{	
-		robot.pwm[L_MOTOR_LOC],
-		robot.pwm[R_MOTOR_LOC]
+		robot.pwm[L_MOTOR_LOC_1],
+		robot.pwm[R_MOTOR_LOC_1],
 	};
 }
 

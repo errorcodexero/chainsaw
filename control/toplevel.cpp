@@ -609,8 +609,8 @@ int main(){
 			case 0: return "UNUSED";
 			case 1: return *found.begin();
 			default:
-				//return "----CONFLICT!----"+as_string(found);
-				assert(0);//check io's. probably assigning more than one thing to the same one
+				return "----CONFLICT!----"+as_string(found);
+				//FIXME assert(0);//check io's. probably assigning more than one thing to the same one
 		}
 	};
 	for(auto a:outputs()){
