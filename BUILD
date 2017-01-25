@@ -559,7 +559,8 @@ cc_library(
 		"executive/teleop.cpp",
 		"executive/auto_forward.cpp",
 		"executive/auto_distance.cpp",
-		"executive/auto_baseline.cpp"
+		"executive/auto_baseline.cpp",
+		"executive/auto_gearboiler.cpp"
 	],
 	hdrs=[
 		"executive/delay.h",
@@ -568,7 +569,8 @@ cc_library(
 		"executive/teleop.h",
 		"executive/auto_forward.h",
 		"executive/auto_distance.h",
-		"executive/auto_baseline.h"
+		"executive/auto_baseline.h",
+		"executive/auto_gearboiler.h"
 	],
 	deps=[":executive",":posedge_trigger_debounce",":posedge_toggle",":motion_profile"]
 )
@@ -623,6 +625,18 @@ cc_test(
 	],
 	timeout = "short"
 )
+
+cc_test(
+        name="auto_gearboiler_test",
+        srcs=["executive/auto_gearboiler.cpp","executive/auto_gearboiler.h"],
+        copts=["-DAUTO_GEARBOILER_TEST"],
+        deps=[
+                ":executive",":executive_impl",
+                ":test"
+        ],
+        timeout = "short"
+)
+
 cc_library(
 	name="executive",
 	srcs=["executive/executive.cpp"],
