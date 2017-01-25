@@ -16,9 +16,9 @@ unsigned pdb_location(Drivebase::Motor m){
 	X(LEFT1,1)
 	X(LEFT2,2)
 	X(LEFT3,3)
-	X(RIGHT1,12)
-	X(RIGHT2,13)
-	X(RIGHT3,14)
+	X(RIGHT1,13)
+	X(RIGHT2,14)
+	X(RIGHT3,15)
 	#undef X
 	assert(0);
 	//assert(m>=0 && m<Drivebase::MOTORS);
