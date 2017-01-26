@@ -219,15 +219,16 @@ void Drivebase::Estimator::update(Time now,Drivebase::Input in,Drivebase::Output
 
 Robot_outputs Drivebase::Output_applicator::operator()(Robot_outputs robot,Drivebase::Output b)const{
 	//cout<<"\nOutputs: "<<b<<"\n";
-	robot.pwm[L_MOTOR_LOC_1] = b.r;
-	robot.pwm[L_MOTOR_LOC_2] = b.r;
-	robot.pwm[L_MOTOR_LOC_3] = b.r;
-	robot.pwm[R_MOTOR_LOC_1] = b.l;
-	robot.pwm[R_MOTOR_LOC_2] = b.l;
-	robot.pwm[R_MOTOR_LOC_3] = b.l;
+	robot.pwm[L_MOTOR_LOC_1] = b.l;
+	robot.pwm[L_MOTOR_LOC_2] = b.l;
+	robot.pwm[L_MOTOR_LOC_3] = b.l;
+	robot.pwm[R_MOTOR_LOC_1] = -b.r;
+	robot.pwm[R_MOTOR_LOC_2] = -b.r;
+	robot.pwm[R_MOTOR_LOC_3] = -b.r;
 
 	cout<<"b.l: "<<b.l<<'\n';
 	cout<<"b.r: "<<b.r<<'\n';
+	cout<<"pwms: "<<robot.pwm<<'\n';
 
 	auto set_encoder=[&](unsigned int a, unsigned int b,unsigned int loc){
 		robot.digital_io[a] = Digital_out::encoder(loc,1);
@@ -249,7 +250,7 @@ Drivebase::Output Drivebase::Output_applicator::operator()(Robot_outputs robot)c
 	//assuming both motors on the same side are set to the same value//FIXME ?
 	return Drivebase::Output{	
 		robot.pwm[L_MOTOR_LOC_1],
-		robot.pwm[R_MOTOR_LOC_1],
+		-robot.pwm[R_MOTOR_LOC_1],
 	};
 }
 
