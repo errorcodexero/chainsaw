@@ -454,6 +454,21 @@ cc_test(
 )
 
 cc_library(
+	name="gear_grabber",
+	srcs=["control/gear_grabber.cpp","util/countdown_timer.cpp"],
+	hdrs=["control/gear_grabber.h","util/countdown_timer.h"],
+	deps=[":interface"]
+)
+
+cc_test(
+	name="gear_grabber_test",
+	srcs=["control/gear_grabber.cpp","control/gear_grabber.h","util/countdown_timer.cpp","util/countdown_timer.h","control/formal.h"],
+	copts=["-DGEAR_GRABBER_TEST"],
+	deps=[":interface"],
+	timeout="short"
+)
+
+cc_library(
 	name="force",
 	srcs=["control/force.cpp"],
 	hdrs=["control/force.h"],
