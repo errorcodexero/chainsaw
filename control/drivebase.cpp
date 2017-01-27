@@ -6,7 +6,6 @@
 
 using namespace std;
 
-// talon locations are -1
 #define L_MOTOR_LOC_1 0
 #define L_MOTOR_LOC_2 1
 #define L_MOTOR_LOC_3 2
@@ -34,10 +33,10 @@ int encoderconv(Maybe_inline<Encoder_output> encoder){
 }
 
 double ticks_to_inches(const int ticks){
-	const unsigned int TICKS_PER_REVOLUTION=100;
-	const double WHEEL_DIAMETER=7.4;//inches
+	const unsigned int TICKS_PER_REVOLUTION=200;//for 2017
+	const double WHEEL_DIAMETER=4.0;//inches for 2017
 	const double WHEEL_CIRCUMFERENCE=WHEEL_DIAMETER*PI;//inches
-	const double INCHES_PER_TICK=WHEEL_CIRCUMFERENCE/(double)TICKS_PER_REVOLUTION;//0.25 vs 0.251327
+	const double INCHES_PER_TICK=WHEEL_CIRCUMFERENCE/(double)TICKS_PER_REVOLUTION;
 	return ticks*INCHES_PER_TICK;
 }
 
