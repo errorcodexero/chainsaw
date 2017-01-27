@@ -87,6 +87,7 @@ CMP1(Drivebase::Speeds)
 
 std::ostream& operator<<(std::ostream&,Drivebase::Input const&);
 bool operator<(Drivebase::Input const&,Drivebase::Input const&);
+bool operator==(Drivebase::Input const&,Drivebase::Input const&);
 bool operator!=(Drivebase::Input const&,Drivebase::Input const&);
 std::set<Drivebase::Input> examples(Drivebase::Input*);
 

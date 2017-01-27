@@ -319,6 +319,21 @@ cc_test(
 )
 
 cc_library(
+	name="speed_tracker",
+	srcs=["util/speed_tracker.cpp"],
+	hdrs=["util/speed_tracker.h"],
+	deps=[":interface"]
+)
+
+cc_test(
+	name="speed_tracker_test",
+	srcs=["util/speed_tracker.cpp","util/speed_tracker.h"],
+	copts=["-DSPEED_TRACKER_TEST"],
+	deps=[":interface"],
+	timeout="short"
+)
+
+cc_library(
 	name="meta",
 	srcs=["util/meta.cpp"],
 	hdrs=["util/meta.h"],
@@ -390,6 +405,21 @@ cc_test(
 	srcs=["control/log.cpp","control/log.h","control/formal.h"],
 	copts=["-DLOG_TEST"],
 	deps=[":interface",":toplevel"],
+	timeout="short"
+)
+
+cc_library(
+	name="gear_shifter",
+	srcs=["control/gear_shifter.cpp"],
+	hdrs=["control/gear_shifter.h"],
+	deps=[":nop",":drivebase",":interface",":speed_tracker",":countdown_timer"]
+)
+
+cc_test(
+	name="gear_shifter_test",
+	srcs=["control/gear_shifter.cpp","control/gear_shifter.h","control/formal.h"],
+	copts=["-DGEAR_SHIFTER_TEST"],
+	deps=[":nop",":drivebase",":interface",":speed_tracker",":countdown_timer"],
 	timeout="short"
 )
 
@@ -660,8 +690,7 @@ cc_library(
 )
 
 cc_test(
-	name="executive_test",
-	srcs=["executive/executive.cpp","executive/executive.h"],
+	name="executive_test",	srcs=["executive/executive.cpp","executive/executive.h"],
 	copts=["-DEXECUTIVE_TEST"],
 	deps=[":executive_impl",":panel",":type"],
 	timeout="short"
