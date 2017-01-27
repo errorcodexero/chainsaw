@@ -32,6 +32,8 @@ int read_file(string const& filename,string &out){
 	return 0;
 }
 
+double mean(double a,double b) { return (a+b)/2; }
+
 double sum(std::vector<double> const& v){
 	double total=0;
 	for(unsigned i=0;i<v.size();i++) total+=v[i];

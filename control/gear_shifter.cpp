@@ -16,14 +16,49 @@ Gear_shifter::Output Gear_shifter::Output_applicator::operator()(Robot_outputs r
 	return robot.solenoid[R_SHIFTER_SOLENOID]?Output::HIGH:Output::LOW;
 }
 
-Gear_shifter::Estimator::Estimator(){}
+Gear_shifter::Estimator::Estimator():last_current(0),last_output(Output::LOW),recommended(Output::LOW){}
 
 Gear_shifter::Status_detail Gear_shifter::Estimator::get()const{
-	return {};
+	return recommended;
 }
 
-void Gear_shifter::Estimator::update(Time,Input,Output){
+void Gear_shifter::Estimator::update(Time now,Input in,Output out){
+	static const double SHIFT_DELAY=2; //seconds between shifts
+	no_shift.update(now,1);
+	if(out!=last_output) no_shift.set(SHIFT_DELAY);
+	if(!no_shift.done()){
+		recommended=out;
+		return;
+	}
 
+	const double CURRENT_SPIKE_THRESHOLD=50;//TODO: Test this value
+	double current_spike=sum(in.current)-last_current;
+	last_current=sum(in.current);
+	if(current_spike>CURRENT_SPIKE_THRESHOLD){
+		recommended=Output::LOW;
+		return;
+	}
+
+	double l_speed=l_tracker.update(now,in.ticks.l);
+	double r_speed=r_tracker.update(now,in.ticks.r);
+
+	const double TURN_THRESHOLD=1.2;
+	if(l_speed>r_speed*TURN_THRESHOLD || r_speed>l_speed*TURN_THRESHOLD){
+		recommended=out;
+		return;
+	}
+
+	double speed=mean(l_speed,r_speed);
+	
+	if(speed<8){
+		recommended=Output::LOW;
+		return;
+	}else if(speed>10){
+		recommended=Output::HIGH;
+		return;
+	}
+
+	recommended=out;
 }
 
 ostream& operator<<(ostream& o,Gear_shifter::Goal const& g){

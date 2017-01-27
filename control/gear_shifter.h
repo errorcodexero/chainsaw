@@ -34,7 +34,10 @@ struct Gear_shifter{
 	};
 
 	struct Estimator{
-		
+		Speed_tracker l_tracker,r_tracker;
+		double last_current;
+		Output last_output,recommended;
+		Countdown_timer no_shift;
 
 		Estimator();
 		Status_detail get()const;
