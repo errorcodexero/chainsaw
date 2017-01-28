@@ -602,6 +602,8 @@ int main(){
 	TOPLEVEL_ITEMS
 	#undef X
 
+	const string CONFLICT_MESSAGE = "----CONFLICT!----";
+
 	auto find_output=[=](Output a)->string{
 		set<string> found;
 		for(auto p:output_map){
@@ -613,12 +615,15 @@ int main(){
 			case 0: return "UNUSED";
 			case 1: return *found.begin();
 			default:
-				return "----CONFLICT!----"+as_string(found);
+				return CONFLICT_MESSAGE + as_string(found) + " ------ Check IO's, assignming the same output from multiple parts - EXITING ------";
 				//FIXME assert(0);//check io's. probably assigning more than one thing to the same one
 		}
 	};
 	for(auto a:outputs()){
 		cout<<a<<"\t"<<find_output(a)<<"\n";
+		if(find_output(a).find(CONFLICT_MESSAGE) != string::npos){//fails the test if there are conflicts
+			exit(1);//change this if you want to allow conflicting assignments
+		}
 	}
 
 	//tester(Toplevel{});
