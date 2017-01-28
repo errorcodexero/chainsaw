@@ -427,14 +427,14 @@ cc_library(
         name="collector",
         srcs=["control/collector.cpp"],
         hdrs=["control/collector.h"],
-        deps=[":intake"]
+        deps=[":intake",":arm"]
 )
 
 cc_test(
         name="collector_test",
         srcs=["control/collector.cpp","control/collector.h","control/formal.h"],
         copts=["-DCOLLECTOR_TEST"],
-        deps=[":intake"],
+        deps=[":intake",":arm"],
         timeout="short"
 )
 

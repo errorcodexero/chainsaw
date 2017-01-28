@@ -2,9 +2,9 @@
 
 using namespace std;
 
-Collector::Goal::Goal():intake(Intake::Goal::OFF){}
+Collector::Goal::Goal():intake(Intake::Goal::OFF),arm(Arm::Goal::IN){}
 
-Collector::Goal::Goal(Intake::Goal i):intake(i){}
+Collector::Goal::Goal(Intake::Goal i,Arm::Goal a):intake(i),arm(a){}
 
 ostream& operator<<(ostream& o,Collector const&){
 	return o<<"Collector()";
@@ -219,7 +219,9 @@ set<Collector::Status_detail> examples(Collector::Status_detail*){
 	}};*/
 	set<Collector::Status_detail> r;
 	for(auto a:examples((Intake::Status_detail*)0)){
-		r|=Collector::Status_detail{a};
+		for(auto b:examples((Arm::Status_detail*)0)){
+			r|=Collector::Status_detail{a,b};
+		}
 	}
 	return r;
 }
@@ -237,7 +239,9 @@ set<Collector::Goal> examples(Collector::Goal*){
 	}};*/
 	set<Collector::Goal> r;
 	for(auto a:examples((Intake::Goal*)0)){
-		r|=Collector::Goal{a};
+		for(auto b:examples((Arm::Goal*)0)){
+			r|=Collector::Goal{a,b};
+		}
 	}
 	return r;
 }
@@ -245,7 +249,9 @@ set<Collector::Goal> examples(Collector::Goal*){
 set<Collector::Output> examples(Collector::Output*){
 	set<Collector::Output> r;
 	for(auto a:examples((Intake::Output*)0)){
-		r|=Collector::Output{a};
+		for(auto b:examples((Arm::Output*)0)){
+			r|=Collector::Output{a,b};
+		}
 	}
 	return r;
 	//return {{}};
@@ -258,7 +264,9 @@ set<Collector::Output> examples(Collector::Output*){
 set<Collector::Status> examples(Collector::Status*){
 	set<Collector::Status> r;
 	for(auto a:examples((Intake::Status*)nullptr)){
-		r|=Collector::Status{a};
+		for(auto b:examples((Arm::Status*)nullptr)){
+			r|=Collector::Status{a,b};
+		}
 	}
 	return r;
 }

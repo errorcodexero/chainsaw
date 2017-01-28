@@ -45,6 +45,7 @@ using Drivebase_sim=Nop_sim<Drivebase::Input>;
 using Pump_sim=Nop_sim<Pump::Input>;
 using Winch_sim=Nop_sim<Winch::Input>;
 using Intake_sim=Nop_sim<Intake::Input>;
+using Arm_sim=Nop_sim<Arm::Input>;
 using Gear_grabber_sim=Nop_sim<Gear_grabber::Input>;
 using Gear_lifter_sim=Nop_sim<Gear_lifter::Input>;
 
