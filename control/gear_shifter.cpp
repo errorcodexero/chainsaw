@@ -39,8 +39,8 @@ void Gear_shifter::Estimator::update(Time now,Input in,Output out){
 		return;
 	}
 
-	double l_speed=l_tracker.update(now,in.ticks.l);
-	double r_speed=r_tracker.update(now,in.ticks.r);
+	double l_speed=ticks_to_inches(l_tracker.update(now,in.ticks.l))/12; //ft/second
+	double r_speed=ticks_to_inches(r_tracker.update(now,in.ticks.r))/12; //ft/second
 
 	const double TURN_THRESHOLD=1.2;
 	if(l_speed>r_speed*TURN_THRESHOLD || r_speed>l_speed*TURN_THRESHOLD){
