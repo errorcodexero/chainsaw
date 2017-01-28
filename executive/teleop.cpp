@@ -39,7 +39,7 @@ Executive Teleop::next_mode(Next_mode_info info) {
 
 IMPL_STRUCT(Teleop::Teleop,TELEOP_ITEMS)
 
-Teleop::Teleop(){}
+Teleop::Teleop():shifter_goal(Gear_shifter::Goal::LOW){}
 
 Toplevel::Goal Teleop::run(Run_info info) {
 	Toplevel::Goal goals;
@@ -49,11 +49,15 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	{//Set drive goals
 		bool spin=fabs(info.main_joystick.axis[Gamepad_axis::RIGHTX])>.01;//drive turning button
 		double boost=info.main_joystick.axis[Gamepad_axis::LTRIGGER],slow=info.main_joystick.axis[Gamepad_axis::RTRIGGER];//turbo and slow buttons	
-	
-		for(int i=0;i<NUDGES;i++){
-			const array<unsigned int,NUDGES> nudge_buttons={Gamepad_button::Y,Gamepad_button::A,Gamepad_button::X,Gamepad_button::B,Gamepad_button::LB,Gamepad_button::RB};
-			//Forward, backward, left, right, clockwise, counter-clockwise
-			if(nudges[i].trigger(boost<.25 && info.main_joystick.button[nudge_buttons[i]])) nudges[i].timer.set(.1);
+
+		POV_section driver_pov=pov_section(info.main_joystick.pov);
+		
+		const array<POV_section,POV_NUDGES> nudge_povs={POV_section::UP,POV_section::DOWN,POV_section::LEFT,POV_section::RIGHT};
+		const array<unsigned int,BUTTON_NUDGES> nudge_buttons={Gamepad_button::LB,Gamepad_button::RB};
+		//Forward, backward, left, right, clockwise, counter-clockwise
+		for(unsigned i=0;i<NUDGES;i++){
+			bool nudge_button_pressed=i<POV_NUDGES?driver_pov==nudge_povs[i]:info.main_joystick.button[nudge_buttons[i%POV_NUDGES]];
+			if(nudges[i].trigger(boost<.25 && nudge_button_pressed)) nudges[i].timer.set(.1);
 			nudges[i].timer.update(info.in.now,enabled);
 		}
 		const double NUDGE_POWER=.2,ROTATE_NUDGE_POWER=.5;
@@ -77,11 +81,17 @@ Toplevel::Goal Teleop::run(Run_info info) {
 		}());
 	}
 
+	if(info.main_joystick.button[Gamepad_button::B]) shifter_goal=Gear_shifter::Goal::AUTO;
+	if(info.main_joystick.button[Gamepad_button::A]) shifter_goal=Gear_shifter::Goal::LOW;
+	if(info.main_joystick.button[Gamepad_button::Y]) shifter_goal=Gear_shifter::Goal::HIGH;
+	goals.shifter=shifter_goal;
+
 	return goals;
 }
 
 #define TELEOP_ITEMS_NO_TYPE(X)\
-	X(nudges)
+	X(nudges)\
+	X(shifter_goal)
 
 bool Teleop::operator<(Teleop const& a)const{
 	#define X(NAME) if(NAME<a.NAME) return 1; if(a.NAME<NAME) return 0;

@@ -7,6 +7,7 @@
 #include "../util/quick.h"
 
 struct Teleop : Executive_impl<Teleop> {
+	static const unsigned POV_NUDGES=4,BUTTON_NUDGES=2;
 	enum Nudges{FORWARD,BACKWARD,LEFT,RIGHT,CLOCKWISE,COUNTERCLOCKWISE,NUDGES};
 	#define NUDGE_ITEMS(X) X(Posedge_trigger,trigger) X(Countdown_timer,timer)
 	struct Nudge{
@@ -15,7 +16,8 @@ struct Teleop : Executive_impl<Teleop> {
 	};
 
 	#define TELEOP_ITEMS(X)\
-		X(SINGLE_ARG(std::array<Nudge,NUDGES>),nudges) 
+		X(SINGLE_ARG(std::array<Nudge,NUDGES>),nudges)\
+		X(Gear_shifter::Goal,shifter_goal)
 	STRUCT_MEMBERS(TELEOP_ITEMS)
 
 	Executive next_mode(Next_mode_info);
