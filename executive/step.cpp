@@ -177,13 +177,13 @@ void test_step(Step a){
 	assert(b==a);
 	//see that can at least run "run", and "done"
 	//a.run(example
-	//todo: try to visit all the possible states that you can get to from the initial one, and see that things don't fail
+	//TODO: try to visit all the possible states that you can get to from the initial one, and see that things don't fail
 	set<Step> visited;
 	queue<Step> to_visit;
 	to_visit|=a;
 
 	//might want to put some limit on the amount of state space that's used.
-	//todo: make a list of the inputs to try
+	//TODO: make a list of the inputs to try
 	//first, run all the "run"s
 	//second, run ready on all the different things and see if any of them change
 	//abort if they do change

@@ -2,7 +2,7 @@
 
 using namespace std;
 
-#define PISTON_LOC 5 
+#define PISTON_LOC 5 //TODO: get real value
 
 Arm::Input::Input():enabled(false){}
 Arm::Input::Input(bool a):enabled(a){}
