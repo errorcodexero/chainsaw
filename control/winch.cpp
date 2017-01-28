@@ -1,6 +1,6 @@
 #include "winch.h"
 
-static const int WINCH_PWM = 5;
+static const int WINCH_PWM = 8;
 static const float WINCH_POWER = .8;
 
 #define HALL_EFFECT_DOWN_LOC 4 //not real number

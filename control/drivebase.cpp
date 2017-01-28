@@ -40,8 +40,8 @@ double ticks_to_inches(const int ticks){
 	return ticks*INCHES_PER_TICK;
 }
 
-#define L_ENCODER_PORTS 0,1
-#define R_ENCODER_PORTS 2,3
+#define R_ENCODER_PORTS 0,1
+#define L_ENCODER_PORTS 2,3
 #define L_ENCODER_LOC 0
 #define R_ENCODER_LOC 1
 
