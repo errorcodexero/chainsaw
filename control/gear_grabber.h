@@ -11,7 +11,7 @@ struct Gear_grabber{
 	typedef Goal Output;
 
 	struct Input{
-		bool closed;//hall-effect
+		bool has_gear;//hall-effect
 		bool enabled;
 		Input();
 		Input(bool,bool);

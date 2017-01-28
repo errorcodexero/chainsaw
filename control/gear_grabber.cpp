@@ -5,8 +5,8 @@ using namespace std;
 #define HALL_EFFECT_LOC 7 //sensor not on robot
 #define PISTON_LOC 6 
 
-Gear_grabber::Input::Input():closed(false),enabled(false){}
-Gear_grabber::Input::Input(bool a,bool b):closed(a),enabled(b){}
+Gear_grabber::Input::Input():has_gear(false),enabled(false){}
+Gear_grabber::Input::Input(bool a,bool b):has_gear(a),enabled(b){}
 
 Gear_grabber::Estimator::Estimator():last(Gear_grabber::Status_detail::OPEN){
 	const Time OPEN_TIME = .2, CLOSE_TIME = .2;
@@ -15,7 +15,7 @@ Gear_grabber::Estimator::Estimator():last(Gear_grabber::Status_detail::OPEN){
 }
 
 bool operator==(const Gear_grabber::Input a,const Gear_grabber::Input b){
-	if(a.closed != b.closed) return false;
+	if(a.has_gear != b.has_gear) return false;
 	return a.enabled == b.enabled;
 }
 
@@ -24,7 +24,7 @@ bool operator!=(const Gear_grabber::Input a,const Gear_grabber::Input b){
 }
 
 bool operator<(const Gear_grabber::Input a,const Gear_grabber::Input b){
-	if(a.closed && !b.closed) return false;
+	if(a.has_gear && !b.has_gear) return false;
 	return !a.enabled && b.enabled;
 }
 
@@ -42,7 +42,7 @@ ostream& operator<<(ostream& o, const Gear_grabber::Estimator a){
 }
 
 ostream& operator<<(ostream& o,const Gear_grabber::Input a){
-	return o<<" Input( closed:"<<a.closed<<" enabled:"<<a.enabled<<")";
+	return o<<"Input(has_gear:"<<a.has_gear<<" enabled:"<<a.enabled<<")";
 }
 
 ostream& operator<<(ostream& o,const Gear_grabber::Goal a){
@@ -112,8 +112,6 @@ void Gear_grabber::Estimator::update(Time time,Input input,Output output){
 			if(close_timer.done()){
 				last = Gear_grabber::Status_detail::CLOSED;
 			}
-			//if(input.closed) last = Gear_grabber::Status_detail::CLOSED;
-			//else last = Gear_grabber::Status_detail::CLOSING;
 			break;
 		default:
 			assert(0);
@@ -135,7 +133,7 @@ Gear_grabber::Output Gear_grabber::Output_applicator::operator()(Robot_outputs r
 }
 
 Robot_inputs Gear_grabber::Input_reader::operator()(Robot_inputs r,Input in)const{
-	r.digital_io.in[HALL_EFFECT_LOC] = in.closed ? Digital_in::_1 : Digital_in::_0;
+	r.digital_io.in[HALL_EFFECT_LOC] = in.has_gear ? Digital_in::_1 : Digital_in::_0;
 	r.robot_mode.enabled = in.enabled;
 	return r;
 }
@@ -173,15 +171,15 @@ int main(){
 		Gear_grabber g;
 		Gear_grabber::Goal goal = Gear_grabber::Goal::CLOSE;
 		const bool ENABLED = true;
-		const Time CLOSE_TIME = 5;//seconds - the amount of time before the simulated hall effect reads that it's closed
+		const Time CLOSE_TIME = 5;//seconds - the amount of time before the simulated hall effect reads that it has a gear
 		for(Time t: range(1000)){
-			bool closed = t >= CLOSE_TIME;
+			bool has_gear = t >= CLOSE_TIME;
 			Gear_grabber::Status_detail status = g.estimator.get();
 			Gear_grabber::Output out = control(status,goal);
 			
 			cout<<"t:"<<t<<"\tgoal:"<<goal<<"\tstatus:"<<status<<"\n";
 			
-			g.estimator.update(t,Gear_grabber::Input{closed,ENABLED},out);
+			g.estimator.update(t,Gear_grabber::Input{has_gear,ENABLED},out);
 			if(ready(status,goal)){
 				cout<<"Goal "<<goal<<" reached. Finishing.\n";
 				break;
@@ -191,13 +189,13 @@ int main(){
 		goal = Gear_grabber::Goal::OPEN;
 
 		for(Time t: range(1000)){
-			bool closed = g.estimator.get() == Gear_grabber::Status_detail::CLOSED;
+			bool has_gear = g.estimator.get() == Gear_grabber::Status_detail::CLOSED;
 			Gear_grabber::Status_detail status = g.estimator.get();
 			Gear_grabber::Output out = control(status,goal);
 			
 			cout<<"t:"<<t<<"\tgoal:"<<goal<<"\tstatus:"<<status<<"\n";
 			
-			g.estimator.update(t,Gear_grabber::Input{closed,ENABLED},out);
+			g.estimator.update(t,Gear_grabber::Input{has_gear,ENABLED},out);
 			if(ready(status,goal)){
 				cout<<"Goal "<<goal<<" reached. Finishing.\n";
 				break;

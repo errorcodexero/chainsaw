@@ -24,19 +24,6 @@ array<pair<size_t,T>,LEN> enumerate(array<T,LEN> a){
 	return r;
 }
 
-/*Drivebase
-Pump (full, estimator=pass-thru)
-Collector
-	front (input=ball preset?, status is a pass-through)
-	sides (input=empty)
-	tilt (done)
-Climb_release - seems to have an input called "enabled", but that's it.  Status is IN,OUT,PROBABLY_OUT,UNKNOWN
-Winch - has an input called deployed, no idea where this is coming from
-Shooter (input(speed RPM,enabled)->speed in RPM)
-*/
-
-//This will probably go away later.
-
 template<typename Input>
 struct Nop_sim{
 	template<typename Output>
@@ -58,6 +45,54 @@ using Drivebase_sim=Nop_sim<Drivebase::Input>;
 using Pump_sim=Nop_sim<Pump::Input>;
 using Winch_sim=Nop_sim<Winch::Input>;
 using Intake_sim=Nop_sim<Intake::Input>;
+using Gear_grabber_sim=Nop_sim<Gear_grabber::Input>;
+using Gear_lifter_sim=Nop_sim<Gear_lifter::Input>;
+
+struct Collector_sim{
+	using Input=Collector::Input;
+	using Output=Collector::Output;
+
+	#define X(A,B) A##_sim B;
+	COLLECTOR_ITEMS(X)
+	 #undef X
+
+	 void update(Time t,bool enable,Output out){
+		#define X(A,B) B.update(t,enable,out.B);
+		COLLECTOR_ITEMS(X)
+		#undef X
+	}
+
+	Input get()const{
+		return Input{
+			#define X(A,B) B.get(),
+			COLLECTOR_ITEMS(X)
+			#undef X
+		};
+	}
+};
+
+struct Gear_collector_sim{
+	using Input=Gear_collector::Input;
+	using Output=Gear_collector::Output;
+
+	#define X(A,B) A##_sim B;
+	GEAR_COLLECTOR_ITEMS(X)
+	#undef X
+
+	void update(Time t,bool enable,Output out){
+		#define X(A,B) B.update(t,enable,out.B);
+		GEAR_COLLECTOR_ITEMS(X)
+		#undef X
+	}
+
+	Input get()const{
+		return Input{
+			#define X(A,B) B.get(),
+			GEAR_COLLECTOR_ITEMS(X)
+			#undef X
+		};
+	}
+};
 
 struct Toplevel_sim{
 	using Input=Toplevel::Input;
@@ -91,6 +126,20 @@ void simulate(SIMULATOR sim,DEVICE device){
 		//device.estimator.update(
 		nyi
 	}
+}
+
+template<typename F>
+void visit(F f,Collector_sim a){
+	#define X(A,B) f(""#B,a.B);
+	COLLECTOR_ITEMS(X)
+	#undef X
+}
+
+template<typename F>
+void visit(F f,Gear_collector_sim a){
+	#define X(A,B) f(""#B,a.B);
+	GEAR_COLLECTOR_ITEMS(X)
+	#undef X
 }
 
 template<typename F>
@@ -180,6 +229,7 @@ void sim_display(T t){
 
 int main(){
 	Toplevel_sim sim;
+
 	sim_display(sim);
 	sim_display(sim.get());
 	sim_display(example((Toplevel::Output*)0));
