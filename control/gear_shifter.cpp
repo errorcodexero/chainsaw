@@ -61,6 +61,8 @@ void Gear_shifter::Estimator::update(Time now,Input in,Output out){
 	recommended=out;
 }
 
+CMP_OPS(Gear_shifter::Estimator,GEAR_SHIFTER_ESTIMATOR)
+
 ostream& operator<<(ostream& o,Gear_shifter::Goal const& g){
 	#define X(A) if(g==Gear_shifter::Goal::A) return o<<"Gear_shifter::Goal("#A")";
 	GEAR_SHIFTER_GOALS

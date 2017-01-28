@@ -510,14 +510,14 @@ cc_library(
 	name="toplevel",
 	srcs=["control/toplevel.cpp"],
 	hdrs=["control/toplevel.h"],
-	deps=[":pump",":drivebase",":winch",":intake",":input"]
+	deps=[":pump",":drivebase",":winch",":intake",":gear_shifter",":input"]
 )
 
 cc_test(
 	name="toplevel_test",
 	srcs=["control/toplevel.cpp","control/toplevel.h","control/formal.h"],
 	copts=["-DTOPLEVEL_TEST"],
-	deps=[":pump",":drivebase",":winch",":intake",":input",":output"],
+	deps=[":pump",":drivebase",":winch",":intake",":gear_shifter",":input",":output"],
 	timeout="short"
 )
 

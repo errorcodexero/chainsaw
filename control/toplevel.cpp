@@ -100,7 +100,8 @@ Toplevel::Output::Output():
 	drive(0.0,0.0),
 	pump(Pump::Output::AUTO),
 	winch(Winch::Output::STOP),
-	intake(Intake::Output::OFF)
+	intake(Intake::Output::OFF),
+	shifter(Gear_shifter::Output::LOW)
 {}
 
 bool operator<(Toplevel::Output const& a,Toplevel::Output const& b){
@@ -334,7 +335,8 @@ set<Toplevel::Status_detail> examples(Toplevel::Status_detail*){
 		*examples((Drivebase::Status_detail*)0).begin(),
 		Pump::Status_detail{Pump::Status::FULL},
 		*examples((Winch::Status_detail*)0).begin(),
-		*examples((Intake::Status_detail*)0).begin()
+		*examples((Intake::Status_detail*)0).begin(),
+		*examples((Gear_shifter::Status_detail*)0).begin()
 	}};
 }
 
@@ -351,7 +353,8 @@ set<Toplevel::Input> examples(Toplevel::Input*){
 		*examples((Drivebase::Input*)0).begin(),
 		Pump::Input{},
 		*examples((Winch::Input*)0).begin(),
-		*examples((Intake::Input*)0).begin()
+		*examples((Intake::Input*)0).begin(),
+		*examples((Gear_shifter::Input*)0).begin()
 	};
 	return {a};
 }

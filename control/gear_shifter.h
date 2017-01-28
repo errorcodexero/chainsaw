@@ -33,11 +33,15 @@ struct Gear_shifter{
 		Output operator()(Robot_outputs)const;
 	};
 
+	#define GEAR_SHIFTER_ESTIMATOR(X) \
+		X(Speed_tracker,l_tracker) \
+		X(Speed_tracker,r_tracker) \
+		X(double,last_current) \
+		X(Output,last_output) \
+		X(Output,recommended) \
+		X(Countdown_timer,no_shift)
 	struct Estimator{
-		Speed_tracker l_tracker,r_tracker;
-		double last_current;
-		Output last_output,recommended;
-		Countdown_timer no_shift;
+		GEAR_SHIFTER_ESTIMATOR(DECL1)
 
 		Estimator();
 		Status_detail get()const;
@@ -48,6 +52,8 @@ struct Gear_shifter{
 	Output_applicator output_applicator;
 	Estimator estimator;
 };
+
+CMP1(Gear_shifter::Estimator)
 
 std::ostream& operator<<(std::ostream&,Gear_shifter::Goal const&);
 std::ostream& operator<<(std::ostream&,Gear_shifter::Output const&);

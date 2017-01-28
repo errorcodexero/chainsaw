@@ -3,13 +3,17 @@
 
 #include "interface.h"
 
-class Speed_tracker{
+struct Speed_tracker{
 	int last_ticks;
 	Time last_time;
 
-	public:
 	double update(Time,int);
 	Speed_tracker();
 };
+
+bool operator==(Speed_tracker const&,Speed_tracker const&);
+bool operator!=(Speed_tracker const&,Speed_tracker const&);
+bool operator<(Speed_tracker const&,Speed_tracker const&);
+std::ostream& operator<<(std::ostream&,Speed_tracker const&);
 
 #endif

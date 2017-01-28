@@ -6,12 +6,14 @@
 #include "drivebase.h"
 #include "winch.h"
 #include "intake.h"
+#include "gear_shifter.h"
 
 #define TOPLEVEL_ITEMS \
 	X(Drivebase,drive,)\
 	X(Pump,pump,Pump::Goal::AUTO)\
-	X(Winch,winch,Winch::Goal::STOP) \
-	X(Intake,intake,Intake::Goal::OFF)
+	X(Winch,winch,Winch::Goal::STOP)\
+	X(Intake,intake,Intake::Goal::OFF)\
+	X(Gear_shifter,shifter,Gear_shifter::Goal::LOW)
 	
 class Toplevel{
 	public:

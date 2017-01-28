@@ -58,6 +58,7 @@ using Drivebase_sim=Nop_sim<Drivebase::Input>;
 using Pump_sim=Nop_sim<Pump::Input>;
 using Winch_sim=Nop_sim<Winch::Input>;
 using Intake_sim=Nop_sim<Intake::Input>;
+using Gear_shifter_sim=Nop_sim<Gear_shifter::Input>;
 
 struct Toplevel_sim{
 	using Input=Toplevel::Input;

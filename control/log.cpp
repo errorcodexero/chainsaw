@@ -82,6 +82,11 @@ void visit(Func f,Joystick_data const& a){
 }
 
 template<typename Func>
+void visit(Func f,Gear_shifter::Output const& a){
+	f.terminal(a);
+}
+
+template<typename Func>
 void visit(Func f,Talon_srx_input const& a){
 	#define X(NAME) f(""#NAME,a.NAME);
 	TALON_SRX_INPUT(X)
