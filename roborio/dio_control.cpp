@@ -192,7 +192,7 @@ Digital_inputs DIO_controls::get(){
 	}
 	for(unsigned i=0;i<encoder.size();i++){
 		if(encoder[i].encoder){
-			r.encoder[i]=encoder[i].encoder->Get();//fixme
+			r.encoder[i]=encoder[i].encoder->Get();//FIXME
 		}
 	}
 	return r;

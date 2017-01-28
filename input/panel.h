@@ -9,7 +9,6 @@ struct Panel{
 	//Buttons:
 	//2 position swicthes:
 	//3 position switches: 
-	//todo: remove this & put in main
 	//10 position switches:
 	int auto_select;//0-9
 	//Dials:

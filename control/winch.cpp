@@ -1,10 +1,10 @@
 #include "winch.h"
 
-static const int WINCH_PWM = 5;
+static const int WINCH_PWM = 8;
 static const float WINCH_POWER = .8;
 
-#define HALL_EFFECT_DOWN_LOC 4 //not real number
-#define HALL_EFFECT_UP_LOC 5 //not real number
+#define HALL_EFFECT_DOWN_LOC 4 //TODO: get real value
+#define HALL_EFFECT_UP_LOC 5 //TODO: get real value
 
 Winch::Input::Input():down(true),up(false){}
 Winch::Input::Input(bool a,bool b):down(a),up(b){}
