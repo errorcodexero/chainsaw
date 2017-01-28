@@ -247,7 +247,7 @@ if __name__=='__main__':
 
 	if check_style(): sys.exit(1)
 
-	if options.arguments: test(options.arguments,option.test_name)
+	if options.arguments: test(options.arguments,options.test_name)
 	if options.test: test(options.arguments,options.test_name)
 	if options.build: build()
 

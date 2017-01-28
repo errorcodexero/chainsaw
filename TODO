@@ -7,6 +7,9 @@ HIGH PRIORITY:
 	- Drive base
 		- Add in gear shifting
 		- Auto gear shifting
+	- Gear mainipulator
+		- Gear grabber
+		- Gear lift
 	- Ball collector
 		- Lift
 		- Arm
@@ -17,8 +20,8 @@ HIGH PRIORITY:
 
 
 NOT AS HIGH PRIORITY:
+	- Vision
 	- Logging
-	- Add in a way to run runall with bazel arguments
 	- Laptop configuration
 		-ssh config:
 			-Fix the "rm ~/.ssh/known_hosts" problem

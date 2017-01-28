@@ -454,6 +454,37 @@ cc_test(
 )
 
 cc_library(
+        name="collector",
+        srcs=["control/collector.cpp"],
+        hdrs=["control/collector.h"],
+        deps=[":intake",":arm"]
+)
+
+cc_test(
+        name="collector_test",
+        srcs=["control/collector.cpp","control/collector.h","control/formal.h"],
+        copts=["-DCOLLECTOR_TEST"],
+        deps=[":intake",":arm"],
+        timeout="short"
+)
+
+cc_library(
+        name="gear_collector",
+        srcs=["control/gear_collector.cpp"],
+        hdrs=["control/gear_collector.h"],
+        deps=[":gear_grabber",":gear_lifter"]
+)
+
+cc_test(
+        name="gear_collector_test",
+        srcs=["control/gear_collector.cpp","control/gear_collector.h","control/formal.h"],
+        copts=["-DGEAR_COLLECTOR_TEST"],
+        deps=[":gear_grabber",":gear_lifter"],
+        timeout="short"
+)
+
+
+cc_library(
 	name="intake",
 	srcs=["control/intake.cpp","control/nop.cpp"],
 	hdrs=["control/intake.h","control/nop.h"],
@@ -484,6 +515,37 @@ cc_test(
 )
 
 cc_library(
+	name="gear_grabber",
+	srcs=["control/gear_grabber.cpp","util/countdown_timer.cpp"],
+	hdrs=["control/gear_grabber.h","util/countdown_timer.h"],
+	deps=[":interface"]
+)
+
+cc_test(
+	name="gear_grabber_test",
+	srcs=["control/gear_grabber.cpp","control/gear_grabber.h","util/countdown_timer.cpp","util/countdown_timer.h","control/formal.h"],
+	copts=["-DGEAR_GRABBER_TEST"],
+	deps=[":interface"],
+	timeout="short"
+)
+
+cc_library(
+        name="gear_lifter",
+        srcs=["control/gear_lifter.cpp","util/countdown_timer.cpp"],
+        hdrs=["control/gear_lifter.h","util/countdown_timer.h"],
+        deps=[":interface"]
+)
+
+cc_test(
+	name="gear_lifter_test",
+	srcs=["control/gear_lifter.cpp","control/gear_lifter.h","util/countdown_timer.cpp","util/countdown_timer.h","control/formal.h"],
+	copts=["-DGEAR_LIFTER_TEST"],
+	deps=[":interface"],
+	timeout="short"
+)
+
+
+cc_library(
 	name="force",
 	srcs=["control/force.cpp"],
 	hdrs=["control/force.h"],
@@ -510,14 +572,14 @@ cc_library(
 	name="toplevel",
 	srcs=["control/toplevel.cpp"],
 	hdrs=["control/toplevel.h"],
-	deps=[":pump",":drivebase",":winch",":intake",":gear_shifter",":input"]
+	deps=[":pump",":drivebase",":winch",":gear_shifter",":collector",":gear_collector",":input"]
 )
 
 cc_test(
 	name="toplevel_test",
 	srcs=["control/toplevel.cpp","control/toplevel.h","control/formal.h"],
 	copts=["-DTOPLEVEL_TEST"],
-	deps=[":pump",":drivebase",":winch",":intake",":gear_shifter",":input",":output"],
+	deps=[":pump",":drivebase",":winch",":gear_shifter",":collector",":input",":gear_collector",":output"],
 	timeout="short"
 )
 
