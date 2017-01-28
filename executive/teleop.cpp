@@ -77,8 +77,6 @@ Toplevel::Goal Teleop::run(Run_info info) {
 		}());
 	}
 
-	//cout<<"drive status:"<<info.toplevel_status.drive<<" \n";
-
 	return goals;
 }
 

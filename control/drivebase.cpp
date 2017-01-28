@@ -225,9 +225,11 @@ Robot_outputs Drivebase::Output_applicator::operator()(Robot_outputs robot,Drive
 	robot.pwm[R_MOTOR_LOC_2] = -b.r;
 	robot.pwm[R_MOTOR_LOC_3] = -b.r;
 
+	/*
 	cout<<"b.l: "<<b.l<<'\n';
 	cout<<"b.r: "<<b.r<<'\n';
 	cout<<"pwms: "<<robot.pwm<<'\n';
+	*/
 
 	auto set_encoder=[&](unsigned int a, unsigned int b,unsigned int loc){
 		robot.digital_io[a] = Digital_out::encoder(loc,1);
