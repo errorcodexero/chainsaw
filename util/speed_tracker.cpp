@@ -1,7 +1,7 @@
 #include "speed_tracker.h"
 
 double Speed_tracker::update(Time t,int ticks){
-	assert(t>last_time);
+	if(t==last_time) return 0;
 	
 	int d_ticks=ticks-last_ticks;
 	Time d_time=t-last_time;
