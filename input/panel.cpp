@@ -113,6 +113,40 @@ Panel interpret_oi(Joystick_data d){
 	return p;
 }
 
+Panel interpret_test_oi(Joystick_data d){	
+	//static const unsigned int POTENTIOMETER_AXIS=1, TEN_POS_SWITCH_AXIS = 0; //TODO: need real values
+	//static const unsigned int BUTTON_0_LOC=0, BUTTON_1_LOC=1, BUTTON_2_LOC=2, BUTTON_3_LOC=3, TWO_POS_SWITCH_0_LOC = 4, TWO_POS_SWITCH_1_LOC =5; //TODO: need real values
+
+	Panel p;
+	{
+		p.in_use=[&](){
+			for(int i=0;i<JOY_AXES;i++) {
+				if(d.axis[i]!=0)return true;
+			}
+			for(int i=0;i<JOY_BUTTONS;i++) {
+				if(d.button[i]!=0)return true;
+			}
+			return false;
+		}();
+		if(!p.in_use) return p;
+	}
+	//p. = interpret_10_turn_pot(d.axis[TEN_POS_SWITCH_AXIS]); //set the switch value from the pot value
+	{//two position switches
+		//p. = d.button[TWO_POS_SWITCH_0_LOC];
+		//p. = d.button[TWO_POS_SWITCH_1_LOC];
+	}
+	{//buttons
+		//p. = d.button[BUTTON_0_LOC];
+		//p. = d.button[BUTTON_1_LOC];
+		//p. = d.button[BUTTON_2_LOC];
+		//p. = d.button[BUTTON_3_LOC];
+	}
+	{//dials
+		//p. = d.axis[POTENTIOMETER_AXIS];
+	}
+	return p;
+}
+
 Panel interpret_gamepad(Joystick_data d){
 	Panel p;
 	p.in_use = get_in_use(d);

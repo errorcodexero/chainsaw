@@ -628,13 +628,6 @@ cc_library(
 )
 
 cc_library(
-	name="test_panel",
-	srcs=["input/test_panel.cpp"],
-	hdrs=["input/test_panel.h","util/maybe.h"],
-	deps=[":interface",":panel",":input_util"]
-)
-
-cc_library(
 	name="executive_impl",
 	srcs=[
 		"executive/delay.cpp",
