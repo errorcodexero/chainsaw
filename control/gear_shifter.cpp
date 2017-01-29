@@ -23,11 +23,14 @@ Gear_shifter::Status_detail Gear_shifter::Estimator::get()const{
 }
 
 void Gear_shifter::Estimator::update(Time now,Input in,Output out){
+	cout<<"Shift Reason:";
+
 	static const double SHIFT_DELAY=2; //seconds between shifts
 	no_shift.update(now,1);
 	if(out!=last_output) no_shift.set(SHIFT_DELAY);
 	if(!no_shift.done()){
 		recommended=out;
+		cout<<"no_shift\n";
 		return;
 	}
 
@@ -36,15 +39,19 @@ void Gear_shifter::Estimator::update(Time now,Input in,Output out){
 	last_current=sum(in.current);
 	if(current_spike>CURRENT_SPIKE_THRESHOLD){
 		recommended=Output::LOW;
+		cout<<"current_spike\n";
 		return;
 	}
 
-	double l_speed=ticks_to_inches(l_tracker.update(now,in.ticks.l))/12; //ft/second
+	double l_speed=ticks_to_inches(l_tracker.update(now,-in.ticks.l))/12; //ft/second
 	double r_speed=ticks_to_inches(r_tracker.update(now,in.ticks.r))/12; //ft/second
+
+	cout<<" l_speed:"<<l_speed<<" r_speed:"<<r_speed<<" ";
 
 	const double TURN_THRESHOLD=1.2;
 	if(l_speed>r_speed*TURN_THRESHOLD || r_speed>l_speed*TURN_THRESHOLD){
 		recommended=out;
+		cout<<"turning\n";
 		return;
 	}
 
@@ -52,12 +59,15 @@ void Gear_shifter::Estimator::update(Time now,Input in,Output out){
 	
 	if(speed<8){
 		recommended=Output::LOW;
+		cout<<"speed low\n";
 		return;
 	}else if(speed>10){
 		recommended=Output::HIGH;
+		cout<<"speed high\n";
 		return;
 	}
 
+	cout<<"none\n";
 	recommended=out;
 }
 

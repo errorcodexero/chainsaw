@@ -322,14 +322,14 @@ cc_library(
 	name="speed_tracker",
 	srcs=["util/speed_tracker.cpp"],
 	hdrs=["util/speed_tracker.h"],
-	deps=[":interface"]
+	deps=[":interface",":countdown_timer"]
 )
 
 cc_test(
 	name="speed_tracker_test",
 	srcs=["util/speed_tracker.cpp","util/speed_tracker.h"],
 	copts=["-DSPEED_TRACKER_TEST"],
-	deps=[":interface"],
+	deps=[":interface",":countdown_timer"],
 	timeout="short"
 )
 
