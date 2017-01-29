@@ -13,14 +13,12 @@
 using namespace std;
 
 static int print_count=0;
-#define SLOW_PRINT (print_count%10==0)
 
 //TODO: at some point, might want to make this whatever is right to start autonomous mode.
 Main::Main():
 	mode(Executive{Teleop()}),
 	autonomous_start(0)
 {}
-
 
 template<size_t LEN>
 array<double,LEN> floats_to_doubles(array<float,LEN> a){
@@ -35,6 +33,7 @@ Robot_outputs Main::operator()(Robot_inputs in,ostream&){
 	static const unsigned MAIN_JOYSTICK_PORT = 0, GUNNER_JOYSTICK_PORT = 1, PANEL_PORT = 2;
 
 	perf.update(in.now);
+	
 	Joystick_data main_joystick=in.joystick[MAIN_JOYSTICK_PORT];
 	Joystick_data gunner_joystick=in.joystick[GUNNER_JOYSTICK_PORT];//TODO: remove
 	Panel panel=interpret_oi(in.joystick[PANEL_PORT]);
@@ -53,18 +52,10 @@ Robot_outputs Main::operator()(Robot_inputs in,ostream&){
 	
 	Toplevel::Status_detail toplevel_status=toplevel.estimator.get();
 		
-	
 	bool autonomous_start_now=autonomous_start(in.robot_mode.autonomous && in.robot_mode.enabled);
-	since_auto_start.update(in.now,autonomous_start_now);
 		
-	Toplevel::Goal goals;
+	Toplevel::Goal goals = mode.run(Run_info{in,main_joystick,gunner_joystick,panel,toplevel_status});
 	
-	goals = mode.run(Run_info{in,main_joystick,gunner_joystick,panel,toplevel_status});
-	
-	if(in.ds_info.connected && SLOW_PRINT){
-		cout<<"mode: "<<mode<<"\n";
-		cout<<"panel:"<<panel<<"\n";
-	}
 	auto next=mode.next_mode(Next_mode_info{in.robot_mode.autonomous,autonomous_start_now,toplevel_status,since_switch.elapsed(),panel,in});
 	
 	since_switch.update(in.now,mode!=next);
@@ -82,6 +73,12 @@ Robot_outputs Main::operator()(Robot_inputs in,ostream&){
 		toplevel.output_applicator(r)
 	);
 	log(in,toplevel_status,r);
+
+	if(in.ds_info.connected && (print_count % 10 == 0)){
+		cout<<"mode: "<<mode<<"\n";
+		cout<<"panel:"<<panel<<"\n";
+	}
+
 	return r;
 }
 
@@ -90,7 +87,6 @@ bool operator==(Main const& a,Main const& b){
 		a.perf==b.perf && 
 		a.toplevel==b.toplevel && 
 		a.since_switch==b.since_switch && 
-		a.since_auto_start==b.since_auto_start &&
 		a.autonomous_start==b.autonomous_start;
 }
 
