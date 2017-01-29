@@ -66,7 +66,7 @@ bool operator!=(Test_panel const& a,Test_panel const& b){
 	return !(a==b);
 }
 
-Test_panel Test_panel::interpret(Joystick_data d){
+Test_panel interpret_test_oi(Joystick_data d){
 	Test_panel p;
 	{
 		p.in_use=[&](){
@@ -99,14 +99,14 @@ Test_panel Test_panel::interpret(Joystick_data d){
 }
 
 Test_panel rand(Test_panel*){
-	return Test_panel::interpret(driver_station_input_rand());
+	return interpret_test_oi(driver_station_input_rand());
 }
 
 #ifdef PANEL_TEST
 int main(){
 	Test_panel p;
 	for(unsigned i=0;i<50;i++){
-		interpret(driver_station_input_rand());
+		interpret_test_oi(driver_station_input_rand());
 	}
 	cout<<p<<"\n";
 	return 0;

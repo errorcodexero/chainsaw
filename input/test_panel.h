@@ -22,9 +22,9 @@ struct Test_panel{
 	double potentiometer;
 		
 	Test_panel();
-	static Test_panel interpret(Joystick_data);
 };
 
+Test_panel interpret_test_oi(Joystick_data);
 bool operator!=(Test_panel const&,Test_panel const&);
 std::ostream& operator<<(std::ostream&,Test_panel);
 

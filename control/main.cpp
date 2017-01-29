@@ -7,15 +7,10 @@
 #include "toplevel.h"
 #include "../util/util.h"
 #include "../input/util.h"
-#include "../util/point.h"
 #include <vector>
-#include <assert.h>
-#include <fstream>
 #include "../executive/teleop.h"
 
 using namespace std;
-
-ofstream myfile2;
 
 static int print_count=0;
 #define SLOW_PRINT (print_count%10==0)
@@ -37,12 +32,14 @@ array<double,LEN> floats_to_doubles(array<float,LEN> a){
 Robot_outputs Main::operator()(Robot_inputs in,ostream&){
 	print_count++;
 
-	perf.update(in.now);
-	Joystick_data main_joystick=in.joystick[0];
-	Joystick_data gunner_joystick=in.joystick[1];
-	Panel panel=interpret(in.joystick[2]);
+	static const unsigned MAIN_JOYSTICK_PORT = 0, GUNNER_JOYSTICK_PORT = 1, PANEL_PORT = 2;
 
-	if(!in.robot_mode.enabled){
+	perf.update(in.now);
+	Joystick_data main_joystick=in.joystick[MAIN_JOYSTICK_PORT];
+	Joystick_data gunner_joystick=in.joystick[GUNNER_JOYSTICK_PORT];//TODO: remove
+	Panel panel=interpret_oi(in.joystick[PANEL_PORT]);
+	if(!panel.in_use){
+		panel = interpret_gamepad(in.joystick[GUNNER_JOYSTICK_PORT]);
 	}
 
 	force.update(
@@ -56,17 +53,18 @@ Robot_outputs Main::operator()(Robot_inputs in,ostream&){
 	
 	Toplevel::Status_detail toplevel_status=toplevel.estimator.get();
 		
-	if(in.ds_info.connected && SLOW_PRINT) cout<<"panel:"<<panel<<"\n";
 	
 	bool autonomous_start_now=autonomous_start(in.robot_mode.autonomous && in.robot_mode.enabled);
 	since_auto_start.update(in.now,autonomous_start_now);
 		
 	Toplevel::Goal goals;
-	//decltype(in.current) robotcurrent;
-	//for(auto &a:robotcurrent) a = 0;
+	
 	goals = mode.run(Run_info{in,main_joystick,gunner_joystick,panel,toplevel_status});
 	
-	if(in.ds_info.connected && SLOW_PRINT) cout<<"mode: "<<mode<<"\n";
+	if(in.ds_info.connected && SLOW_PRINT){
+		cout<<"mode: "<<mode<<"\n";
+		cout<<"panel:"<<panel<<"\n";
+	}
 	auto next=mode.next_mode(Next_mode_info{in.robot_mode.autonomous,autonomous_start_now,toplevel_status,since_switch.elapsed(),panel,in});
 	
 	since_switch.update(in.now,mode!=next);
