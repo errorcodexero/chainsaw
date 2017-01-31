@@ -6,7 +6,7 @@
 
 struct Panel{
 	bool in_use;
-	//Buttons:
+	//*Buttons:
 	bool learn;
 	bool collect;
 	bool shoot_prep;
@@ -17,7 +17,6 @@ struct Panel{
 	bool gear_score;
 	bool climb;
 	//2 position swicthes:
-	bool auto_select_more;
 	//3 position switches:
 	enum class Gear_collector{UP,DOWN,AUTO};
 	Gear_collector gear_collector;
@@ -31,7 +30,7 @@ struct Panel{
 	Belt_direction belt_direction;
 	enum class Ball_collector{ON,OFF,AUTO};
 	Ball_collector ball_collector; 
-	//10 position switches:
+	//10 *position switches:
 	int auto_select;//0-9
 	//Dials:
 	float speed_dial;
