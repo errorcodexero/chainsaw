@@ -52,12 +52,10 @@ Toplevel::Goal Teleop::run(Run_info info) {
 
 		POV_section driver_pov=pov_section(info.main_joystick.pov);
 		
-		const array<POV_section,POV_NUDGES> nudge_povs={POV_section::UP,POV_section::DOWN,POV_section::LEFT,POV_section::RIGHT};
-		const array<unsigned int,BUTTON_NUDGES> nudge_buttons={Gamepad_button::LB,Gamepad_button::RB};
-		//Forward, backward, left, right, clockwise, counter-clockwise
+		const array<POV_section,NUDGES> nudge_povs={POV_section::UP,POV_section::DOWN,POV_section::LEFT,POV_section::RIGHT};
+		//Forward, backward, clockwise, counter-clockwise
 		for(unsigned i=0;i<NUDGES;i++){
-			bool nudge_button_pressed=i<POV_NUDGES?driver_pov==nudge_povs[i]:info.main_joystick.button[nudge_buttons[i%POV_NUDGES]];
-			if(nudges[i].trigger(boost<.25 && nudge_button_pressed)) nudges[i].timer.set(.1);
+			if(nudges[i].trigger(boost<.25 && driver_pov==nudge_povs[i])) nudges[i].timer.set(.1);
 			nudges[i].timer.update(info.in.now,enabled);
 		}
 		const double NUDGE_POWER=.2,ROTATE_NUDGE_POWER=.5;
