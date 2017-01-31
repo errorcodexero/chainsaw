@@ -8,11 +8,11 @@
 using namespace std;
 
 #define BUTTONS \
-
+	X(learn) X(collect) X(shoot_prep) X(shoot) X(gear_collect) X(gear_prep_collect) X(gear_prep_score) X(gear_score) X(climb)
 #define TWO_POS_SWITCHES \
-
+	X(auto_select_more)
 #define THREE_POS_SWITCHES \
-
+	X(gear_collector) X(gear_holder) X(ball_shooter) X(ball_arm) X(belt_direction) X(ball_collector)
 #define TEN_POS_SWITCHES \
 	X(auto_select)
 
@@ -34,8 +34,66 @@ Panel::Panel():
 	#define X(TWO_POS_SWITCH) TWO_POS_SWITCH(false),
 	TWO_POS_SWITCHES
 	#undef X
+	gear_collector(Gear_collector::UP),
+	gear_holder(Gear_holder::OPEN),
+	ball_shooter(Ball_shooter::POWER),
+	ball_arm(Ball_arm::STOW),
+	belt_direction(Belt_direction::IN),
+	ball_collector(Ball_collector::OFF),
 	auto_select(0)
 {}
+
+ostream& operator<<(ostream& o,Panel::Gear_collector p){
+	#define X(NAME) if(p==Panel::Gear_collector::NAME) return o<<""#NAME;
+	X(UP) X(DOWN) X(AUTO)
+	#undef X
+	assert(0);
+}
+
+ostream& operator<<(ostream& o,Panel::Gear_holder p){
+	#define X(NAME) if(p==Panel::Gear_holder::NAME) return o<<""#NAME;
+	X(OPEN) X(CLOSED) X(AUTO)
+	#undef X
+	assert(0);
+}
+
+ostream& operator<<(ostream& o,Panel::Ball_shooter p){
+	#define X(NAME) if(p==Panel::Ball_shooter::NAME) return o<<""#NAME;
+	X(POWER) X(RPM) X(AUTO)
+	#undef X
+	assert(0);
+}
+
+ostream& operator<<(ostream& o,Panel::Ball_arm p){
+	#define X(NAME) if(p==Panel::Ball_arm::NAME) return o<<""#NAME;
+	X(STOW) X(STOW) X(AUTO)
+	#undef X
+	assert(0);
+}
+
+ostream& operator<<(ostream& o,Panel::Belt_direction p){
+	#define X(NAME) if(p==Panel::Belt_direction::NAME) return o<<""#NAME;
+	X(IN) X(OUT) X(AUTO)
+	#undef X
+	assert(0);
+}
+
+ostream& operator<<(ostream& o,Panel::Ball_collector p){
+	#define X(NAME) if(p==Panel::Ball_collector::NAME) return o<<""#NAME;
+	X(ON) X(OFF) X(AUTO)
+	#undef X
+	assert(0);
+}
+
+
+
+
+
+
+
+
+
+
 
 ostream& operator<<(ostream& o,Panel p){
 	o<<"Panel(";
