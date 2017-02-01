@@ -2,6 +2,7 @@
 #include "toplevel.h"
 #include "../util/type.h"
 #include "nop.h"
+#include <math.h>
 
 using namespace std;
 
@@ -41,13 +42,55 @@ ostream& operator<<(ostream& o,Nop_sim<T> const& a){
 	return o<<type(a);
 }
 
-using Drivebase_sim=Nop_sim<Drivebase::Input>;
 using Pump_sim=Nop_sim<Pump::Input>;
 using Winch_sim=Nop_sim<Winch::Input>;
 using Intake_sim=Nop_sim<Intake::Input>;
 using Arm_sim=Nop_sim<Arm::Input>;
 using Gear_grabber_sim=Nop_sim<Gear_grabber::Input>;
 using Gear_lifter_sim=Nop_sim<Gear_lifter::Input>;
+
+struct Drivebase_sim{
+	using Input=Drivebase::Input;
+	using Output=Drivebase::Output;
+	
+	float x,y,theta; //x,y are in distance in feet
+	
+	Time last_time =0;
+	void update(Time t,bool enable,Output out){
+		Time dt=t-last_time;
+		cout << "Drivebase Delta Time: " << dt << "\n"; 
+		last_time=t;
+		if(!enable) return;
+		x=y=theta=0;
+		
+	float dtheta = (((out.l-out.r)*5/12.5))*6.25;
+		float speed= (out.l+out.r)*5;
+		float dist_traveled=speed*dt;
+		float dy=dist_traveled*cosf(theta);
+		float dx=dist_traveled*sinf(theta);
+		y+=dy;
+		x+=dx;
+		theta+=dtheta;
+
+		
+	
+	}
+	Input get()const{
+	/*	Input in;
+		in.current=0;
+		in.left=Digital.in{};
+		in.right=Digital_in{};	
+		return in;
+	*/
+		assert(0);
+	}
+
+
+};
+
+ostream& operator<<(ostream& o,Drivebase_sim const& a){
+	assert(0);
+}
 
 struct Collector_sim{
 	using Input=Collector::Input;
@@ -125,7 +168,7 @@ void simulate(SIMULATOR sim,DEVICE device){
 	for(Time t=0;t<2;t+=TIMESTEP){
 		//TODO: Make the simulator go 2014 style where you only get "significant" changes printed
 		//device.estimator.update(
-		nyi
+		
 	}
 }
 
@@ -229,7 +272,7 @@ void sim_display(T t){
 }
 
 int main(){
-	Toplevel_sim sim;
+	/*Toplevel_sim sim;
 
 	sim_display(sim);
 	sim_display(sim.get());
@@ -242,6 +285,7 @@ int main(){
 		sim.update(t,1,out);
 	}
 	return 0;
+	*/
 }
 
 #endif
