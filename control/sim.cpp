@@ -63,7 +63,7 @@ struct Drivebase_sim{
 		if(!enable) return;
 		x=y=theta=0;
 		
-	float dtheta = (((out.l-out.r)*5/12.5))*6.25;
+		float dtheta = (((out.l-out.r)*5/12.5))*6.25;
 		float speed= (out.l+out.r)*5;
 		float dist_traveled=speed*dt;
 		float dy=dist_traveled*cosf(theta);
@@ -79,7 +79,9 @@ struct Drivebase_sim{
 	/*	Input in;
 		in.current=0;
 		in.left=Digital.in{};
-		in.right=Digital_in{};	
+		in.right=Digital_in{};
+		in.ticks.l=
+		in.ticks.r=	
 		return in;
 	*/
 		assert(0);
@@ -89,6 +91,7 @@ struct Drivebase_sim{
 };
 
 ostream& operator<<(ostream& o,Drivebase_sim const& a){
+	// return o << a.speed << a.Dist_traveled << a.x << a.y << "\n"
 	assert(0);
 }
 
