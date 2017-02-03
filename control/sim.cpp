@@ -53,16 +53,15 @@ struct Drivebase_sim{
 	using Input=Drivebase::Input;
 	using Output=Drivebase::Output;
 	
-	float x,y,theta; //x,y are in distance in feet
-	
+	float x=0,y=0,theta=0;//x,y are in distance in feet
 	Time last_time =0;
+	int ticks_left;
+	int ticks_right;
 	void update(Time t,bool enable,Output out){
 		Time dt=t-last_time;
 		cout << "Drivebase Delta Time: " << dt << "\n"; 
 		last_time=t;
 		if(!enable) return;
-		x=y=theta=0;
-		
 		float dtheta = (((out.l-out.r)*5/12.5))*6.25;
 		float speed= (out.l+out.r)*5;
 		float dist_traveled=speed*dt;
@@ -76,23 +75,17 @@ struct Drivebase_sim{
 	
 	}
 	Input get()const{
-	/*	Input in;
-		in.current=0;
-		in.left=Digital.in{};
-		in.right=Digital_in{};
-		in.ticks.l=
-		in.ticks.r=	
-		return in;
-	*/
-		assert(0);
+		auto d=Digital_in::_0;
+		auto p=make_pair(d,d);
+		return {Drivebase::Input{
+			{0,0,0,0,0,0},p,p,{0,0}
+		}};
 	}
-
 
 };
 
 ostream& operator<<(ostream& o,Drivebase_sim const& a){
-	// return o << a.speed << a.Dist_traveled << a.x << a.y << "\n"
-	assert(0);
+	return o << "Drivebase_sim " << a.x << a.y << a.x << a.theta << "\n";
 }
 
 struct Collector_sim{
@@ -275,7 +268,7 @@ void sim_display(T t){
 }
 
 int main(){
-	/*Toplevel_sim sim;
+	Toplevel_sim sim;
 
 	sim_display(sim);
 	sim_display(sim.get());
@@ -288,7 +281,7 @@ int main(){
 		sim.update(t,1,out);
 	}
 	return 0;
-	*/
+	
 }
 
 #endif
