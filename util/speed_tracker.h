@@ -7,13 +7,22 @@
 struct Speed_tracker{
 	const Time POLL_TIME=0.05; //seconds
 
+	private:
 	int last_ticks;
 	Time last_time;
-	double speed;
+	double speed;//inches/second
 	Countdown_timer poll_timer;
 
-	double update(Time,int);
+	public:
+	void update(Time,int);
+	double get()const;
+	
 	Speed_tracker();
+	
+	friend bool operator==(Speed_tracker const&,Speed_tracker const&);
+	friend bool operator!=(Speed_tracker const&,Speed_tracker const&);
+	friend bool operator<(Speed_tracker const&,Speed_tracker const&);
+	friend std::ostream& operator<<(std::ostream&,Speed_tracker const&);
 };
 
 bool operator==(Speed_tracker const&,Speed_tracker const&);

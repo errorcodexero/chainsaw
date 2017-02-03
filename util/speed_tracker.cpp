@@ -1,19 +1,23 @@
 #include "speed_tracker.h"
+#include "../control/drivebase.h"
 
 using namespace std;
 
-double Speed_tracker::update(Time t,int ticks){
+void Speed_tracker::update(Time t,int ticks){
 	poll_timer.update(t,1);
 	if(poll_timer.done()){
-		speed=(ticks-last_ticks)/(t-last_time);
+		speed=(ticks_to_inches(ticks)-ticks_to_inches(last_ticks))/(t-last_time);
 		last_ticks=ticks;
 		last_time=t;
 		poll_timer.set(POLL_TIME);
 	}
+}
+
+double Speed_tracker::get()const{
 	return speed;
 }
 
-Speed_tracker::Speed_tracker():last_ticks(0),last_time(0),speed(0){
+Speed_tracker::Speed_tracker():last_ticks(0),last_time(0),speed(0),poll_timer({}){
 	poll_timer.set(POLL_TIME);
 }
 

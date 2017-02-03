@@ -16,13 +16,14 @@ Gear_shifter::Output Gear_shifter::Output_applicator::operator()(Robot_outputs r
 	return robot.solenoid[R_SHIFTER_SOLENOID]?Output::HIGH:Output::LOW;
 }
 
-Gear_shifter::Estimator::Estimator():last_current(0),last_output(Output::LOW),recommended(Output::LOW){}
+Gear_shifter::Estimator::Estimator():l_tracker(),r_tracker(),last_current(0),last_output(Output::LOW),recommended(Output::LOW),no_shift(){}
 
 Gear_shifter::Status_detail Gear_shifter::Estimator::get()const{
 	return recommended;
 }
 
 void Gear_shifter::Estimator::update(Time now,Input in,Output out){
+	//cout<<"distance:"<<ticks_to_inches(in.ticks.l)<<" "<<ticks_to_inches(in.ticks.r)<<"\n";
 	cout<<"Shift Reason:";
 
 	static const double SHIFT_DELAY=2; //seconds between shifts
@@ -42,26 +43,32 @@ void Gear_shifter::Estimator::update(Time now,Input in,Output out){
 		cout<<"current_spike\n";
 		return;
 	}
+	l_tracker.update(now,-in.ticks.l);
+	r_tracker.update(now,in.ticks.r);
 
-	double l_speed=ticks_to_inches(l_tracker.update(now,-in.ticks.l))/12; //ft/second
-	double r_speed=ticks_to_inches(r_tracker.update(now,in.ticks.r))/12; //ft/second
+	static const double INCHES_TO_FEET = 1.0/12.0;
 
-	cout<<" l_speed:"<<l_speed<<" r_speed:"<<r_speed<<" ";
+	Drivebase::Speeds speeds = {l_tracker.get() * INCHES_TO_FEET, r_tracker.get() * INCHES_TO_FEET}; //ft/second
+
+	cout<<" speeds:"<<speeds<<" ";
 
 	const double TURN_THRESHOLD=1.2;
-	if(l_speed>r_speed*TURN_THRESHOLD || r_speed>l_speed*TURN_THRESHOLD){
+	if(speeds.l>speeds.r*TURN_THRESHOLD || speeds.r>speeds.l*TURN_THRESHOLD){
 		recommended=out;
 		cout<<"turning\n";
 		return;
 	}
 
-	double speed=mean(l_speed,r_speed);
+	double mean_speed=mean(speeds.l,speeds.r);
 	
-	if(speed<8){
+	static const double SLOW_SPEED_THRESHOLD = 8.0,FAST_SPEED_THRESHOLD = 10.0;//feet/second
+
+	if(mean_speed<SLOW_SPEED_THRESHOLD){
 		recommended=Output::LOW;
 		cout<<"speed low\n";
 		return;
-	}else if(speed>10){
+	}
+	if(mean_speed>FAST_SPEED_THRESHOLD){
 		recommended=Output::HIGH;
 		cout<<"speed high\n";
 		return;
