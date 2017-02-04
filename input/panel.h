@@ -6,19 +6,44 @@
 
 struct Panel{
 	bool in_use;
-	//Buttons:
+	//*Buttons:
+	bool learn;
+	bool collect;
+	bool shoot_prep;
+	bool shoot;
+	bool gear_collect;
+	bool gear_prep_collect;
+	bool gear_prep_score;
+	bool gear_score;
+	bool climb;
 	//2 position swicthes:
-	//3 position switches: 
-	//10 position switches:
+	//3 position switches:
+	enum class Gear_collector{UP,DOWN,AUTO};
+	Gear_collector gear_collector;
+	enum class Gear_holder{OPEN,CLOSED,AUTO};
+	Gear_holder gear_holder;
+	enum class Ball_shooter{POWER,RPM,AUTO};
+	Ball_shooter ball_shooter;
+	enum class Ball_arm{STOW,LOW,AUTO};
+	Ball_arm ball_arm;
+	enum class Belt_direction{IN,OUT,AUTO};
+	Belt_direction belt_direction;
+	enum class Ball_collector{ON,OFF,AUTO};
+	Ball_collector ball_collector; 
+	//10 *position switches:
 	int auto_select;//0-9
 	//Dials:
+	float speed_dial;
 	Panel();
 };
 
 bool operator!=(Panel const&,Panel const&);
 std::ostream& operator<<(std::ostream&,Panel);
 
-Panel interpret(Joystick_data);
+Panel interpret_oi(Joystick_data);
+Panel interpret_test_oi(Joystick_data);
+Panel interpret_gamepad(Joystick_data);
+
 Joystick_data driver_station_input_rand();
 Panel rand(Panel*);
 
