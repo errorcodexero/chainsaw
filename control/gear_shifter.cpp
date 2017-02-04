@@ -29,6 +29,7 @@ void Gear_shifter::Estimator::update(Time now,Input in,Output out){
 	static const double SHIFT_DELAY=2; //seconds between shifts
 	no_shift.update(now,1);
 	if(out!=last_output) no_shift.set(SHIFT_DELAY);
+	last_output=out;
 	if(!no_shift.done()){
 		recommended=out;
 		cout<<"no_shift\n";
