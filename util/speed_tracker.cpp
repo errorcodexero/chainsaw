@@ -10,6 +10,7 @@ void Speed_tracker::update(Time t,int ticks){
 		last_ticks=ticks;
 		last_time=t;
 		poll_timer.set(POLL_TIME);
+		poll_timer.update(t,1);  
 	}
 }
 

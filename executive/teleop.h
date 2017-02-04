@@ -15,8 +15,7 @@ struct Teleop : Executive_impl<Teleop> {
 	};
 
 	#define TELEOP_ITEMS(X)\
-		X(SINGLE_ARG(std::array<Nudge,NUDGES>),nudges)\
-		X(Gear_shifter::Goal,shifter_goal)
+		X(SINGLE_ARG(std::array<Nudge,NUDGES>),nudges)
 	STRUCT_MEMBERS(TELEOP_ITEMS)
 
 	Executive next_mode(Next_mode_info);

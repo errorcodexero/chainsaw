@@ -1,4 +1,5 @@
 #include "gear_shifter.h"
+#include <math.h>
 
 using namespace std;
 
@@ -36,22 +37,27 @@ void Gear_shifter::Estimator::update(Time now,Input in,Output out){
 		return;
 	}
 
-	const double CURRENT_SPIKE_THRESHOLD=50;//TODO: Test this value
+	const double CURRENT_SPIKE_THRESHOLD=-8;//TODO: Test this value
+	const double CURRENT_SHIFT_SPEED_THRESHOLD = 1.0;//feet/second
+
 	double current_spike=sum(in.current)-last_current;
 	last_current=sum(in.current);
-	if(current_spike>CURRENT_SPIKE_THRESHOLD){
+	cout<<" difference_in_current:"<<current_spike;
+	
+	l_tracker.update(now,-in.ticks.l);
+	r_tracker.update(now,in.ticks.r);
+	
+	static const double INCHES_TO_FEET = 1.0/12.0;
+	
+	Drivebase::Speeds speeds = {fabs(l_tracker.get() * INCHES_TO_FEET), fabs(r_tracker.get() * INCHES_TO_FEET)}; //ft/second
+	
+	cout<<" speeds:"<<speeds<<" ";
+	
+	if(current_spike < CURRENT_SPIKE_THRESHOLD && speeds.l < CURRENT_SHIFT_SPEED_THRESHOLD && speeds.r < CURRENT_SHIFT_SPEED_THRESHOLD){
 		recommended=Output::LOW;
 		cout<<"current_spike\n";
 		return;
 	}
-	l_tracker.update(now,-in.ticks.l);
-	r_tracker.update(now,in.ticks.r);
-
-	static const double INCHES_TO_FEET = 1.0/12.0;
-
-	Drivebase::Speeds speeds = {l_tracker.get() * INCHES_TO_FEET, r_tracker.get() * INCHES_TO_FEET}; //ft/second
-
-	cout<<" speeds:"<<speeds<<" ";
 
 	const double TURN_THRESHOLD=1.2;
 	if(speeds.l>speeds.r*TURN_THRESHOLD || speeds.r>speeds.l*TURN_THRESHOLD){
@@ -62,14 +68,14 @@ void Gear_shifter::Estimator::update(Time now,Input in,Output out){
 
 	double mean_speed=mean(speeds.l,speeds.r);
 	
-	static const double SLOW_SPEED_THRESHOLD = 8.0,FAST_SPEED_THRESHOLD = 10.0;//feet/second
+	static const double LOW_SPEED_THRESHOLD = 5.0, HIGH_SPEED_THRESHOLD = 5.0;//feet/second
 
-	if(mean_speed<SLOW_SPEED_THRESHOLD){
+	if(mean_speed<LOW_SPEED_THRESHOLD){
 		recommended=Output::LOW;
 		cout<<"speed low\n";
 		return;
 	}
-	if(mean_speed>FAST_SPEED_THRESHOLD){
+	if(mean_speed>HIGH_SPEED_THRESHOLD){
 		recommended=Output::HIGH;
 		cout<<"speed high\n";
 		return;
@@ -133,7 +139,36 @@ bool ready(Gear_shifter::Status,Gear_shifter::Goal){
 #ifdef GEAR_SHIFTER_TEST
 #include "formal.h"
 int main(){
-	Gear_shifter g;
-	tester(g);
+	{
+		Gear_shifter g;
+		tester(g);
+	}
+	{
+		cout<<"\nTEST 1\n";
+		Gear_shifter g;
+		Gear_shifter::Goal goal = Gear_shifter::Goal::AUTO;
+
+		const Time SPIKE_TIME = 10;
+		const double SPIKE_VALUE = -14;
+		const int TICKS_INCREMENT = 500;
+
+		Drivebase::Encoder_ticks ticks = {0,0};
+		array<double,Drivebase::MOTORS> currents = {0,0,0,0,0,0};
+			
+		for(Time t = 0; t < 100; t+=0.05){
+			Gear_shifter::Status_detail status = g.estimator.get();
+			Gear_shifter::Output out = control(status,goal);
+			
+			if(t >= SPIKE_TIME) currents = {SPIKE_VALUE,SPIKE_VALUE,SPIKE_VALUE,SPIKE_VALUE,SPIKE_VALUE,SPIKE_VALUE};
+			else ticks = {ticks.l + TICKS_INCREMENT, ticks.r + TICKS_INCREMENT};
+	
+			Gear_shifter::Input in = {currents,{},{},ticks};
+			
+			cout<<"t:"<<t<<"\tin:"<<in<<"\tstatus:"<<status<<"\tgoal:"<<goal<<"\tout:"<<out<<"\n";
+			
+			g.estimator.update(t,in,out);
+			cout<<"\n----------------------------------------------------------------\n";
+		}
+	}
 }
 #endif
