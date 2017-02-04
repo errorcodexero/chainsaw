@@ -593,7 +593,7 @@ cc_library(
 cc_test(
 	name="sim_test",
 	srcs=["control/sim.cpp"],
-	copts=["-DSIM_TEST"],
+	copts=["-DSIM_TEST","-g"],
 	deps=[":toplevel",":type",":nop"],
 	timeout="short"
 )

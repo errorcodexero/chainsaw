@@ -20,7 +20,7 @@ struct Main{
 	Perf_tracker perf;
 	Toplevel toplevel;
 	
-	Countup_timer since_switch,since_auto_start;
+	Countup_timer since_switch;
 
 	Posedge_trigger autonomous_start;
 	Log log;	
