@@ -439,16 +439,16 @@ cc_test(
 )
 
 cc_library(
-	name="winch",
-	srcs=["control/winch.cpp"],
-	hdrs=["control/winch.h"],
+	name="climber",
+	srcs=["control/climber.cpp"],
+	hdrs=["control/climber.h"],
 	deps=[":interface"]
 )
 
 cc_test(
-	name="winch_test",
-	srcs=["control/winch.cpp","control/winch.h","control/formal.h"],
-	copts=["-DWINCH_TEST"],
+	name="climber_test",
+	srcs=["control/climber.cpp","control/climber.h","control/formal.h"],
+	copts=["-DCLIMBER_TEST"],
 	deps=[":interface"],
 	timeout="short"
 )
@@ -572,14 +572,14 @@ cc_library(
 	name="toplevel",
 	srcs=["control/toplevel.cpp"],
 	hdrs=["control/toplevel.h"],
-	deps=[":pump",":drivebase",":winch",":gear_shifter",":collector",":gear_collector",":input"]
+	deps=[":pump",":drivebase",":climber",":gear_shifter",":collector",":gear_collector",":input"]
 )
 
 cc_test(
 	name="toplevel_test",
 	srcs=["control/toplevel.cpp","control/toplevel.h","control/formal.h"],
 	copts=["-DTOPLEVEL_TEST"],
-	deps=[":pump",":drivebase",":winch",":gear_shifter",":collector",":input",":gear_collector",":output"],
+	deps=[":pump",":drivebase",":climber",":gear_shifter",":collector",":input",":gear_collector",":output"],
 	timeout="short"
 )
 

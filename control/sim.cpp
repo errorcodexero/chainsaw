@@ -43,7 +43,7 @@ ostream& operator<<(ostream& o,Nop_sim<T> const& a){
 }
 
 using Pump_sim=Nop_sim<Pump::Input>;
-using Winch_sim=Nop_sim<Winch::Input>;
+using Climber_sim=Nop_sim<Climber::Input>;
 using Intake_sim=Nop_sim<Intake::Input>;
 using Gear_shifter_sim=Nop_sim<Gear_shifter::Input>;
 using Arm_sim=Nop_sim<Arm::Input>;

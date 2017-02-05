@@ -99,7 +99,7 @@ ostream& operator<<(ostream& o,Toplevel::Output_applicator const&){
 Toplevel::Output::Output():
 	drive(0.0,0.0),
 	pump(Pump::Output::AUTO),
-	winch(Winch::Output::STOP),
+	climber(Climber::Output::STOP),
 	shifter(Gear_shifter::Output::LOW),
 	collector(),
 	gear_collector()
@@ -158,7 +158,7 @@ Toplevel::Status::Status():
 		{0,0}
 	),
 	pump(Pump::Status::NOT_FULL),
-	winch(Winch::Status::DOWN),
+	climber(Climber::Status::DOWN),
 	collector(),
 	gear_collector()
 {}
@@ -336,7 +336,7 @@ set<Toplevel::Status_detail> examples(Toplevel::Status_detail*){
 	return {Toplevel::Status_detail{
 		*examples((Drivebase::Status_detail*)0).begin(),
 		Pump::Status_detail{Pump::Status::FULL},
-		*examples((Winch::Status_detail*)0).begin(),
+		*examples((Climber::Status_detail*)0).begin(),
 		*examples((Gear_shifter::Status_detail*)0).begin(),
 		*examples((Collector::Status_detail*)0).begin(),
 		*examples((Gear_collector::Status_detail*)0).begin()
@@ -355,7 +355,7 @@ set<Toplevel::Input> examples(Toplevel::Input*){
 	Toplevel::Input a{
 		*examples((Drivebase::Input*)0).begin(),
 		Pump::Input{},
-		*examples((Winch::Input*)0).begin(),
+		*examples((Climber::Input*)0).begin(),
 		*examples((Gear_shifter::Input*)0).begin(),
 		*examples((Collector::Input*)0).begin(),
 		*examples((Gear_collector::Input*)0).begin()

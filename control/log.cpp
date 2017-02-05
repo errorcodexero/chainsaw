@@ -201,7 +201,7 @@ void visit(Func f,int i){
 
 
 template<typename Func>
-void visit(Func f,Winch::Status const& a){
+void visit(Func f,Climber::Status const& a){
 	f.terminal(a);
 }
 
