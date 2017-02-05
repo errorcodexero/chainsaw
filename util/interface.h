@@ -169,6 +169,7 @@ struct DS_info{
 	bool connected;
 	Alliance alliance;
 	int location;
+	DS_info();
 };
 
 enum class Digital_in{OUTPUT,_0,_1,ENCODER};

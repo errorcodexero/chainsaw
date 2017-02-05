@@ -564,7 +564,7 @@ cc_test(
 	name="sim_test",
 	srcs=["control/sim.cpp"],
 	copts=["-DSIM_TEST","-g"],
-	deps=[":toplevel",":type",":nop"],
+	deps=[":toplevel",":type",":nop", ":main"],
 	timeout="short"
 )
 
