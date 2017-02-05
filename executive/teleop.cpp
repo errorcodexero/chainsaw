@@ -5,7 +5,7 @@
 
 using namespace std;
 
-double set_drive_speed(double axis,double boost,double slow){
+double set_drive_speed(double axis,double boost,bool slow){
 	static const float MAX_SPEED=1;//Change this value to change the max power the robot will achieve with full boost (cannot be larger than 1.0)
 	static const float DEFAULT_SPEED=.4;//Change this value to change the default power
 	static const float SLOW_BY=.5;//Change this value to change the percentage of the default power the slow button slows
@@ -39,7 +39,7 @@ Executive Teleop::next_mode(Next_mode_info info) {
 
 IMPL_STRUCT(Teleop::Teleop,TELEOP_ITEMS)
 
-Teleop::Teleop():shifter_goal(Gear_shifter::Goal::LOW){}
+Teleop::Teleop(){}
 
 Toplevel::Goal Teleop::run(Run_info info) {
 	Toplevel::Goal goals;
@@ -48,7 +48,8 @@ Toplevel::Goal Teleop::run(Run_info info) {
 
 	{//Set drive goals
 		bool spin=fabs(info.main_joystick.axis[Gamepad_axis::RIGHTX])>.01;//drive turning button
-		double boost=info.main_joystick.axis[Gamepad_axis::LTRIGGER],slow=info.main_joystick.axis[Gamepad_axis::RTRIGGER];//turbo and slow buttons	
+		double boost=info.main_joystick.axis[Gamepad_axis::LTRIGGER]; //Turbo button
+		bool slow=info.main_joystick.button[Gamepad_button::LB]; //Slow button
 
 		POV_section driver_pov=pov_section(info.main_joystick.pov);
 		
@@ -58,12 +59,12 @@ Toplevel::Goal Teleop::run(Run_info info) {
 			if(nudges[i].trigger(boost<.25 && driver_pov==nudge_povs[i])) nudges[i].timer.set(.1);
 			nudges[i].timer.update(info.in.now,enabled);
 		}
-		const double NUDGE_POWER=.2,ROTATE_NUDGE_POWER=.5;
+		const double NUDGE_POWER=.2,ROTATE_NUDGE_POWER=.2;
 		goals.drive.left=([&]{
 			if(!nudges[Nudges::FORWARD].timer.done()) return -NUDGE_POWER;
 			if(!nudges[Nudges::BACKWARD].timer.done()) return NUDGE_POWER;
-			if(!nudges[Nudges::CLOCKWISE].timer.done()) return -ROTATE_NUDGE_POWER;
-			if(!nudges[Nudges::COUNTERCLOCKWISE].timer.done()) return ROTATE_NUDGE_POWER;
+			if(!nudges[Nudges::CLOCKWISE].timer.done()) return ROTATE_NUDGE_POWER;
+			if(!nudges[Nudges::COUNTERCLOCKWISE].timer.done()) return -ROTATE_NUDGE_POWER;
 			double power=set_drive_speed(info.main_joystick.axis[Gamepad_axis::LEFTY],boost,slow);
 			if(spin) power+=set_drive_speed(-info.main_joystick.axis[Gamepad_axis::RIGHTX],boost,slow);
 			return power;
@@ -79,17 +80,17 @@ Toplevel::Goal Teleop::run(Run_info info) {
 		}());
 	}
 
-	if(info.main_joystick.button[Gamepad_button::B]) shifter_goal=Gear_shifter::Goal::AUTO;
-	if(info.main_joystick.button[Gamepad_button::A]) shifter_goal=Gear_shifter::Goal::LOW;
-	if(info.main_joystick.button[Gamepad_button::Y]) shifter_goal=Gear_shifter::Goal::HIGH;
-	goals.shifter=shifter_goal;
-
+	goals.shifter=[&]{
+		if(info.main_joystick.button[Gamepad_button::RB]) return Gear_shifter::Goal::LOW;
+		if(info.main_joystick.axis[Gamepad_axis::RTRIGGER]>.8) return Gear_shifter::Goal::HIGH;
+		return Gear_shifter::Goal::AUTO;
+	}();
+	
 	return goals;
 }
 
 #define TELEOP_ITEMS_NO_TYPE(X)\
-	X(nudges)\
-	X(shifter_goal)
+	X(nudges)
 
 bool Teleop::operator<(Teleop const& a)const{
 	#define X(NAME) if(NAME<a.NAME) return 1; if(a.NAME<NAME) return 0;
