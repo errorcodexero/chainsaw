@@ -598,6 +598,10 @@ ostream& operator<<(ostream& o,Digital_inputs const& a){
 	o<<a.encoder;
 	return o<<")";
 }
+DS_info::DS_info():
+connected(0),alliance(Alliance::INVALID),location(0)
+{
+}
 
 Robot_inputs::Robot_inputs():
 	now(0),orientation(0),pump(0)

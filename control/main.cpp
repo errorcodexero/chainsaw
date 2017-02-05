@@ -100,6 +100,7 @@ ostream& operator<<(ostream& o,Main const& m){
 	o<<" "<<m.perf;
 	o<<" "<<m.toplevel;
 	o<<" "<<m.since_switch;
+	o<<" "<<m.mode;
 	return o<<")";
 }
 

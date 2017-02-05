@@ -3,6 +3,7 @@
 #include "../util/type.h"
 #include "nop.h"
 #include <math.h>
+#include "main.h"
 
 using namespace std;
 
@@ -56,30 +57,39 @@ struct Drivebase_sim{
 	
 	float x=0,y=0,theta=0;//x,y are in distance in feet
 	Time last_time =0;
-	int ticks_left;
-	int ticks_right;
+	int ticks_left=2;
+	int ticks_right=2;
+	float dist_left=0;
+	float dist_right=0;
 	void update(Time t,bool enable,Output out){
 		Time dt=t-last_time;
 		cout << "Drivebase Delta Time: " << dt << "\n"; 
 		last_time=t;
 		if(!enable) return;
 		float dtheta = (((out.l-out.r)*5/12.5))*6.25;
-		float speed= (out.l+out.r)*5;
-		float dist_traveled=speed*dt;
+		float speedl= (out.l)*.2;
+		float speedr= (out.r)*.2;
+		dist_left+=speedl*dt;
+		cout << "speed " << speedl << " , " << dt << "\n";
+		dist_right+=speedr*dt;
+		float dist_traveled=(dist_left+dist_right)/2;
 		float dy=dist_traveled*cosf(theta);
 		float dx=dist_traveled*sinf(theta);
+		cout << "ticks_left " << ticks_left << " , " << dist_left <<" , " << inches_to_ticks(dist_left*12) << "\n";
+		ticks_left+=inches_to_ticks(dist_left*12);
+		ticks_right+=inches_to_ticks(dist_right*12);
+		cout << "dx: "<<dx<< "dy " << dy << "dt " << dtheta << "\n";
 		y+=dy;
 		x+=dx;
 		theta+=dtheta;
-
-		
+		cout << "x " << x << " y " << y << "\n";		
 	
 	}
 	Input get()const{
 		auto d=Digital_in::_0;
 		auto p=make_pair(d,d);
 		return {Drivebase::Input{
-			{0,0,0,0,0,0},p,p,{0,0}
+			{0,0,0,0,0,0},p,p,{ticks_left,ticks_right}
 		}};
 	}
 
@@ -270,19 +280,32 @@ void sim_display(T t){
 
 int main(){
 	Toplevel_sim sim;
-
+	Main m;
+	Robot_inputs all;	
 	sim_display(sim);
 	sim_display(sim.get());
 	sim_display(example((Toplevel::Output*)0));
-
+	all.robot_mode.autonomous=true;
+	all.robot_mode.enabled=true;
+	all.joystick[2].axis[1]=1;	
 	static const Time TIMESTEP=.1;
-	for(Time t=0;t<2;t+=TIMESTEP){
+	for(Time t=0;t<20;t+=TIMESTEP){
+		cout << "Main " << m << "\n";
 		cout<<t<<"\t"<<sim.get()<<"\n";
-		auto out=example((Toplevel::Output*)0);
-		sim.update(t,1,out);
+		auto out=m(m.toplevel.input_reader(all,sim.get()));
+		//auto out=example((Toplevel::Output*)0);
+		/*Toplevel::Goal goal;
+		goal.drive.left=1;
+		goal.drive.right=1;
+		auto status_detail=m.toplevel.estimator.get();
+		auto out=control(status_detail,goal);*/
+		cout <<"out "  << out << "\n";
+		sim.update(t,1,m.toplevel.output_applicator(out));
+		m.toplevel.estimator.update(t,sim.get(),m.toplevel.output_applicator(out));
 	}
 	return 0;
 	
 }
+
 
 #endif

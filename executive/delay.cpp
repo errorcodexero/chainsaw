@@ -4,12 +4,13 @@
 #include "auto_null.h"
 #include "auto_distance.h"
 #include "auto_forward.h"
+#include "auto_baseline.h"
 
-using namespace std;
-
+using namespace std; 
 using Mode=Executive;
 
 Executive auto_mode_convert(Next_mode_info info){
+	cout << "panel in use " << info.panel.in_use << "\n";
 	if (info.panel.in_use) {
 		switch(info.panel.auto_select){ 
 			case 1: 
@@ -17,6 +18,7 @@ Executive auto_mode_convert(Next_mode_info info){
 			case 2:
 				return Executive{Auto_distance{{0,0,0}}};
 			case 3:
+				return Executive{Auto_baseline{{0,0,0}}};
 			case 4:
 			case 5:
 			case 6:
@@ -33,7 +35,7 @@ Executive auto_mode_convert(Next_mode_info info){
 
 Mode Delay::next_mode(Next_mode_info info){
 	if(!info.autonomous) return Mode{Teleop()};
-	if(info.since_switch > 8) return auto_mode_convert(info);
+	if(info.since_switch > .5) return auto_mode_convert(info);
 	return Mode{Delay()};
 }
 
