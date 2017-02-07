@@ -1,23 +1,23 @@
 Driver:
- A          - Low gear
- B          - Auto-shifting
+ A          - 
+ B          - 
  X          - 
- Y          - High gear
+ Y          - 
  Start      - 
  Back       - 
- RB         - 
- LB         - 
- RT         - Slow
+ RB         - Low gear
+ LB         - Slow
+ RT         - High gear
  LT         - Turbo
  L_Joy:
   X Axis    - 
   Y Axis    - Forward/backward
-  Pushed in -
+  Pushed in - 
  R_Joy:
   X Axis    - Turning
-  Y Axis    -
-  Pushed in -
-POV:  
+  Y Axis    - 
+  Pushed in - 
+POV:
   Center     - 
   Up         - Nudge forward
   Up_left    - 
