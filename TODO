@@ -5,18 +5,20 @@ CRITICAL:
 HIGH PRIORITY:
 	- Fix talon srx initialization: separate address for CANs and accessing index for them in the talon_srx_controls array
 	- Drive base
-		- Add in gear shifting
 		- Auto gear shifting
 	- Gear mainipulator
 		- Gear grabber
 		- Gear lift
+	- Climber
 	- Ball collector
 		- Lift
 		- Arm
 		- Intake
+	- Hopper?
+	- Shooter
 	- Autonomous:
 		- Simple one that only crosses the base line
-	- Add in a Control struct that is set by either the panel or the gamepad to make teleop decisions based on user input easier?
+		- Gear scoring (TOP PRIORITY)
 
 
 NOT AS HIGH PRIORITY:
