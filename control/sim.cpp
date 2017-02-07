@@ -287,12 +287,17 @@ int main(){
 	sim_display(example((Toplevel::Output*)0));
 	all.robot_mode.autonomous=true;
 	all.robot_mode.enabled=true;
-	all.joystick[2].axis[1]=1;	
+	all.joystick[2].axis[1]=1;
+	auto robotinput = m.toplevel.input_reader(all,sim.get());
+	cout << "robot mode " << all.robot_mode << "\n";	
 	static const Time TIMESTEP=.1;
+	robotinput.robot_mode.autonomous=true;
+	robotinput.robot_mode.enabled=true;
 	for(Time t=0;t<20;t+=TIMESTEP){
 		cout << "Main " << m << "\n";
 		cout<<t<<"\t"<<sim.get()<<"\n";
-		auto out=m(m.toplevel.input_reader(all,sim.get()));
+		auto out=m(robotinput);
+		
 		//auto out=example((Toplevel::Output*)0);
 		/*Toplevel::Goal goal;
 		goal.drive.left=1;
