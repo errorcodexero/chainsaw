@@ -45,7 +45,7 @@ ostream& operator<<(ostream& o,Nop_sim<T> const& a){
 
 using Pump_sim=Nop_sim<Pump::Input>;
 using Climber_sim=Nop_sim<Climber::Input>;
-using Intake_sim=Nop_sim<Intake::Input>;
+using Intake_s=Nop_sim<Intake::Input>;
 using Gear_shifter_sim=Nop_sim<Gear_shifter::Input>;
 using Arm_sim=Nop_sim<Arm::Input>;
 using Gear_grabber_sim=Nop_sim<Gear_grabber::Input>;
@@ -63,22 +63,19 @@ struct Drivebase_sim{
 	float dist_right=0;
 	void update(Time t,bool enable,Output out){
 		Time dt=t-last_time;
-		cout << "Drivebase Delta Time: " << dt << "\n"; 
 		last_time=t;
 		if(!enable) return;
 		float dtheta = (((out.l-out.r)*5/12.5))*6.25;
 		float speedl= (out.l)*.2;
 		float speedr= (out.r)*.2;
 		dist_left+=speedl*dt;
-		cout << "speed " << speedl << " , " << dt << "\n";
 		dist_right+=speedr*dt;
 		float dist_traveled=(dist_left+dist_right)/2;
 		float dy=dist_traveled*cosf(theta);
 		float dx=dist_traveled*sinf(theta);
-		cout << "ticks_left " << ticks_left << " , " << dist_left <<" , " << inches_to_ticks(dist_left*12) << "\n";
+		cout << "TICKS " << ticks_left << "," << ticks_right << "\n";
 		ticks_left+=inches_to_ticks(dist_left*12);
 		ticks_right+=inches_to_ticks(dist_right*12);
-		cout << "dx: "<<dx<< "dy " << dy << "dt " << dtheta << "\n";
 		y+=dy;
 		x+=dx;
 		theta+=dtheta;
@@ -289,11 +286,11 @@ int main(){
 	all.robot_mode.enabled=true;
 	all.joystick[2].axis[1]=1;
 	auto robotinput = m.toplevel.input_reader(all,sim.get());
-	cout << "robot mode " << all.robot_mode << "\n";	
 	static const Time TIMESTEP=.1;
 	robotinput.robot_mode.autonomous=true;
 	robotinput.robot_mode.enabled=true;
 	for(Time t=0;t<20;t+=TIMESTEP){
+		robotinput.now=t;
 		cout << "Main " << m << "\n";
 		cout<<t<<"\t"<<sim.get()<<"\n";
 		auto out=m(robotinput);
@@ -307,6 +304,7 @@ int main(){
 		cout <<"out "  << out << "\n";
 		sim.update(t,1,m.toplevel.output_applicator(out));
 		m.toplevel.estimator.update(t,sim.get(),m.toplevel.output_applicator(out));
+		cout <<"sim get encoders" <<sim.get()<< "\n"
 	}
 	return 0;
 	

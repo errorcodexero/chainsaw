@@ -10,7 +10,7 @@ using namespace std;
 using Mode=Executive;
 
 Executive auto_mode_convert(Next_mode_info info){
-	cout << "panel in use " << info.panel.in_use << "\n";
+	cout << "panel in use " << info.panel.in_use <<" auto panel value " <<info.panel.auto_select<<  "\n";
 	if (info.panel.in_use) {
 		switch(info.panel.auto_select){ 
 			case 1: 
@@ -18,10 +18,10 @@ Executive auto_mode_convert(Next_mode_info info){
 			case 2:
 				return Executive{Auto_distance{{0,0,0}}};
 			case 3:
-				return Executive{Auto_baseline{{0,0,0}}};
 			case 4:
 			case 5:
 			case 6:
+				return Executive{Auto_baseline{{0,0,0}}};
 			case 7:
 			case 8:
 			case 9:
@@ -34,8 +34,11 @@ Executive auto_mode_convert(Next_mode_info info){
 }
 
 Mode Delay::next_mode(Next_mode_info info){
+	cout << "delay auto " << info.autonomous << "\n";
 	if(!info.autonomous) return Mode{Teleop()};
-	if(info.since_switch > .5) return auto_mode_convert(info);
+	cout << "switch " << info.since_switch << "\n";
+	if(info.since_switch > .5)
+	return auto_mode_convert(info);
 	return Mode{Delay()};
 }
 
