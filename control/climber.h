@@ -3,26 +3,32 @@
 
 #include <set>
 #include "../util/interface.h"
+#include "nop.h"
+#include "../util/countdown_timer.h"
 
 struct Climber{
-	enum class Goal{AUTO_DOWN,DOWN,STOP,UP,AUTO_UP};
+	enum class Goal{AUTO_CLIMB,CLIMB,STOP,RELEASE,AUTO_RELEASE};
 	
-	enum class Output{DOWN,STOP,UP};
+	enum class Output{CLIMB,STOP,RELEASE};
 
-	struct Input{
-		bool down, up;//hall-effects
+	using Input = Nop::Input;
+
+	/*struct Input{//no sensors?
+		bool climbed, released;//hall-effects
 		Input();
 		Input(bool,bool);
-	};
+	};*/
 
-	enum class Status_detail{ERROR_,DOWN,GOING_DOWN,STOPPED,GOING_UP,UP};
+	enum class Status_detail{ERROR_,CLIMBED,CLIMBING,STOPPED,RELEASING,RELEASED};//TODO: if no sensors: remove ERROR_
 	
 	typedef Status_detail Status;
 	
-	struct Input_reader{
+	using Input_reader = Nop::Input_reader;
+
+	/*struct Input_reader{
 		Input operator()(Robot_inputs const&)const;
 		Robot_inputs operator()(Robot_inputs,Input)const;
-	};
+	};*/
 
 	struct Output_applicator{
 		Robot_outputs operator()(Robot_outputs,Output)const;
@@ -31,6 +37,8 @@ struct Climber{
 
 	struct Estimator{
 		Status_detail last;
+		Output last_output;
+		Countdown_timer state_timer;
 		
 		void update(Time,Input,Output);
 		Status_detail get()const;
@@ -48,15 +56,15 @@ std::set<Climber::Status_detail> examples(Climber::Status_detail*);
 std::set<Climber::Output> examples(Climber::Output*);
 
 std::ostream& operator<<(std::ostream&,Climber::Goal);
-std::ostream& operator<<(std::ostream&,Climber::Input);
+//std::ostream& operator<<(std::ostream&,Climber::Input);
 std::ostream& operator<<(std::ostream&,Climber::Status_detail);
 std::ostream& operator<<(std::ostream&,Climber::Output);
 std::ostream& operator<<(std::ostream&,Climber const&);
-
+/*
 bool operator<(Climber::Input,Climber::Input);
 bool operator==(Climber::Input,Climber::Input);
 bool operator!=(Climber::Input,Climber::Input);
-
+*/
 bool operator==(Climber::Estimator,Climber::Estimator);
 bool operator!=(Climber::Estimator,Climber::Estimator);
 

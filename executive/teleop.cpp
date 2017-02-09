@@ -118,8 +118,13 @@ Toplevel::Goal Teleop::run(Run_info info) {
 		return Gear_shifter::Goal::AUTO;
 	}();
 
-	if(info.panel.gear_score){
+	if(info.panel.gear_prep_score){
 		gear_score_protocol(info.toplevel_status,info.in.robot_mode.enabled,info.in.now,goals);
+	} else if(info.panel.gear_score){
+		goals.gear_collector.gear_grabber = Gear_grabber::Goal::OPEN;
+	}
+	if(info.panel.climb){
+		goals.climber = Climber::Goal::CLIMB;
 	}
 	
 	return goals;

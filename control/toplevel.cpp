@@ -158,7 +158,7 @@ Toplevel::Status::Status():
 		{0,0}
 	),
 	pump(Pump::Status::NOT_FULL),
-	climber(Climber::Status::DOWN),
+	climber(Climber::Status::RELEASED),
 	collector(),
 	gear_collector()
 {}
