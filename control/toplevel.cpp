@@ -151,18 +151,17 @@ ostream& operator<<(ostream& o,Toplevel::Goal g){
 }
 
 Toplevel::Status::Status():
+	pump(Pump::Status::NOT_FULL),
+	climber(Climber::Status::DOWN),
 	drive(
 		{Motor_check::Status::OK_,Motor_check::Status::OK_},
 		false,
 		{0.0,0.0},
 		{0,0}
 	),
-	pump(Pump::Status::NOT_FULL),
-	climber(Climber::Status::DOWN),
 	collector(),
 	gear_collector()
 {}
-
 bool operator==(Toplevel::Status a,Toplevel::Status b){
 	#define X(A,name,C) if(a.name!=b.name) return 0;
 	TOPLEVEL_ITEMS
@@ -334,10 +333,10 @@ bool operator<(Toplevel::Goal const& a,Toplevel::Goal const& b){
 
 set<Toplevel::Status_detail> examples(Toplevel::Status_detail*){
 	return {Toplevel::Status_detail{
-		*examples((Drivebase::Status_detail*)0).begin(),
 		Pump::Status_detail{Pump::Status::FULL},
 		*examples((Climber::Status_detail*)0).begin(),
 		*examples((Gear_shifter::Status_detail*)0).begin(),
+		*examples((Drivebase::Status_detail*)0).begin(),
 		*examples((Collector::Status_detail*)0).begin(),
 		*examples((Gear_collector::Status_detail*)0).begin()
 	}};
@@ -353,10 +352,10 @@ set<Toplevel::Status> examples(Toplevel::Status*){ return {Toplevel::Status{}}; 
 
 set<Toplevel::Input> examples(Toplevel::Input*){
 	Toplevel::Input a{
-		*examples((Drivebase::Input*)0).begin(),
 		Pump::Input{},
 		*examples((Climber::Input*)0).begin(),
 		*examples((Gear_shifter::Input*)0).begin(),
+		*examples((Drivebase::Input*)0).begin(),
 		*examples((Collector::Input*)0).begin(),
 		*examples((Gear_collector::Input*)0).begin()
 	};

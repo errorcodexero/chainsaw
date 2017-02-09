@@ -16,11 +16,11 @@ const T& clamp( const T& v, const T& lo, const T& hi )
 }
 
 double Motion_profile::target_speed(const double current){
-	float error = goal-current;
-	float motorv = error*vel_modifier;
-	const float max=1;
-	
-	return clamp(motorv,-max,max);
+	//float error = goal-current;
+	//float motorv = error*vel_modifier;
+	//const float max=1;
+	if(current==current) return 1; /*clamp(motorv,-max,max);*/ //TODO fix so that it will return proper values.
+	else return 1;
 }
 void Motion_profile::set_goal(double g){
 	goal=g;

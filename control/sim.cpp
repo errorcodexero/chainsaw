@@ -45,7 +45,7 @@ ostream& operator<<(ostream& o,Nop_sim<T> const& a){
 
 using Pump_sim=Nop_sim<Pump::Input>;
 using Climber_sim=Nop_sim<Climber::Input>;
-using Intake_s=Nop_sim<Intake::Input>;
+using Intake_sim=Nop_sim<Intake::Input>;
 using Gear_shifter_sim=Nop_sim<Gear_shifter::Input>;
 using Arm_sim=Nop_sim<Arm::Input>;
 using Gear_grabber_sim=Nop_sim<Gear_grabber::Input>;
@@ -59,23 +59,25 @@ struct Drivebase_sim{
 	Time last_time =0;
 	int ticks_left=2;
 	int ticks_right=2;
-	float dist_left=0;
-	float dist_right=0;
 	void update(Time t,bool enable,Output out){
 		Time dt=t-last_time;
 		last_time=t;
 		if(!enable) return;
 		float dtheta = (((out.l-out.r)*5/12.5))*6.25;
-		float speedl= (out.l)*.2;
-		float speedr= (out.r)*.2;
-		dist_left+=speedl*dt;
-		dist_right+=speedr*dt;
+		float speedl= (out.l)*5;
+		float speedr= (out.r)*5;
+		cout << "Motors: " << out.l << "," << out.r << "\n";
+		float dist_left=speedl*dt;
+		float dist_right=speedr*dt;
 		float dist_traveled=(dist_left+dist_right)/2;
 		float dy=dist_traveled*cosf(theta);
 		float dx=dist_traveled*sinf(theta);
-		cout << "TICKS " << ticks_left << "," << ticks_right << "\n";
+		cout << "distance in update " << dist_left << "," << dist_right << "\n";
+		cout << "ticks in update before update " << ticks_left << "," << ticks_right << "\n";	
+		cout << "inches to ticks " << inches_to_ticks(dist_left*12) << "\n";
 		ticks_left+=inches_to_ticks(dist_left*12);
 		ticks_right+=inches_to_ticks(dist_right*12);
+		cout << "ticks in update after update" << ticks_left << "," << ticks_right << "\n";
 		y+=dy;
 		x+=dx;
 		theta+=dtheta;
@@ -83,6 +85,7 @@ struct Drivebase_sim{
 	
 	}
 	Input get()const{
+		cout << "ticks in get " << ticks_left << "," <<ticks_right<<"\n";
 		auto d=Digital_in::_0;
 		auto p=make_pair(d,d);
 		return {Drivebase::Input{
@@ -289,12 +292,18 @@ int main(){
 	static const Time TIMESTEP=.1;
 	robotinput.robot_mode.autonomous=true;
 	robotinput.robot_mode.enabled=true;
+
+	//cout << "10" << inches_to_ticks(10) << "\n";
+	//cout << "20" << inches_to_ticks(20) << "\n";
+	//cout << "50" << inches_to_ticks(50) << "\n";
+	//cout << "inverse one " <<ticks_to_inches(inches_to_ticks(10))<< " two " << inches_to_ticks(ticks_to_inches(10)) << "\n";
 	for(Time t=0;t<20;t+=TIMESTEP){
 		robotinput.now=t;
-		cout << "Main " << m << "\n";
-		cout<<t<<"\t"<<sim.get()<<"\n";
+
+		//cout << "Main " << m << "\n";
+		cout<< "\n" <<t<<"\t"<<sim.get()<<"\n";
 		auto out=m(robotinput);
-		
+		cout << "Mode: " <<m.mode << "\n";	
 		//auto out=example((Toplevel::Output*)0);
 		/*Toplevel::Goal goal;
 		goal.drive.left=1;
@@ -304,7 +313,6 @@ int main(){
 		cout <<"out "  << out << "\n";
 		sim.update(t,1,m.toplevel.output_applicator(out));
 		m.toplevel.estimator.update(t,sim.get(),m.toplevel.output_applicator(out));
-		cout <<"sim get encoders" <<sim.get()<< "\n"
 	}
 	return 0;
 	

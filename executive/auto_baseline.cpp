@@ -32,7 +32,8 @@ Executive Auto_baseline::next_mode(Next_mode_info info){
 
 Toplevel::Goal Auto_baseline::run(Run_info info){
 	Toplevel::Goal goals;
-	double power = -motion_profile.target_speed(ticks_to_inches(info.toplevel_status.drive.ticks.l));//assuming that the left and right encoder values are similar enough
+	double power = motion_profile.target_speed(ticks_to_inches(info.toplevel_status.drive.ticks.l));//assuming that the left and right encoder values are similar enough
+	cout << "motion power : " << power << "\n";
 	goals.drive.left = power;
 	goals.drive.right = power;
 		return goals;

@@ -27,7 +27,6 @@ bool operator==(Teleop::Nudge const& a,Teleop::Nudge const& b){
 }
 
 Executive Teleop::next_mode(Next_mode_info info) {
-	cout <<"executive auto " << info.autonomous_start << " , " << info.panel.in_use <<" info.sinceswitch "  <<info.since_switch <<   "\n";
 	if (info.autonomous_start) {
 		if (info.panel.in_use) {
 			return Executive{Delay()};

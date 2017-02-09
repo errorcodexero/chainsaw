@@ -34,9 +34,7 @@ Executive auto_mode_convert(Next_mode_info info){
 }
 
 Mode Delay::next_mode(Next_mode_info info){
-	cout << "delay auto " << info.autonomous << "\n";
 	if(!info.autonomous) return Mode{Teleop()};
-	cout << "switch " << info.since_switch << "\n";
 	if(info.since_switch > .5)
 	return auto_mode_convert(info);
 	return Mode{Delay()};

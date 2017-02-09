@@ -47,7 +47,7 @@ double inches_to_ticks(const float inches){
 	const double WHEEL_CIRCUMFERENCE=WHEEL_DIAMETER*PI;//inches
 	const double INCHES_PER_TICK=WHEEL_CIRCUMFERENCE/(double)TICKS_PER_REVOLUTION;
 	const double ERROR_CORRECTION = 0.181952663;//2017, encoders are geared. Rough calculation.
-	return inches/INCHES_PER_TICK*ERROR_CORRECTION;
+	return inches/(INCHES_PER_TICK*ERROR_CORRECTION);
 }
 
 #define R_ENCODER_PORTS 0,1
