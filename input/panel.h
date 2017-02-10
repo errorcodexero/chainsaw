@@ -18,17 +18,17 @@ struct Panel{
 	bool climb;
 	//2 position swicthes:
 	//3 position switches:
-	enum class Gear_collector{UP,DOWN,AUTO};
+	enum class Gear_collector{UP,DOWN,AUTO};//gear_lifter
 	Gear_collector gear_collector;
-	enum class Gear_holder{OPEN,CLOSED,AUTO};
+	enum class Gear_holder{OPEN,CLOSED,AUTO};//gear_grabber
 	Gear_holder gear_holder;
 	enum class Ball_shooter{POWER,RPM,AUTO};
 	Ball_shooter ball_shooter;
-	enum class Ball_arm{STOW,LOW,AUTO};
+	enum class Ball_arm{STOW,LOW,AUTO};//arm
 	Ball_arm ball_arm;
-	enum class Belt_direction{IN,OUT,AUTO};
+	enum class Belt_direction{IN,OUT,AUTO};//lift
 	Belt_direction belt_direction;
-	enum class Ball_collector{ON,OFF,AUTO};
+	enum class Ball_collector{ON,OFF,AUTO};//intake
 	Ball_collector ball_collector; 
 	//10 *position switches:
 	int auto_select;//0-9

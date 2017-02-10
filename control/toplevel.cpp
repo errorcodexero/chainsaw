@@ -152,7 +152,7 @@ ostream& operator<<(ostream& o,Toplevel::Goal g){
 
 Toplevel::Status::Status():
 	pump(Pump::Status::NOT_FULL),
-	climber(Climber::Status::DOWN),
+	climber(Climber::Status::RELEASED),
 	drive(
 		{Motor_check::Status::OK_,Motor_check::Status::OK_},
 		false,

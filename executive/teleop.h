@@ -14,9 +14,20 @@ struct Teleop : Executive_impl<Teleop> {
 		Countdown_timer timer;
 	};
 
+	#define GEAR_SCORE_STEPS X(CLEAR_BALLS) X(RAISE_ARM) X(LIFT_GEAR)
+	enum class Gear_score_step{
+		#define X(NAME) NAME,
+		GEAR_SCORE_STEPS
+		#undef X
+	};
+
 	#define TELEOP_ITEMS(X)\
-		X(SINGLE_ARG(std::array<Nudge,NUDGES>),nudges)
+		X(SINGLE_ARG(std::array<Nudge,NUDGES>),nudges) \
+		X(Countdown_timer,clear_ball_timer) \
+		X(Gear_score_step,gear_score_step) 
 	STRUCT_MEMBERS(TELEOP_ITEMS)
+
+	void gear_score_protocol(Toplevel::Status_detail const&,const bool,const Time,Toplevel::Goal&);
 
 	Executive next_mode(Next_mode_info);
 	Toplevel::Goal run(Run_info);
@@ -28,6 +39,7 @@ struct Teleop : Executive_impl<Teleop> {
 };
 
 std::ostream& operator<<(std::ostream&,Teleop::Nudge const&);
+std::ostream& operator<<(std::ostream&,Teleop::Gear_score_step const&);
 
 bool operator<(Teleop::Nudge const&,Teleop::Nudge const&);
 bool operator==(Teleop::Nudge const&,Teleop::Nudge const&);

@@ -442,14 +442,14 @@ cc_library(
 	name="climber",
 	srcs=["control/climber.cpp"],
 	hdrs=["control/climber.h"],
-	deps=[":interface"]
+	deps=[":interface",":nop",":countdown_timer"]
 )
 
 cc_test(
 	name="climber_test",
 	srcs=["control/climber.cpp","control/climber.h","control/formal.h"],
 	copts=["-DCLIMBER_TEST"],
-	deps=[":interface"],
+	deps=[":interface",":nop",":countdown_timer"],
 	timeout="short"
 )
 
