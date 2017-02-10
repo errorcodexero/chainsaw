@@ -261,6 +261,15 @@ Panel interpret_gamepad(Joystick_data d){
 	Panel p;
 	p.in_use = get_in_use(d);
 	if(!p.in_use) return p;
+	
+	bool alternative_op = d.button[Gamepad_button::LB];
+
+	if(!alternative_op){
+		
+	} else{
+		
+	}
+
 	return p;
 }
 
