@@ -1,9 +1,4 @@
-CRITICAL:
-	Fix connection problem (like generating print-outs before robot is connected to a driver station or any other solution that might/will work)
-
-	
 HIGH PRIORITY:
-	- Fix talon srx initialization: separate address for CANs and accessing index for them in the talon_srx_controls array
 	- Drive base
 		- Auto gear shifting
 	- Gear mainipulator
@@ -33,6 +28,7 @@ NOT AS HIGH PRIORITY:
 NICE THINGS TO HAVE:
 	- Expand testing of the different robot modes
 	- Log Analysis
+	- Fix talon srx initialization: separate address for CANs and accessing index for them in the talon_srx_controls array
 	- Clean-up stuff:
 		- Deploy script
 		- Use enum class more places
