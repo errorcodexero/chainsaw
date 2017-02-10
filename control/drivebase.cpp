@@ -68,7 +68,7 @@ Robot_inputs Drivebase::Input_reader::operator()(Robot_inputs all,Input in)const
 	};
 	encoder(L_ENCODER_PORTS,in.left);
 	encoder(R_ENCODER_PORTS,in.right);
-	all.digital_io.encoder[L_ENCODER_LOC] = in.ticks.l;
+	all.digital_io.encoder[L_ENCODER_LOC] = -in.ticks.l;
 	all.digital_io.encoder[R_ENCODER_LOC] = in.ticks.r;
 	return all;
 }
@@ -88,7 +88,7 @@ Drivebase::Input Drivebase::Input_reader::operator()(Robot_inputs const& in)cons
 		}(),
 		encoder_info(L_ENCODER_PORTS),
 		encoder_info(R_ENCODER_PORTS),
-		{encoderconv(in.digital_io.encoder[L_ENCODER_LOC]),encoderconv(in.digital_io.encoder[R_ENCODER_LOC])}
+		{-encoderconv(in.digital_io.encoder[L_ENCODER_LOC]),encoderconv(in.digital_io.encoder[R_ENCODER_LOC])}
 	};
 }
 

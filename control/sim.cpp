@@ -57,15 +57,15 @@ struct Drivebase_sim{
 	
 	float x=0,y=0,theta=0;//x,y are in distance in feet
 	Time last_time =0;
-	int ticks_left=2;
-	int ticks_right=2;
+	int ticks_left=3;
+	int ticks_right=3;
 	void update(Time t,bool enable,Output out){
 		Time dt=t-last_time;
 		last_time=t;
 		if(!enable) return;
 		float dtheta = (((out.l-out.r)*5/12.5))*6.25;
-		float speedl= (out.l)*5;
-		float speedr= (out.r)*5;
+		float speedl= (out.l)*2.5;
+		float speedr= (out.r)*2.5;
 		cout << "Motors: " << out.l << "," << out.r << "\n";
 		float dist_left=speedl*dt;
 		float dist_right=speedr*dt;
@@ -85,12 +85,15 @@ struct Drivebase_sim{
 	
 	}
 	Input get()const{
+		
 		cout << "ticks in get " << ticks_left << "," <<ticks_right<<"\n";
 		auto d=Digital_in::_0;
 		auto p=make_pair(d,d);
-		return {Drivebase::Input{
-			{0,0,0,0,0,0},p,p,{ticks_left,ticks_right}
+		Drivebase::Input in = {Drivebase::Input{
+			{0,0,0,0,0,0},p,p,{-ticks_left,ticks_right}//because encoders are opotistes
 		}};
+		cout<<"drive_in:"<<in<<"\n";
+		return in;
 	}
 
 };
@@ -170,7 +173,7 @@ struct Toplevel_sim{
 
 template<typename SIMULATOR,typename DEVICE>
 void simulate(SIMULATOR sim,DEVICE device){
-	static const Time TIMESTEP=.1;//this will probably change to .01 or .02 later.
+	static const Time TIMESTEP=.05;//this will probably change to .01 or .02 later.
 	auto in=sim.get();
 	for(Time t=0;t<2;t+=TIMESTEP){
 		//TODO: Make the simulator go 2014 style where you only get "significant" changes printed
@@ -313,6 +316,7 @@ int main(){
 		cout <<"out "  << out << "\n";
 		sim.update(t,1,m.toplevel.output_applicator(out));
 		m.toplevel.estimator.update(t,sim.get(),m.toplevel.output_applicator(out));
+		robotinput = m.toplevel.input_reader(robotinput,sim.get());
 	}
 	return 0;
 	

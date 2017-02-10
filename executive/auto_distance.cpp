@@ -17,7 +17,7 @@ Executive Auto_distance::next_mode(Next_mode_info info){
 	
 	motion_profile.set_goal(TARGET_DISTANCE);
 	
-	cout<<"\nencoder_differences:"<<encoder_differences<<"   left(inches):"<<ticks_to_inches(encoder_differences.l)<<"   target(inches):"<<TARGET_DISTANCE<<"\n";
+	cout<<"\nAuto_distance: encoder_differences:"<<encoder_differences<<"   left(inches):"<<ticks_to_inches(encoder_differences.l)<<"   target(inches):"<<TARGET_DISTANCE<<"\n";
 	
 	if(ticks_to_inches(encoder_differences.l) >= TARGET_DISTANCE-TOLERANCE && ticks_to_inches(encoder_differences.l) <= TARGET_DISTANCE+TOLERANCE){
 		in_range.update(info.in.now,info.in.robot_mode.enabled);

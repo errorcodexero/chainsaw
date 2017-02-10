@@ -16,16 +16,17 @@ Executive Auto_baseline::next_mode(Next_mode_info info){
 
 	motion_profile.set_goal(TARGET_DISTANCE);
 
-	cout<<"\n" << "encoder_differences:"<< encoder_differences<<"   left(inches):"<<ticks_to_inches(encoder_differences.l)<<"   target(inches):"<<TARGET_DISTANCE<<"\n";
+	cout<<"\n" << "auto_baseline: encoder_differences:"<< encoder_differences<<"   left(inches):"<<ticks_to_inches(encoder_differences.l)<<"   target(inches):"<<TARGET_DISTANCE<<"\n";
 	
 	if(ticks_to_inches(encoder_differences.l) >= TARGET_DISTANCE-TOLERANCE && ticks_to_inches(encoder_differences.l) <= TARGET_DISTANCE+TOLERANCE){
-	in_range.update(info.in.now,info.in.robot_mode.enabled);
+		cout <<"IN  RANGE"<< "\n";
+		in_range.update(info.in.now,info.in.robot_mode.enabled);
 	} else {
-	const double IN_RANGE_TIME = 2.0;//seconds - the time that the robot needs to be within a certain distance from the target
-	in_range.set(IN_RANGE_TIME);
+		const double IN_RANGE_TIME = 2.0;//seconds - the time that the robot needs to be within a certain distance from the target
+		in_range.set(IN_RANGE_TIME);
 	}
 	if(in_range.done()){
-	return Executive{Teleop()};
+		return Executive{Teleop()};
 	}
 	return Executive{Auto_baseline(CONSTRUCT_STRUCT_PARAMS(AUTO_BASELINE_ITEMS))};
 }
