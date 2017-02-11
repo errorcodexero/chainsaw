@@ -38,7 +38,7 @@ Toplevel::Goal Auto_baseline::run(Run_info info){
 		return goals;
 }
 
-/*
+
 Executive Auto_baseline_turn::next_mode(Next_mode_info info){
 	if(!info.autonomous) return Executive{Teleop()};
 	Drivebase::Encoder_ticks encoder_differences={
@@ -73,9 +73,9 @@ Toplevel::Goal Auto_baseline_turn::run(Run_info info){
 	goals.drive.right = power;
 	return goals;
 }
-*/
+
 bool Auto_baseline::operator==(Auto_baseline const&)const{ return true; }//TODO: update with values in that struct
-//bool Auto_baseline::operator==(Auto_baseline_turn const&) const{ return true}
+bool Auto_baseline_turn::operator==(Auto_baseline_turn const&) const{ return true;}//TODO
 
 #ifdef AUTO_BASELINE_TEST
 #include "test.h"
