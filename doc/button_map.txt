@@ -46,8 +46,8 @@ Gunner:
   Right     -
   Pushed in - 
  R_Joy:
-  Up        - Ball lift belts in OR (with AO) intake in
-  Down      - Ball lift belts out OR (with AO) intake out
+  Up        - Ball lift belts on OR (with AO) intake in
+  Down      - Ball lift belts off OR (with AO) intake out
   Left      - Ball lift belts auto (with AO) intake auto
   Right     - 
   Pushed in - 

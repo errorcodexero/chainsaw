@@ -657,6 +657,14 @@ cc_library(
 	deps=[":interface",":input_util"]
 )
 
+cc_test(
+	name="panel_test",
+	srcs=["input/panel.cpp","input/panel.h"],
+	copts=["-DPANEL_TEST"],
+	deps=[":interface",":input_util"],
+	timeout = "short"
+)
+
 cc_library(
 	name="executive_impl",
 	srcs=[

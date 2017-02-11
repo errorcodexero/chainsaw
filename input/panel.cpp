@@ -48,7 +48,7 @@ ostream& operator<<(ostream& o,Panel::Gear_collector p){
 
 ostream& operator<<(ostream& o,Panel::Gear_holder p){
 	#define X(NAME) if(p==Panel::Gear_holder::NAME) return o<<""#NAME;
-	X(OPEN) X(CLOSED) X(AUTO)
+	X(OPEN) X(CLOSE) X(AUTO)
 	#undef X
 	assert(0);
 }
@@ -138,7 +138,6 @@ Panel interpret_oi(Joystick_data d){
 	{//two position switches
 	}
 	{//three position switches
-		
 		Volt gear_collector = d.axis[GEAR_COL_AXIS];
 		p.gear_collector = [&]{
 			static const Volt UP = -1, DOWN = 0, AUTO = 1;
@@ -148,15 +147,15 @@ Panel interpret_oi(Joystick_data d){
 		}();
 
 		Volt gear_holder = d.axis[GEAR_HOLDER_AXIS];
-			p.gear_holder = [&]{
-			static const Volt OPEN = -1, CLOSED = 0, AUTO = 1;
-			if(set_button(gear_holder,OPEN,CLOSED,AUTO)) return Panel::Gear_holder::CLOSED;
-			if(set_button(gear_holder,CLOSED,AUTO,ARTIFICIAL_MAX)) return Panel::Gear_holder::AUTO;
+		p.gear_holder = [&]{
+			static const Volt OPEN = -1, CLOSE = 0, AUTO = 1;
+			if(set_button(gear_holder,OPEN,CLOSE,AUTO)) return Panel::Gear_holder::CLOSE;
+			if(set_button(gear_holder,CLOSE,AUTO,ARTIFICIAL_MAX)) return Panel::Gear_holder::AUTO;
 			return Panel::Gear_holder::OPEN;
 		}();	
 	 
 		Volt ball_shooter = d.axis[BALL_SHOOTER_AXIS];
-			p.ball_shooter = [&]{
+		p.ball_shooter = [&]{
 			static const Volt POWER = -1, RPM = 0, AUTO = 1;
 			if(set_button(ball_shooter,POWER,RPM,AUTO)) return Panel::Ball_shooter::RPM;
 			if(set_button(ball_shooter,RPM,AUTO,ARTIFICIAL_MAX)) return Panel::Ball_shooter::AUTO;
@@ -165,7 +164,7 @@ Panel interpret_oi(Joystick_data d){
 		
 		
 		Volt ball_arm = d.axis[BALL_ARM_AXIS];
-			p.ball_arm = [&]{
+		p.ball_arm = [&]{
 			static const Volt STOW = -1, LOW = 0, AUTO = 1;
 			if(set_button(ball_arm,STOW,LOW,AUTO)) return Panel::Ball_arm::LOW;
 			if(set_button(ball_arm,LOW,AUTO,ARTIFICIAL_MAX)) return Panel::Ball_arm::AUTO;
@@ -173,7 +172,7 @@ Panel interpret_oi(Joystick_data d){
 		}();
 			
 		Volt belt_direction = d.axis[BELT_DIR_AXIS];
-			p.belt_direction = [&]{
+		p.belt_direction = [&]{
 			static const Volt IN = -1, OUT = 0, AUTO = 1;
 			if(set_button(belt_direction,IN,OUT,AUTO)) return Panel::Belt_direction::OUT;
 			if(set_button(belt_direction,IN,AUTO,ARTIFICIAL_MAX)) return Panel::Belt_direction::AUTO;
@@ -181,20 +180,18 @@ Panel interpret_oi(Joystick_data d){
 		}();
 
 		Volt ball_collector = d.axis[BALL_COL_AXIS];
-			p.ball_collector = [&]{
+		p.ball_collector = [&]{
 			static const Volt ON = -1, OFF = 0, AUTO = 1;
 			if(set_button(ball_collector,ON,OFF,AUTO)) return Panel::Ball_collector::OFF;
 			if(set_button(ball_collector,OFF,AUTO,ARTIFICIAL_MAX)) return Panel::Ball_collector::AUTO;
 			return Panel::Ball_collector::ON;
-		}();
-
-	
+		}();	
 	}
 	{//buttons
-		//sets all buttons to off beacuse we assume that only one should be pressed on this axis at a time
+		/*//sets all buttons to off beacuse we assume that only one should be pressed on this axis at a time
 		#define X(button) p.button = false;
 		BUTTONS
-		#undef X
+		#undef X*/
 		p.learn=d.button[LEARN_LOC];
 		p.collect=d.button[BALL_COL_LOC];
 		p.shoot_prep=d.button[PREP_SHOOT_LOC];
@@ -265,11 +262,133 @@ Panel interpret_gamepad(Joystick_data d){
 	bool alternative_op = d.button[Gamepad_button::LB];
 
 	if(!alternative_op){
-		
+		p.learn = d.button[Gamepad_button::BACK];
+		p.climb = d.button[Gamepad_button::START];
+		p.gear_score = d.button[Gamepad_button::Y];
+		p.gear_prep_collect = d.button[Gamepad_button::A];
+		p.speed_dial = d.axis[Gamepad_axis::LTRIGGER];
+		switch(pov_section(d.axis[Gamepad_axis::DPAD])){
+			case POV_section::CENTER:
+				break;
+			case POV_section::UP:
+				p.ball_arm = Panel::Ball_arm::STOW;
+				break;
+			case POV_section::UP_LEFT:
+				break;
+			case POV_section::LEFT:
+				p.ball_arm = Panel::Ball_arm::AUTO;
+				break;
+			case POV_section::DOWN_LEFT:
+				break;
+			case POV_section::DOWN:
+				p.ball_arm = Panel::Ball_arm::LOW;
+				break;
+			case POV_section::DOWN_RIGHT:
+				break;
+			case POV_section::RIGHT:
+				break;
+			case POV_section::UP_RIGHT:
+				break;
+			default:
+				assert(0);
+		}
+		switch(joystick_section(d.axis[Gamepad_axis::LEFTX],d.axis[Gamepad_axis::LEFTY])){
+			case Joystick_section::UP:
+				p.gear_collector = Panel::Gear_collector::UP;
+				break;
+			case Joystick_section::LEFT:
+				p.gear_collector = Panel::Gear_collector::AUTO;
+				break;
+			case Joystick_section::DOWN:
+				p.gear_collector = Panel::Gear_collector::DOWN;
+				break;
+			case Joystick_section::RIGHT:
+				break;
+			case Joystick_section::CENTER:
+				break;
+			default:
+				assert(0);
+		}
+		switch(joystick_section(d.axis[Gamepad_axis::RIGHTX],d.axis[Gamepad_axis::RIGHTY])){
+			case Joystick_section::UP:
+				p.belt_direction = Panel::Belt_direction::IN;
+				break;
+			case Joystick_section::LEFT:
+				p.belt_direction = Panel::Belt_direction::AUTO;
+				break;
+			case Joystick_section::DOWN:
+				p.belt_direction = Panel::Belt_direction::OUT;
+				break;
+			case Joystick_section::RIGHT:
+				break;
+			case Joystick_section::CENTER:
+				break;
+			default:
+				assert(0);
+		}
 	} else{
-		
+		p.shoot = d.button[Gamepad_button::B];
+		p.shoot_prep = d.button[Gamepad_button::X];
+		switch(pov_section(d.axis[Gamepad_axis::DPAD])){
+			case POV_section::CENTER:
+				break;
+			case POV_section::UP:
+				p.ball_shooter = Panel::Ball_shooter::POWER;
+				break;
+			case POV_section::UP_LEFT:
+				break;
+			case POV_section::LEFT:
+				p.ball_shooter = Panel::Ball_shooter::AUTO;
+				break;
+			case POV_section::DOWN_LEFT:
+				break;
+			case POV_section::DOWN:
+				p.ball_shooter = Panel::Ball_shooter::RPM;
+				break;
+			case POV_section::DOWN_RIGHT:
+				break;
+			case POV_section::RIGHT:
+				break;
+			case POV_section::UP_RIGHT:
+				break;
+			default:
+				assert(0);
+		}
+		switch(joystick_section(d.axis[Gamepad_axis::LEFTX],d.axis[Gamepad_axis::LEFTY])){
+			case Joystick_section::UP:
+				p.gear_holder = Panel::Gear_holder::OPEN;
+				break;
+			case Joystick_section::LEFT:
+				p.gear_holder = Panel::Gear_holder::AUTO;
+				break;
+			case Joystick_section::DOWN:
+				p.gear_holder = Panel::Gear_holder::CLOSE;
+				break;
+			case Joystick_section::RIGHT:
+				break;
+			case Joystick_section::CENTER:
+				break;
+			default:
+				assert(0);
+		}
+		switch(joystick_section(d.axis[Gamepad_axis::RIGHTX],d.axis[Gamepad_axis::RIGHTY])){
+			case Joystick_section::UP:
+				p.ball_collector = Panel::Ball_collector::ON;
+				break;
+			case Joystick_section::LEFT:
+				p.ball_collector = Panel::Ball_collector::AUTO;
+				break;
+			case Joystick_section::DOWN:
+				p.ball_collector = Panel::Ball_collector::OFF;
+				break;
+			case Joystick_section::RIGHT:
+				break;
+			case Joystick_section::CENTER:
+				break;
+			default:
+				assert(0);
+		}
 	}
-
 	return p;
 }
 

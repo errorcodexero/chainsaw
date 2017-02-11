@@ -24,7 +24,7 @@ namespace Gamepad_button{
 }
 namespace Gamepad_axis{
 	//How the axes appear in the DS; though
-	static const unsigned LEFTX=0,LEFTY=1,LTRIGGER=2,RTRIGGER=3,RIGHTX=4,RIGHTY=5,DPADX=6;
+	static const unsigned LEFTX=0,LEFTY=1,LTRIGGER=2,RTRIGGER=3,RIGHTX=4,RIGHTY=5,DPAD=6;
 	//DPADY does not exist, neither does axis 6
 }
 
