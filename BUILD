@@ -614,21 +614,6 @@ cc_test(
 )
 
 cc_library(
-	name="tote_sensors",
-	srcs=["control/tote_sensors.cpp"],
-	hdrs=["control/tote_sensors.h"],
-	deps=[":nop"]
-)
-
-cc_test(
-	name="tote_sensors_test",
-	srcs=["control/tote_sensors.cpp","control/tote_sensors.h","control/formal.h"],
-	copts=["-DTOTE_SENSORS_TEST"],
-	deps=[":nop"],
-	timeout="short"
-)
-
-cc_library(
 	name="nop",
 	srcs=["control/nop.cpp"],
 	hdrs=["control/nop.h"],
