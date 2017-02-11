@@ -34,25 +34,24 @@ Robot_outputs Main::operator()(Robot_inputs in,ostream&){
 
 	perf.update(in.now);
 	
-	Joystick_data main_joystick=in.joystick[MAIN_JOYSTICK_PORT];
-	Joystick_data gunner_joystick=in.joystick[GUNNER_JOYSTICK_PORT];//TODO: remove
+	Joystick_data driver_joystick=in.joystick[MAIN_JOYSTICK_PORT];
 	Panel panel=interpret_oi(in.joystick[PANEL_PORT]);
 	if(!panel.in_use){
 		panel = interpret_gamepad(in.joystick[GUNNER_JOYSTICK_PORT]);
 	}
 
 	force.update(
-		main_joystick.button[Gamepad_button::A],
-		main_joystick.button[Gamepad_button::LB],
-		main_joystick.button[Gamepad_button::RB],
-		main_joystick.button[Gamepad_button::BACK],
-		main_joystick.button[Gamepad_button::B],
-		main_joystick.button[Gamepad_button::X]
+		driver_joystick.button[Gamepad_button::A],
+		driver_joystick.button[Gamepad_button::LB],
+		driver_joystick.button[Gamepad_button::RB],
+		driver_joystick.button[Gamepad_button::BACK],
+		driver_joystick.button[Gamepad_button::B],
+		driver_joystick.button[Gamepad_button::X]
 	);
 	
 	Toplevel::Status_detail toplevel_status=toplevel.estimator.get();
 	bool autonomous_start_now=autonomous_start(in.robot_mode.autonomous && in.robot_mode.enabled);
-	Toplevel::Goal goals = mode.run(Run_info{in,main_joystick,gunner_joystick,panel,toplevel_status});
+	Toplevel::Goal goals = mode.run(Run_info{in,driver_joystick,panel,toplevel_status});
 	
 	auto next=mode.next_mode(Next_mode_info{in.robot_mode.autonomous,autonomous_start_now,toplevel_status,since_switch.elapsed(),panel,in});
 	
