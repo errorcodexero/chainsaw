@@ -1,7 +1,7 @@
 #include "climber.h"
 
 static const int CLIMBER_PWM = 8;
-static const float CLIMBER_POWER = .8;
+static const float CLIMBER_POWER = 1.0;
 
 using namespace std;
 
