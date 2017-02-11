@@ -20,7 +20,7 @@ struct Panel{
 	//3 position switches:
 	enum class Gear_collector{UP,DOWN,AUTO};//gear_lifter
 	Gear_collector gear_collector;
-	enum class Gear_holder{OPEN,CLOSED,AUTO};//gear_grabber
+	enum class Gear_holder{OPEN,CLOSE,AUTO};//gear_grabber
 	Gear_holder gear_holder;
 	enum class Ball_shooter{POWER,RPM,AUTO};
 	Ball_shooter ball_shooter;
