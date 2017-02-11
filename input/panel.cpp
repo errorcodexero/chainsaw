@@ -62,7 +62,7 @@ ostream& operator<<(ostream& o,Panel::Ball_shooter p){
 
 ostream& operator<<(ostream& o,Panel::Ball_arm p){
 	#define X(NAME) if(p==Panel::Ball_arm::NAME) return o<<""#NAME;
-	X(STOW) X(STOW) X(AUTO)
+	X(LOW) X(STOW) X(AUTO)
 	#undef X
 	assert(0);
 }
