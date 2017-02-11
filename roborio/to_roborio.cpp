@@ -165,7 +165,7 @@ string space_out(string s){
 }
 
 template<typename USER_CODE>
-class To_crio
+class To_roborio
 {
 	//TODO: see if these still have to all be pointers or if there's some alternative w/ the roboRIO
 	Solenoid *solenoid[Robot_outputs::SOLENOIDS];
@@ -185,7 +185,7 @@ class To_crio
 	Compressor *compressor;
 	DriverStation& driver_station;
 public:
-	To_crio():error_code(0),skipped(0),driver_station(DriverStation::GetInstance())//,gyro(NULL)
+	To_roborio():error_code(0),skipped(0),driver_station(DriverStation::GetInstance())//,gyro(NULL)
 	{
 		power = new PowerDistributionPanel();
 		// Wake the NUC by sending a Wake-on-LAN magic UDP packet:
@@ -491,7 +491,7 @@ public:
 
 template<typename USER_CODE>
 class Robot_adapter: public SampleRobot{
-	To_crio<USER_CODE> u;
+	To_roborio<USER_CODE> u;
 
 	void RobotInit(){}
 	

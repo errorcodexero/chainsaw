@@ -102,9 +102,9 @@ ostream& operator<<(ostream& o,Gear_shifter::Output const& out){
 	assert(0); 
 }
 
-ostream& operator<<(ostream& o,Gear_shifter const&){
+ostream& operator<<(ostream& o,Gear_shifter const& a){
 	o<<"Gear_shifter(";
-	//TODO
+	o<<a.estimator.get();
 	return o<<")";
 }
 

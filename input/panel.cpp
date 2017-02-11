@@ -8,6 +8,7 @@
 using namespace std;
 static const unsigned int BALL_COL_AXIS=0,BELT_DIR_AXIS=1,BALL_ARM_AXIS=2,BALL_SHOOTER_AXIS=3,GEAR_HOLDER_AXIS=4,GEAR_COL_AXIS=5,AUTO_SEL_AXIS=6,SHOOTER_DIAL_AXIS=7;//TODO: rename constants
 static const unsigned int BALL_COL_LOC=0,PREP_SHOOT_LOC=1,SHOOT_LOC=2,COL_GEAR_LOC=3,PREP_GEAR_LOC=4,PREP_SCORE_GEAR_LOC=5,SCORE_GEAR_LOC=6,CLIMBER_LOC=7,LEARN_LOC=8;//TODO: rename constants
+static const unsigned int LIFT_LOC_1 = 9, LIFT_LOC_2 = 10;
 
 #define BUTTONS \
 	X(learn) X(collect) X(shoot_prep) X(shoot) X(gear_collect) X(gear_prep_collect) X(gear_prep_score) X(gear_score) X(climb)
@@ -194,6 +195,14 @@ Panel interpret_oi(Joystick_data d){
 			if(set_button(intake_control,OFF,AUTO,ARTIFICIAL_MAX)) return Panel::Intake_control::AUTO;
 			return Panel::Intake_control::ON;
 		}();	
+		{
+			bool lift_1 = d.button[LIFT_LOC_1], lift_2 = d.button[LIFT_LOC_2];
+			p.lift = [&]{
+				if(lift_1) return Panel::Lift::UP;
+				if(lift_2) return Panel::Lift::DOWN;
+				return Panel::Lift::AUTO;
+			}();
+		}
 	}
 	{//buttons
 		/*//sets all buttons to off beacuse we assume that only one should be pressed on this axis at a time

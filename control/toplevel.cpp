@@ -619,7 +619,6 @@ int main(){
 			case 1: return *found.begin();
 			default:
 				return CONFLICT_MESSAGE + as_string(found) + " ------ Check IO's, assignming the same output from multiple parts - EXITING ------";
-				//FIXME assert(0);//check io's. probably assigning more than one thing to the same one
 		}
 	};
 	for(auto a:outputs()){

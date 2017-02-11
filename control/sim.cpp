@@ -4,18 +4,9 @@
 #include "nop.h"
 #include <math.h>
 #include "main.h"
+#include "../util/util.h"
 
 using namespace std;
-
-//TODO: MOVE TO UTIL
-template<typename T>
-vector<pair<size_t,T>> enumerate(vector<T> a){
-	vector<pair<size_t,T>> r;
-	for(size_t i=0;i<a.size();i++){
-		r|=make_pair(i,a[i]);
-	}
-	return r;
-}
 
 template<typename T,size_t LEN>
 array<pair<size_t,T>,LEN> enumerate(array<T,LEN> a){

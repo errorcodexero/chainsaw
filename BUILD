@@ -594,7 +594,7 @@ cc_test(
 	name="sim_test",
 	srcs=["control/sim.cpp"],
 	copts=["-DSIM_TEST","-g"],
-	deps=[":toplevel",":type",":nop", ":main"],
+	deps=[":toplevel",":type",":nop", ":main",":util"],
 	timeout="short"
 )
 
@@ -610,21 +610,6 @@ cc_test(
 	srcs=["control/pump.cpp","control/pump.h","util/maybe.h","control/formal.h"],
 	copts=["-DPUMP_TEST"],
 	deps=[":interface"],
-	timeout="short"
-)
-
-cc_library(
-	name="tote_sensors",
-	srcs=["control/tote_sensors.cpp"],
-	hdrs=["control/tote_sensors.h"],
-	deps=[":nop"]
-)
-
-cc_test(
-	name="tote_sensors_test",
-	srcs=["control/tote_sensors.cpp","control/tote_sensors.h","control/formal.h"],
-	copts=["-DTOTE_SENSORS_TEST"],
-	deps=[":nop"],
 	timeout="short"
 )
 
