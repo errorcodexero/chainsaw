@@ -39,10 +39,11 @@ struct Gear_shifter{
 		X(double,last_current) \
 		X(Output,last_output) \
 		X(Output,recommended) \
-		X(Countdown_timer,no_shift)
+		X(Countdown_timer,no_shift) \
+		X(int, print_count)
 	struct Estimator{
 		GEAR_SHIFTER_ESTIMATOR(DECL1)
-
+		
 		Estimator();
 		Status_detail get()const;
 		void update(Time,Input,Output);

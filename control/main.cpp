@@ -51,10 +51,7 @@ Robot_outputs Main::operator()(Robot_inputs in,ostream&){
 	);
 	
 	Toplevel::Status_detail toplevel_status=toplevel.estimator.get();
-	cout << "main robot mode " << in.robot_mode << endl;
-	cout << "main auto " << in.robot_mode.autonomous << " , " << in.robot_mode.enabled << " , " << (in.robot_mode.autonomous && in.robot_mode.enabled) <<"\n";
 	bool autonomous_start_now=autonomous_start(in.robot_mode.autonomous && in.robot_mode.enabled);
-	cout << "auto start " << autonomous_start_now << "\n";
 	Toplevel::Goal goals = mode.run(Run_info{in,main_joystick,gunner_joystick,panel,toplevel_status});
 	
 	auto next=mode.next_mode(Next_mode_info{in.robot_mode.autonomous,autonomous_start_now,toplevel_status,since_switch.elapsed(),panel,in});
