@@ -24,6 +24,7 @@ struct Auto_gearboiler_topeg : public Executive_impl<Auto_gearboiler_topeg>{
 	bool operator==(Auto_gearboiler_topeg const&)const;
 };
 
+
 struct Auto_gearboiler_geardrop : public Executive_impl<Auto_gearboiler_geardrop>{
 	STRUCT_MEMBERS(AUTO_GEARBOILER_ITEMS)
 	

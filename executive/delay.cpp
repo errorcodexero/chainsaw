@@ -30,7 +30,7 @@ Executive auto_mode_convert(Next_mode_info info){
 				return Executive{Auto_null()};
 		}
 	}
-	return Mode{Delay()};
+	return Executive{Auto_baseline{{0,0,0}}};
 }
 
 Mode Delay::next_mode(Next_mode_info info){
