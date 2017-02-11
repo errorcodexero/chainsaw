@@ -354,7 +354,7 @@ ostream& operator<<(ostream& o,Robot_outputs a){
 	o<<"Robot_outputs(";
 	o<<"pwm:";
 	for(unsigned i=0;i<a.PWMS;i++){
-		o<<(int)a.pwm[i]<<" ";
+		o<<setw(5)<<fixed<<setprecision(2)<<a.pwm[i]<<" ";
 	}
 	o<<" solenoid:";
 	for(unsigned i=0;i<a.SOLENOIDS;i++){
