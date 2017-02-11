@@ -299,7 +299,7 @@ int main(){
 		//cout << "inverse one " <<ticks_to_inches(inches_to_ticks(10))<< " two " << inches_to_ticks(ticks_to_inches(10)) << "\n";
 		for(Time t=0;t<20;t+=TIMESTEP){
 			robotinput.now=t;
-	
+			robotinput.robot_mode.enabled=true;	
 			//cout << "Main " << m << "\n";
 			cout<< "\n" <<t<<"\t"<<sim.get()<<"\n";
 			auto out=m(robotinput);

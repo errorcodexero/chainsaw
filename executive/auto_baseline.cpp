@@ -11,16 +11,17 @@ Executive Auto_baseline::next_mode(Next_mode_info info){
 		X(r),
 	};
 
-	const double TARGET_DISTANCE = 9.0*12.0;//inches
-	const double TOLERANCE = 3.0;//inches
+	const double TARGET_DISTANCE = 12.0*12.0;//inches
+	const double TOLERANCE = 4.0;//inches
 
 	motion_profile.set_goal(TARGET_DISTANCE);
 
 	cout<<"\n" << "auto_baseline: encoder_differences:"<< encoder_differences<<"   left(inches):"<<ticks_to_inches(encoder_differences.l)<<"   target(inches):"<<TARGET_DISTANCE<<"\n";
 	
 	if(ticks_to_inches(encoder_differences.l) >= TARGET_DISTANCE-TOLERANCE && ticks_to_inches(encoder_differences.l) <= TARGET_DISTANCE+TOLERANCE){
-		cout <<"IN  RANGE"<< "\n";
+		cout << "enabled" << info.in.robot_mode.enabled << "\n";
 		in_range.update(info.in.now,info.in.robot_mode.enabled);
+		cout <<"IN  RANGE"<< in_range << "\n";
 	} else {
 		const double IN_RANGE_TIME = 2.0;//seconds - the time that the robot needs to be within a certain distance from the target
 		in_range.set(IN_RANGE_TIME);
