@@ -20,16 +20,8 @@ Main::Main():
 	autonomous_start(0)
 {}
 
-template<size_t LEN>
-array<double,LEN> floats_to_doubles(array<float,LEN> a){
-	array<double,LEN> r;
-	for(size_t i=0;i<LEN;i++) r[i]=a[i];
-	return r;
-}
-
 Robot_outputs Main::operator()(Robot_inputs in,ostream&){
 	print_count++;
-
 	static const unsigned MAIN_JOYSTICK_PORT = 0, GUNNER_JOYSTICK_PORT = 1, PANEL_PORT = 2;
 
 	perf.update(in.now);
@@ -122,7 +114,6 @@ vector<T> uniq(vector<T> v){
 	return r;
 }
 
-int main(){
-}
+int main(){}
 
 #endif

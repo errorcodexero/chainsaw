@@ -63,10 +63,15 @@ std::ostream& operator<<(std::ostream& o,std::set<T> const& v){
 }
 
 double mean(double,double);
-
 double sum(std::vector<double> const&);
 double mean(std::vector<double> const&);
 double stddev(std::vector<double> const&);
+
+template<typename T>
+std::vector<std::pair<size_t,T>> enumerate(std::vector<T>);
+
+template<size_t LEN>
+std::array<double,LEN> floats_to_doubles(std::array<float,LEN>);
 
 template<size_t LEN>
 double sum(std::array<double,LEN> const& a){
