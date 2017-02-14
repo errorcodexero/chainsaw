@@ -4,4 +4,14 @@
 struct Gear_shifter{
 	enum class Output {HIGH, LOW};
 };	
+namespace std:
+
+
+
+
+
+
+
+
+
 #endif	
