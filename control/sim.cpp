@@ -41,6 +41,7 @@ using Gear_shifter_sim=Nop_sim<Gear_shifter::Input>;
 using Arm_sim=Nop_sim<Arm::Input>;
 using Gear_grabber_sim=Nop_sim<Gear_grabber::Input>;
 using Gear_lifter_sim=Nop_sim<Gear_lifter::Input>;
+using Shooter_feed_sim = Nop_sim<Shooter_feed::Input>;
 
 struct Drivebase_sim{
 	using Input=Drivebase::Input;

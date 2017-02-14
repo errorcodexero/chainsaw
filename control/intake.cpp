@@ -5,7 +5,6 @@ using namespace std;
 
 #define INTAKE_ADDRESS 7
 #define INTAKE_SPEED 1.0
-#define INTAKE_SPEED 1.0
 #define STOP_SPEED 0.0
 
 ostream& operator<<(ostream& o, Intake::Goal a){

@@ -102,7 +102,8 @@ Toplevel::Output::Output():
 	climber(Climber::Output::STOP),
 	shifter(Gear_shifter::Output::LOW),
 	collector(),
-	gear_collector()
+	gear_collector(),
+	shooter_feed(Shooter_feed::Output::OFF)
 {}
 
 bool operator<(Toplevel::Output const& a,Toplevel::Output const& b){
@@ -160,7 +161,8 @@ Toplevel::Status::Status():
 	pump(Pump::Status::NOT_FULL),
 	climber(Climber::Status::RELEASED),
 	collector(),
-	gear_collector()
+	gear_collector(),
+	shooter_feed()
 {}
 
 bool operator==(Toplevel::Status a,Toplevel::Status b){
@@ -339,7 +341,8 @@ set<Toplevel::Status_detail> examples(Toplevel::Status_detail*){
 		*examples((Climber::Status_detail*)0).begin(),
 		*examples((Gear_shifter::Status_detail*)0).begin(),
 		*examples((Collector::Status_detail*)0).begin(),
-		*examples((Gear_collector::Status_detail*)0).begin()
+		*examples((Gear_collector::Status_detail*)0).begin(),
+		*examples((Shooter_feed::Status_detail*)nullptr).begin()
 	}};
 }
 
@@ -358,7 +361,8 @@ set<Toplevel::Input> examples(Toplevel::Input*){
 		*examples((Climber::Input*)0).begin(),
 		*examples((Gear_shifter::Input*)0).begin(),
 		*examples((Collector::Input*)0).begin(),
-		*examples((Gear_collector::Input*)0).begin()
+		*examples((Gear_collector::Input*)0).begin(),
+		*examples((Shooter_feed::Input*)nullptr).begin()
 	};
 	return {a};
 }

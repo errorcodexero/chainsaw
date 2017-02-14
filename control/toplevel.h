@@ -8,6 +8,7 @@
 #include "gear_shifter.h"
 #include "collector.h"
 #include "gear_collector.h"
+#include "shooter_feed.h"
 
 #define TOPLEVEL_ITEMS \
 	X(Drivebase,drive,)\
@@ -15,7 +16,8 @@
 	X(Climber,climber,Climber::Goal::STOP)\
 	X(Gear_shifter,shifter,Gear_shifter::Goal::LOW)\
 	X(Collector,collector,)\
-	X(Gear_collector,gear_collector,)
+	X(Gear_collector,gear_collector,) \
+	X(Shooter_feed,shooter_feed,Shooter_feed::Goal::OFF) 
 	
 class Toplevel{
 	public:
