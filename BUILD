@@ -1,6 +1,6 @@
 cc_test(
 	name = "point_test",
-	srcs = ["util/point.cpp","util/point.h","util/interface.h","util/jag_interface.h","util/maybe.h","util/driver_station_interface.h","util/maybe_inline.h","util/checked_array.h","util/util.h","util/pwm.h"],
+	srcs = ["util/point.cpp","util/point.h","util/interface.h","util/maybe.h","util/driver_station_interface.h","util/maybe_inline.h","util/checked_array.h","util/util.h","util/pwm.h"],
 	copts = ["-DPOINT_TEST"],
 	timeout="short"
 )
@@ -16,12 +16,12 @@ cc_test(
 cc_library(
 	name = "point",
 	srcs = ["util/point.cpp"],
-	hdrs = ["util/point.h","util/interface.h","util/jag_interface.h","util/maybe.h","util/driver_station_interface.h","util/maybe_inline.h","util/checked_array.h","util/util.h","util/pwm.h"]
+	hdrs = ["util/point.h","util/interface.h","util/maybe.h","util/driver_station_interface.h","util/maybe_inline.h","util/checked_array.h","util/util.h","util/pwm.h"]
 )
 
 cc_test(
 	name="util_test",
-	#srcs=["util/util.cpp","util/interface.h","util/jag_interface.h","util/maybe.h","util/driver_station_interface.h","util/maybe_inline.h","util/checked_array.h","util/util.h","util/pwm.h"],
+	#srcs=["util/util.cpp","util/interface.h","util/maybe.h","util/driver_station_interface.h","util/maybe_inline.h","util/checked_array.h","util/util.h","util/pwm.h"],
 	srcs=["util/util.cpp"],
 	copts=["-DUTIL_TEST"],
 	deps=[":point"],
@@ -34,17 +34,6 @@ cc_library(
 	srcs=["util/util.cpp"],
 	deps=[":point"]
 )
-
-cc_test(
-	name="jag_interface_test",
-	srcs=["util/jag_interface.cpp"],
-	copts=["-DJAG_INTERFACE_TEST"],
-	deps=[":util"],
-	timeout="short"
-
-)
-
-cc_library(name="jag_interface",srcs=["util/jag_interface.cpp"],deps=[":util"])
 
 cc_test(
 	name="driver_station_interface_test",
@@ -65,7 +54,7 @@ cc_test(
 	name="interface_test",
 	srcs=["util/interface.cpp"],
 	copts=["-DINTERFACE_TEST"],
-	deps=[":jag_interface",":driver_station_interface"],
+	deps=[":driver_station_interface"],
 	timeout="short"
 )
 
@@ -73,7 +62,6 @@ cc_library(
 	name="posedge_toggle",
 	srcs=["util/posedge_toggle.cpp"],
 	hdrs=["util/posedge_toggle.h"],
-	deps=[":jag_interface"]
 )
 
 
@@ -198,7 +186,7 @@ cc_library(
 	name="interface",
 	srcs=["util/interface.cpp"],
 	hdrs=["util/interface.h"],
-	deps=[":jag_interface",":driver_station_interface",":pwm"]
+	deps=[":driver_station_interface",":pwm"]
 )
 
 cc_library(
@@ -319,6 +307,21 @@ cc_test(
 )
 
 cc_library(
+	name="speed_tracker",
+	srcs=["util/speed_tracker.cpp"],
+	hdrs=["util/speed_tracker.h"],
+	deps=[":interface",":countdown_timer",":drivebase"]
+)
+
+cc_test(
+	name="speed_tracker_test",
+	srcs=["util/speed_tracker.cpp","util/speed_tracker.h"],
+	copts=["-DSPEED_TRACKER_TEST"],
+	deps=[":interface",":countdown_timer",":drivebase"],
+	timeout="short"
+)
+
+cc_library(
 	name="meta",
 	srcs=["util/meta.cpp"],
 	hdrs=["util/meta.h"],
@@ -394,6 +397,21 @@ cc_test(
 )
 
 cc_library(
+	name="gear_shifter",
+	srcs=["control/gear_shifter.cpp"],
+	hdrs=["control/gear_shifter.h"],
+	deps=[":nop",":drivebase",":interface",":speed_tracker",":countdown_timer"]
+)
+
+cc_test(
+	name="gear_shifter_test",
+	srcs=["control/gear_shifter.cpp","control/gear_shifter.h","control/formal.h"],
+	copts=["-DGEAR_SHIFTER_TEST"],
+	deps=[":nop",":drivebase",":interface",":speed_tracker",":countdown_timer"],
+	timeout="short"
+)
+
+cc_library(
 	name="drivebase",
 	srcs=["control/drivebase.cpp"],
 	hdrs=["control/drivebase.h","util/quick.h"],
@@ -409,17 +427,17 @@ cc_test(
 )
 
 cc_library(
-	name="winch",
-	srcs=["control/winch.cpp"],
-	hdrs=["control/winch.h"],
-	deps=[":interface"]
+	name="climber",
+	srcs=["control/climber.cpp"],
+	hdrs=["control/climber.h"],
+	deps=[":interface",":nop",":countdown_timer"]
 )
 
 cc_test(
-	name="winch_test",
-	srcs=["control/winch.cpp","control/winch.h","control/formal.h"],
-	copts=["-DWINCH_TEST"],
-	deps=[":interface"],
+	name="climber_test",
+	srcs=["control/climber.cpp","control/climber.h","control/formal.h"],
+	copts=["-DCLIMBER_TEST"],
+	deps=[":interface",":nop",":countdown_timer"],
 	timeout="short"
 )
 
@@ -466,6 +484,36 @@ cc_test(
 	srcs=["control/intake.cpp","control/intake.h","control/nop.h","control/nop.cpp","control/formal.h"],
 	copts=["-DINTAKE_TEST"],
 	deps=[":interface"],
+	timeout="short"
+)
+
+cc_library(
+	name="shooter_feed",
+	srcs=["control/shooter_feed.cpp","control/nop.cpp"],
+	hdrs=["control/shooter_feed.h","control/nop.h"],
+	deps=[":interface"]
+)
+
+cc_test(
+	name="shooter_feed_test",
+	srcs=["control/shooter_feed.cpp","control/shooter_feed.h","control/nop.h","control/nop.cpp","control/formal.h"],
+	copts=["-DSHOOTER_FEED_TEST"],
+	deps=[":interface"],
+	timeout="short"
+)
+
+cc_library(
+	name="shooter",
+	srcs=["control/shooter.cpp"],
+	hdrs=["control/shooter.h","util/quick.h","control/formal.h"],
+	deps=[":interface",":nop",":countdown_timer"]
+)
+
+cc_test(
+	name="shooter_test",
+	srcs=["control/shooter.cpp","control/shooter.h","util/quick.h","control/formal.h"],
+	copts=["-DSHOOTER_TEST"],
+	deps=[":interface",":nop",":countdown_timer"],
 	timeout="short"
 )
 
@@ -542,14 +590,14 @@ cc_library(
 	name="toplevel",
 	srcs=["control/toplevel.cpp"],
 	hdrs=["control/toplevel.h"],
-	deps=[":pump",":drivebase",":winch",":collector",":gear_collector",":input"]
+	deps=[":pump",":drivebase",":climber",":gear_shifter",":collector",":gear_collector",":shooter_feed",":input"]
 )
 
 cc_test(
 	name="toplevel_test",
 	srcs=["control/toplevel.cpp","control/toplevel.h","control/formal.h"],
 	copts=["-DTOPLEVEL_TEST"],
-	deps=[":pump",":drivebase",":winch",":collector",":input",":gear_collector",":output"],
+	deps=[":pump",":drivebase",":climber",":gear_shifter",":collector",":input",":gear_collector",":shooter_feed",":output"],
 	timeout="short"
 )
 
@@ -563,8 +611,8 @@ cc_library(
 cc_test(
 	name="sim_test",
 	srcs=["control/sim.cpp"],
-	copts=["-DSIM_TEST"],
-	deps=[":toplevel",":type",":nop"],
+	copts=["-DSIM_TEST","-g"],
+	deps=[":toplevel",":type",":nop", ":main",":util"],
 	timeout="short"
 )
 
@@ -580,21 +628,6 @@ cc_test(
 	srcs=["control/pump.cpp","control/pump.h","util/maybe.h","control/formal.h"],
 	copts=["-DPUMP_TEST"],
 	deps=[":interface"],
-	timeout="short"
-)
-
-cc_library(
-	name="tote_sensors",
-	srcs=["control/tote_sensors.cpp"],
-	hdrs=["control/tote_sensors.h"],
-	deps=[":nop"]
-)
-
-cc_test(
-	name="tote_sensors_test",
-	srcs=["control/tote_sensors.cpp","control/tote_sensors.h","control/formal.h"],
-	copts=["-DTOTE_SENSORS_TEST"],
-	deps=[":nop"],
 	timeout="short"
 )
 
@@ -625,6 +658,14 @@ cc_library(
 	srcs=["input/panel.cpp"],
 	hdrs=["input/panel.h","util/maybe.h"],
 	deps=[":interface",":input_util"]
+)
+
+cc_test(
+	name="panel_test",
+	srcs=["input/panel.cpp","input/panel.h"],
+	copts=["-DPANEL_TEST"],
+	deps=[":interface",":input_util"],
+	timeout = "short"
 )
 
 cc_library(
@@ -722,8 +763,7 @@ cc_library(
 )
 
 cc_test(
-	name="executive_test",
-	srcs=["executive/executive.cpp","executive/executive.h"],
+	name="executive_test",	srcs=["executive/executive.cpp","executive/executive.h"],
 	copts=["-DEXECUTIVE_TEST"],
 	deps=[":executive_impl",":panel",":type"],
 	timeout="short"

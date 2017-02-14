@@ -300,11 +300,6 @@ bool operator==(Robot_outputs a,Robot_outputs b){
 			return 0;
 		}
 	}
-	/*for(unsigned i=0;i<Robot_outputs::CAN_JAGUARS;i++){
-		if(a.jaguar[i]!=b.jaguar[i]){
-			return 0;
-		}
-	}*/
 	return a.driver_station==b.driver_station && a.pump_auto==b.pump_auto;
 }
 
@@ -340,13 +335,6 @@ bool operator<(Robot_outputs a,Robot_outputs b){
 		if(b.talon_srx[i]<a.talon_srx[i])return 0;
 	}
 	
-	/*for(unsigned i=0;i<Robot_outputs::CAN_JAGUARS;i++){
-		auto a1=a.jaguar[i];
-		auto b1=b.jaguar[i];
-		if(a1<b1) return 1;
-		if(b1<a1) return 0;
-	}*/
-
 	return a.pump_auto<b.pump_auto;
 }
 
@@ -354,7 +342,7 @@ ostream& operator<<(ostream& o,Robot_outputs a){
 	o<<"Robot_outputs(";
 	o<<"pwm:";
 	for(unsigned i=0;i<a.PWMS;i++){
-		o<<(int)a.pwm[i]<<" ";
+		o<<setw(5)<<fixed<<setprecision(2)<<a.pwm[i]<<" ";
 	}
 	o<<" solenoid:";
 	for(unsigned i=0;i<a.SOLENOIDS;i++){
@@ -378,10 +366,6 @@ ostream& operator<<(ostream& o,Robot_outputs a){
 	for(unsigned i=0;i<Panel_outputs::PANEL_OUTPUTS;i++){
 		o<<a.panel_output[i];
 	}
-	/*o<<" jaguar:";
-	for(unsigned i=0;i<a.CAN_JAGUARS;i++){
-		o<<a.jaguar[i];
-	}*/
 	o<<" driver_station_output:"<<a.driver_station;
 	o<<" pump_auto:"<<a.pump_auto;
 	return o<<")";
@@ -598,6 +582,10 @@ ostream& operator<<(ostream& o,Digital_inputs const& a){
 	o<<a.encoder;
 	return o<<")";
 }
+DS_info::DS_info():
+connected(0),alliance(Alliance::INVALID),location(0)
+{
+}
 
 Robot_inputs::Robot_inputs():
 	now(0),orientation(0),pump(0)
@@ -633,11 +621,6 @@ bool operator==(Robot_inputs a,Robot_inputs b){
 			return 0;
 		}
 	}
-	/*for(unsigned i=0;i<Robot_outputs::CAN_JAGUARS;i++){
-		if(a.jaguar[i]!=b.jaguar[i]){
-			return 0;
-		}
-	}*/
 	for(unsigned i=0;i<Robot_inputs::TALON_SRX_INPUTS;i++){
 		if(a.talon_srx[i]!=b.talon_srx[i]){
 			return 0;
@@ -664,7 +647,6 @@ bool operator<(Robot_inputs a,Robot_inputs b){
 	X(digital_io)
 	X(analog)
 	X(talon_srx)
-	//X(jaguar) 
 	X(driver_station)
 	X(orientation)
 	X(current)
@@ -694,10 +676,6 @@ ostream& operator<<(ostream& o,Robot_inputs a){
 	for(unsigned i=0;i<Robot_inputs::TALON_SRX_INPUTS;i++){
 		o<<a.talon_srx[i];
 	}
-	/*o<<" jaguar:";
-	for(unsigned i=0;i<Robot_outputs::CAN_JAGUARS;i++){
-		o<<a.jaguar[i];
-	}*/
 	o<<" currents:"<<a.current;	
 	o<<" driver_station_inputs:"<<a.driver_station;
 	o<<" orientation:"<<a.orientation;
@@ -709,10 +687,7 @@ int main(){
 	cout<<Robot_outputs()<<"\n";
 	cout<<Robot_inputs()<<"\n";
 	cout<<Joystick_data()<<"\n";
-	cout<<Jaguar_output()<<"\n";
 	cout<<Talon_srx_output()<<"\n";
-	cout<<Jaguar_output::speedOut(10)<<"\n";
-	cout<<Jaguar_output::voltageOut(1.0)<<"\n";
 	for(auto a:digital_ins()){
 		assert(a==parse_digital_in(as_string(a)));
 	}

@@ -52,7 +52,6 @@ struct Auto_gearboiler_approach: public Executive_impl<Auto_gearboiler_approach>
 	bool operator==(Auto_gearboiler_approach const&)const;
 };
 
-
 struct Auto_gearboiler_geardrop : public Executive_impl<Auto_gearboiler_geardrop>{
 	STRUCT_MEMBERS(AUTO_GEARBOILER_ITEMS)
 	

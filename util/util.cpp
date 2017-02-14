@@ -32,6 +32,24 @@ int read_file(string const& filename,string &out){
 	return 0;
 }
 
+template<typename T>
+vector<pair<size_t,T>> enumerate(vector<T> a){
+	vector<pair<size_t,T>> r;
+	for(size_t i=0;i<a.size();i++){
+		r|=make_pair(i,a[i]);
+	}
+	return r;
+}
+
+template<size_t LEN>
+array<double,LEN> floats_to_doubles(array<float,LEN> a){
+	array<double,LEN> r;
+	for(size_t i=0;i<LEN;i++) r[i]=a[i];
+	return r;
+}
+
+double mean(double a,double b) { return (a+b)/2; }
+
 double sum(std::vector<double> const& v){
 	double total=0;
 	for(unsigned i=0;i<v.size();i++) total+=v[i];

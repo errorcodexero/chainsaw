@@ -1,56 +1,63 @@
 Driver:
- A          - Backward nudge
- B          - Right nudge
- X          - Left nudge
- Y          - Forward nudge
+ A          - 
+ B          - 
+ X          - 
+ Y          - 
  Start      - 
  Back       - 
- RB         - Clockwise nudge
- LB         - Counter-clockwise nudge
- RT         - Slow
+ RB         - Low gear
+ LB         - Slow
+ RT         - High gear
  LT         - Turbo
  L_Joy:
-  X Axis    - Left/right
+  X Axis    - 
   Y Axis    - Forward/backward
-  Pushed in -
+  Pushed in - 
  R_Joy:
   X Axis    - Turning
-  Y Axis    -
-  Pushed in -
- POV        - 
-
+  Y Axis    - 
+  Pushed in - 
+POV:
+  Center     - 
+  Up         - Nudge forward
+  Up_left    - 
+  Left       - Nudge counterclockwise
+  Down_left  - 
+  Down       - Nudge backward
+  Down_right - 
+  Right      - Nudge clockwise
+  Up_right   - 
 
 Gunner:
- A          - Arm all the way down
- B          - Open grabber
- X          - Close grabber
- Y          - Arm all the way up
- Start      - 
- Back       - 
- RB         - Single shot
- LB         - Burst shot
- RT         - Shoot
- LT         - Rev
+ A          - Prep for gear collection
+ B          - Prep for scoring a gear OR (with AO) shoot
+ X          - Collect OR (with AO) prep to shoot
+ Y          - Score gear
+ Start      - Climb
+ Back       - Learn
+ RB         - 
+ LB         - Alternative Operation (AO) - changes what other buttons do if held
+ RT         - 
+ LT         - Speed modifier
  L_Joy:
-  Up        - 
-  Down      - 
-  Left      -
+  Up        - Gear lift up OR (with AO) Open gear grabber
+  Down      - Gear lift down OR (with AO) Close gear grabber
+  Left      - Gear lift auto OR (with AO) Set gear grabber to auto
   Right     -
   Pushed in - 
  R_Joy:
-  Up        - 
-  Down      - 
-  Left      - 
+  Up        - Ball lift belts on OR (with AO) intake in
+  Down      - Ball lift belts off OR (with AO) intake out
+  Left      - Ball lift belts auto (with AO) intake auto
   Right     - 
   Pushed in - 
- POV        
-  Center     -
-  Up         - 
-  Up_left    -
-  Left       - 
-  Down_left  -
-  Down       -
-  Down_right -
+ POV:        
+  Center     - 
+  Up         - Ball arm in OR (with AO) shooter power mode
+  Up_left    - 
+  Left       - Ball arm auto OR (with AO) shooter auto mode
+  Down_left  - 
+  Down       - Ball arm out OR (with AO) shooter rpm mode
+  Down_right - 
   Right      - 
-  Up_right   -
-
+  Up_right   - 

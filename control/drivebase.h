@@ -79,6 +79,8 @@ std::ostream& operator<<(std::ostream&,Drivebase::Encoder_ticks const&);
 
 double ticks_to_inches(const int);
 
+double inches_to_ticks(const float);
+
 int encoderconv(Maybe_inline<Encoder_output>);
 
 CMP1(Drivebase::Encoder_ticks)
@@ -87,6 +89,7 @@ CMP1(Drivebase::Speeds)
 
 std::ostream& operator<<(std::ostream&,Drivebase::Input const&);
 bool operator<(Drivebase::Input const&,Drivebase::Input const&);
+bool operator==(Drivebase::Input const&,Drivebase::Input const&);
 bool operator!=(Drivebase::Input const&,Drivebase::Input const&);
 std::set<Drivebase::Input> examples(Drivebase::Input*);
 

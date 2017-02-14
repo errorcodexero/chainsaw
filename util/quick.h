@@ -3,7 +3,7 @@
 
 #define EQ1(A,B) if(a.B!=b.B) return 0;
 
-#define LT1(A,B) if(a.B<b.B) return 0; if(b.B<a.B) return 1;
+#define LT1(A,B) if(a.B<b.B) return 1; if(b.B<a.B) return 0;
 
 #define PRINT1(A,B) o<<a.B<<" ";
 

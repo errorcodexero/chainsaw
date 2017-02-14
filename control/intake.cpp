@@ -3,10 +3,8 @@
 
 using namespace std;
 
-#define FRONT_INTAKE_ADDRESS 6 //TODO: get real value
-#define SIDES_INTAKE_ADDRESS 7 //TODO: get real value
-#define FRONT_INTAKE_SPEED 1.0
-#define SIDES_INTAKE_SPEED 1.0
+#define INTAKE_ADDRESS 7
+#define INTAKE_SPEED 1.0
 #define STOP_SPEED 0.0
 
 ostream& operator<<(ostream& o, Intake::Goal a){
@@ -26,16 +24,13 @@ bool operator!=(Intake a, Intake b){ return !(a==b);}
 Robot_outputs Intake::Output_applicator::operator()(Robot_outputs r, Intake::Output out)const{
 	switch(out){
 		case Intake::Output::OUT:
-			r.pwm[FRONT_INTAKE_ADDRESS]=-FRONT_INTAKE_SPEED;
-			r.pwm[SIDES_INTAKE_ADDRESS]=-SIDES_INTAKE_SPEED;
+			r.pwm[INTAKE_ADDRESS]=-INTAKE_SPEED;
 			break;
 		case Intake::Output::OFF:
-			r.pwm[FRONT_INTAKE_ADDRESS]=STOP_SPEED;	
-			r.pwm[SIDES_INTAKE_ADDRESS]=STOP_SPEED;	
+			r.pwm[INTAKE_ADDRESS]=STOP_SPEED;	
 			break;
 		case Intake::Output::IN:
-			r.pwm[SIDES_INTAKE_ADDRESS]=SIDES_INTAKE_SPEED;
-			r.pwm[FRONT_INTAKE_ADDRESS]=FRONT_INTAKE_SPEED;
+			r.pwm[INTAKE_ADDRESS]=INTAKE_SPEED;
 			break;
 		default:
 			assert(0);
@@ -44,9 +39,9 @@ Robot_outputs Intake::Output_applicator::operator()(Robot_outputs r, Intake::Out
 }
 
 Intake::Output Intake::Output_applicator::operator()(Robot_outputs r)const{
-	if(r.pwm[SIDES_INTAKE_ADDRESS]==-SIDES_INTAKE_SPEED && r.pwm[FRONT_INTAKE_ADDRESS]==-FRONT_INTAKE_SPEED) return Intake::Output::OUT;
-	if(r.pwm[SIDES_INTAKE_ADDRESS]==STOP_SPEED && r.pwm[FRONT_INTAKE_ADDRESS]==STOP_SPEED) return Intake::Output::OFF;
-	if(r.pwm[SIDES_INTAKE_ADDRESS]==SIDES_INTAKE_SPEED && r.pwm[FRONT_INTAKE_ADDRESS]==FRONT_INTAKE_SPEED) return Intake::Output::IN;
+	if(r.pwm[INTAKE_ADDRESS]==-INTAKE_SPEED) return Intake::Output::OUT;
+	if(r.pwm[INTAKE_ADDRESS]==STOP_SPEED) return Intake::Output::OFF;
+	if(r.pwm[INTAKE_ADDRESS]==INTAKE_SPEED) return Intake::Output::IN;
 	assert(0);
 }
 	

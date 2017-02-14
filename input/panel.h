@@ -18,20 +18,22 @@ struct Panel{
 	bool climb;
 	//2 position swicthes:
 	//3 position switches:
-	enum class Gear_collector{UP,DOWN,AUTO};
-	Gear_collector gear_collector;
-	enum class Gear_holder{OPEN,CLOSED,AUTO};
-	Gear_holder gear_holder;
-	enum class Ball_shooter{POWER,RPM,AUTO};
-	Ball_shooter ball_shooter;
-	enum class Ball_arm{STOW,LOW,AUTO};
-	Ball_arm ball_arm;
-	enum class Belt_direction{IN,OUT,AUTO};
-	Belt_direction belt_direction;
-	enum class Ball_collector{ON,OFF,AUTO};
-	Ball_collector ball_collector; 
+	enum class Gear_lifter{UP,DOWN,AUTO};
+	Gear_lifter gear_lifter;
+	enum class Gear_grabber{OPEN,CLOSE,AUTO};
+	Gear_grabber gear_grabber;
+	enum class Shooter{ON,OFF,REVERSE};
+	Shooter shooter;
+	enum class Arm{STOW,LOW,AUTO};
+	Arm arm;
+	enum class Intake_direction{IN,OUT,AUTO};
+	Intake_direction intake_direction;
+	enum class Intake_control{ON,OFF,AUTO};//for intake//TODO
+	Intake_control intake_control; 
+	enum class Lift{UP,DOWN,AUTO};
+	Lift lift;
 	//10 *position switches:
-	int auto_select;//0-9
+	int auto_select;//0-19
 	//Dials:
 	float speed_dial;
 	Panel();

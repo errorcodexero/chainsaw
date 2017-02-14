@@ -25,7 +25,7 @@ void Countdown_timer::update(Time now,bool enable){
 }
 
 bool Countdown_timer::done()const{
-	return left<=0;
+	return left<=0;//TODO: change to a number slightly higher than zero? 
 }
 
 bool operator<(Countdown_timer const& a,Countdown_timer const& b){

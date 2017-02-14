@@ -23,8 +23,7 @@ std::ostream& operator<<(std::ostream&,Next_mode_info const&);
 
 #define RUN_INFO_ITEMS(X)\
 	X(Robot_inputs,in)\
-	X(Joystick_data,main_joystick)\
-	X(Joystick_data,gunner_joystick)\
+	X(Joystick_data,driver_joystick)\
 	X(Panel,panel)\
 	X(Toplevel::Status_detail,toplevel_status)
 DECLARE_STRUCT(Run_info,RUN_INFO_ITEMS)

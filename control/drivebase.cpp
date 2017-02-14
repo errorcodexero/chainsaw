@@ -34,10 +34,20 @@ int encoderconv(Maybe_inline<Encoder_output> encoder){
 
 double ticks_to_inches(const int ticks){
 	const unsigned int TICKS_PER_REVOLUTION=200;//for 2017
-	const double WHEEL_DIAMETER=4.0;//inches for 2017
+	const double WHEEL_DIAMETER=4.25;//inches for 2017
 	const double WHEEL_CIRCUMFERENCE=WHEEL_DIAMETER*PI;//inches
 	const double INCHES_PER_TICK=WHEEL_CIRCUMFERENCE/(double)TICKS_PER_REVOLUTION;
-	return ticks*INCHES_PER_TICK;
+	const double ERROR_CORRECTION = 0.181952663;//2017, encoders are geared. Rough calculation.
+	return ticks*INCHES_PER_TICK*ERROR_CORRECTION;
+}
+
+double inches_to_ticks(const float inches){
+	const unsigned int TICKS_PER_REVOLUTION=200;//for 2017
+	const double WHEEL_DIAMETER=4.25;//inches for 2017
+	const double WHEEL_CIRCUMFERENCE=WHEEL_DIAMETER*PI;//inches
+	const double INCHES_PER_TICK=WHEEL_CIRCUMFERENCE/(double)TICKS_PER_REVOLUTION;
+	const double ERROR_CORRECTION = 0.181952663;//2017, encoders are geared. Rough calculation.
+	return inches/INCHES_PER_TICK*ERROR_CORRECTION;
 }
 
 #define R_ENCODER_PORTS 0,1

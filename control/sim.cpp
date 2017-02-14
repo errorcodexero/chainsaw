@@ -3,18 +3,10 @@
 #include "../util/type.h"
 #include "nop.h"
 #include <math.h>
+#include "main.h"
+#include "../util/util.h"
 
 using namespace std;
-
-//TODO: MOVE TO UTIL
-template<typename T>
-vector<pair<size_t,T>> enumerate(vector<T> a){
-	vector<pair<size_t,T>> r;
-	for(size_t i=0;i<a.size();i++){
-		r|=make_pair(i,a[i]);
-	}
-	return r;
-}
 
 template<typename T,size_t LEN>
 array<pair<size_t,T>,LEN> enumerate(array<T,LEN> a){
@@ -43,56 +35,57 @@ ostream& operator<<(ostream& o,Nop_sim<T> const& a){
 }
 
 using Pump_sim=Nop_sim<Pump::Input>;
-using Winch_sim=Nop_sim<Winch::Input>;
+using Climber_sim=Nop_sim<Climber::Input>;
 using Intake_sim=Nop_sim<Intake::Input>;
+using Gear_shifter_sim=Nop_sim<Gear_shifter::Input>;
 using Arm_sim=Nop_sim<Arm::Input>;
 using Gear_grabber_sim=Nop_sim<Gear_grabber::Input>;
 using Gear_lifter_sim=Nop_sim<Gear_lifter::Input>;
+using Shooter_feed_sim = Nop_sim<Shooter_feed::Input>;
 
 struct Drivebase_sim{
 	using Input=Drivebase::Input;
 	using Output=Drivebase::Output;
 	
-	float x,y,theta; //x,y are in distance in feet
-	
+	float x=0,y=0,theta=0;//x,y are in distance in feet
 	Time last_time =0;
+	int ticks_left=2;
+	int ticks_right=2;
+	float dist_left=0;
+	float dist_right=0;
 	void update(Time t,bool enable,Output out){
 		Time dt=t-last_time;
-		cout << "Drivebase Delta Time: " << dt << "\n"; 
 		last_time=t;
 		if(!enable) return;
-		x=y=theta=0;
-		
 		float dtheta = (((out.l-out.r)*5/12.5))*6.25;
-		float speed= (out.l+out.r)*5;
-		float dist_traveled=speed*dt;
+		float speedl= (out.l)*.2;
+		float speedr= (out.r)*.2;
+		dist_left+=speedl*dt;
+		dist_right+=speedr*dt;
+		float dist_traveled=(dist_left+dist_right)/2;
 		float dy=dist_traveled*cosf(theta);
 		float dx=dist_traveled*sinf(theta);
+		ticks_left+=inches_to_ticks(dist_left*12);
+		ticks_right+=inches_to_ticks(dist_right*12);
+		cout << "dx:"<<dx<< " dy:" << dy << " dt:" << dtheta << "\n";
 		y+=dy;
 		x+=dx;
 		theta+=dtheta;
-
-		
+		cout << "x:" << x << " y:" << y << "\n";
 	
 	}
 	Input get()const{
-	/*	Input in;
-		in.current=0;
-		in.left=Digital.in{};
-		in.right=Digital_in{};
-		in.ticks.l=
-		in.ticks.r=	
-		return in;
-	*/
-		assert(0);
+		auto d=Digital_in::_0;
+		auto p=make_pair(d,d);
+		return {Drivebase::Input{
+			{0,0,0,0,0,0},p,p,{ticks_left,ticks_right}
+		}};
 	}
-
 
 };
 
 ostream& operator<<(ostream& o,Drivebase_sim const& a){
-	// return o << a.speed << a.Dist_traveled << a.x << a.y << "\n"
-	assert(0);
+	return o << "Drivebase_sim(" << a.x << a.y << a.x << a.theta << ")\n";
 }
 
 struct Collector_sim{
@@ -275,20 +268,42 @@ void sim_display(T t){
 }
 
 int main(){
-	/*Toplevel_sim sim;
-
-	sim_display(sim);
-	sim_display(sim.get());
-	sim_display(example((Toplevel::Output*)0));
-
-	static const Time TIMESTEP=.1;
-	for(Time t=0;t<2;t+=TIMESTEP){
-		cout<<t<<"\t"<<sim.get()<<"\n";
-		auto out=example((Toplevel::Output*)0);
-		sim.update(t,1,out);
+	{
+		Toplevel_sim sim;
+		sim_display(sim);
+		sim_display(sim.get());
+		sim_display(example((Toplevel::Output*)0));
 	}
-	return 0;
-	*/
+	cout<<"\n================================================\n";
+	{
+		Toplevel_sim sim;
+		Main m;
+		Robot_inputs all;	
+		all.robot_mode.autonomous=true;
+		all.robot_mode.enabled=true;
+		all.joystick[2].axis[1]=1;
+		auto robotinput = m.toplevel.input_reader(all,sim.get());
+		cout << "robot mode " << all.robot_mode << "\n";	
+		static const Time TIMESTEP=.1;
+		robotinput.robot_mode.autonomous=true;
+		robotinput.robot_mode.enabled=true;
+		for(Time t=0;t<20;t+=TIMESTEP){
+			cout << "Main " << m << "\n";
+			cout<<t<<"\t"<<sim.get()<<"\n";
+			auto out=m(robotinput);
+			
+			//auto out=example((Toplevel::Output*)0);
+			/*Toplevel::Goal goal;
+			goal.drive.left=1;
+			goal.drive.right=1;
+			auto status_detail=m.toplevel.estimator.get();
+			auto out=control(status_detail,goal);*/
+			cout <<"out "  << out << "\n";
+			sim.update(t,1,m.toplevel.output_applicator(out));
+			m.toplevel.estimator.update(t,sim.get(),m.toplevel.output_applicator(out));
+		}
+	}
+	return 0;	
 }
 
 #endif

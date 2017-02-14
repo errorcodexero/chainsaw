@@ -3,7 +3,6 @@
 
 #include <iosfwd>
 #include <bitset>
-#include "jag_interface.h"
 #include "driver_station_interface.h"
 #include "maybe_inline.h"
 #include "checked_array.h"
@@ -111,9 +110,6 @@ struct Robot_outputs{
 	static const unsigned TALON_SRX_OUTPUTS=6;//FIXME: talon initializaitons
 	Checked_array<Talon_srx_output, TALON_SRX_OUTPUTS> talon_srx;
 	
-	static const unsigned CAN_JAGUARS=0;
-	Checked_array<Jaguar_output,CAN_JAGUARS> jaguar;
-	
 	Checked_array<Panel_output,PANEL_OUTPUTS> panel_output;
 		
 	//could add in some setup for the analog inputs
@@ -169,6 +165,7 @@ struct DS_info{
 	bool connected;
 	Alliance alliance;
 	int location;
+	DS_info();
 };
 
 enum class Digital_in{OUTPUT,_0,_1,ENCODER};
@@ -210,7 +207,6 @@ struct Robot_inputs{
 	static const unsigned TALON_SRX_INPUTS=1;
 	Checked_array<Talon_srx_input, TALON_SRX_INPUTS> talon_srx;
 	
-	Checked_array<Jaguar_input,Robot_outputs::CAN_JAGUARS> jaguar;
 	Driver_station_input driver_station;
 	Rad orientation;
 		
