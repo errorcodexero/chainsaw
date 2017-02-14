@@ -503,6 +503,21 @@ cc_test(
 )
 
 cc_library(
+	name="shooter",
+	srcs=["control/shooter.cpp"],
+	hdrs=["control/shooter.h","util/quick.h","control/formal.h"],
+	deps=[":interface",":nop",":countdown_timer"]
+)
+
+cc_test(
+	name="shooter_test",
+	srcs=["control/shooter.cpp","control/shooter.h","util/quick.h","control/formal.h"],
+	copts=["-DSHOOTER_TEST"],
+	deps=[":interface",":nop",":countdown_timer"],
+	timeout="short"
+)
+
+cc_library(
 	name="arm",
 	srcs=["control/arm.cpp","util/countdown_timer.cpp"],
 	hdrs=["control/arm.h","util/countdown_timer.h"],
