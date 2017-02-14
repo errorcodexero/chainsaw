@@ -115,7 +115,7 @@ float axis_to_percent(double a){
 	return .5-(a/2);
 }
 
-bool set_button(const Volt AXIS_VALUE, const Volt LOWER_VALUE, const Volt TESTING_VALUE, const Volt UPPER_VALUE){
+bool set_button(const float AXIS_VALUE, const float LOWER_VALUE, const float TESTING_VALUE, const float UPPER_VALUE){
 	float lower_tolerance = (TESTING_VALUE - LOWER_VALUE)/2;
 	float upper_tolerance = (UPPER_VALUE - TESTING_VALUE)/2;
 	float min = TESTING_VALUE - lower_tolerance;
@@ -135,62 +135,62 @@ bool get_in_use(Joystick_data d){
 
 Panel interpret_oi(Joystick_data d){
 	Panel p;
-	static const Volt ARTIFICIAL_MAX = 1.5;
+	static const float ARTIFICIAL_MAX = 1.5;
 	{
 		p.in_use=get_in_use(d);
 		if(!p.in_use) return p;
 	}
 	{//set the auto mode number from the dial value
-		Volt auto_dial_value = d.axis[AUTO_SEL_AXIS];
+		float auto_dial_value = d.axis[AUTO_SEL_AXIS];
 		p.auto_select = interpret_10_turn_pot(auto_dial_value);
 	}
 	{//two position switches
 	}
 	{//three position switches
-		Volt gear_lifter = d.axis[GEAR_COL_AXIS];
+		float gear_lifter = d.axis[GEAR_COL_AXIS];
 		p.gear_lifter = [&]{
-			static const Volt UP = -1, DOWN = 0, AUTO = 1;
+			static const float UP = -1, DOWN = 0, AUTO = 1;
 			if(set_button(gear_lifter,UP,DOWN,AUTO)) return Panel::Gear_lifter::DOWN;
 			if(set_button(gear_lifter,DOWN,AUTO,ARTIFICIAL_MAX)) return Panel::Gear_lifter::AUTO;
 			return Panel::Gear_lifter::UP;
 		}();
 
-		Volt gear_grabber = d.axis[GEAR_HOLDER_AXIS];
+		float gear_grabber = d.axis[GEAR_HOLDER_AXIS];
 		p.gear_grabber = [&]{
-			static const Volt OPEN = -1, CLOSE = 0, AUTO = 1;
+			static const float OPEN = -1, CLOSE = 0, AUTO = 1;
 			if(set_button(gear_grabber,OPEN,CLOSE,AUTO)) return Panel::Gear_grabber::CLOSE;
 			if(set_button(gear_grabber,CLOSE,AUTO,ARTIFICIAL_MAX)) return Panel::Gear_grabber::AUTO;
 			return Panel::Gear_grabber::OPEN;
 		}();	
 	 
-		Volt shooter = d.axis[BALL_SHOOTER_AXIS];
+		float shooter = d.axis[BALL_SHOOTER_AXIS];
 		p.shooter = [&]{
-			static const Volt ON = -1, OFF = 0, REVERSE = 1;
+			static const float ON = -1, OFF = 0, REVERSE = 1;
 			if(set_button(shooter,ON,OFF,REVERSE)) return Panel::Shooter::OFF;
 			if(set_button(shooter,OFF,REVERSE,ARTIFICIAL_MAX)) return Panel::Shooter::REVERSE;
 			return Panel::Shooter::ON;
 		}();
 		
 		
-		Volt arm = d.axis[BALL_ARM_AXIS];
+		float arm = d.axis[BALL_ARM_AXIS];
 		p.arm = [&]{
-			static const Volt STOW = -1, LOW = 0, AUTO = 1;
+			static const float STOW = -1, LOW = 0, AUTO = 1;
 			if(set_button(arm,STOW,LOW,AUTO)) return Panel::Arm::LOW;
 			if(set_button(arm,LOW,AUTO,ARTIFICIAL_MAX)) return Panel::Arm::AUTO;
 			return Panel::Arm::STOW;
 		}();
 			
-		Volt intake_direction = d.axis[BELT_DIR_AXIS];
+		float intake_direction = d.axis[BELT_DIR_AXIS];
 		p.intake_direction = [&]{
-			static const Volt IN = -1, OUT = 0, AUTO = 1;
+			static const float IN = -1, OUT = 0, AUTO = 1;
 			if(set_button(intake_direction,IN,OUT,AUTO)) return Panel::Intake_direction::OUT;
 			if(set_button(intake_direction,IN,AUTO,ARTIFICIAL_MAX)) return Panel::Intake_direction::AUTO;
 			return Panel::Intake_direction::IN;
 		}();
 
-		Volt intake_control = d.axis[BALL_COL_AXIS];
+		float intake_control = d.axis[BALL_COL_AXIS];
 		p.intake_control = [&]{
-			static const Volt ON = -1, OFF = 0, AUTO = 1;
+			static const float ON = -1, OFF = 0, AUTO = 1;
 			if(set_button(intake_control,ON,OFF,AUTO)) return Panel::Intake_control::OFF;
 			if(set_button(intake_control,OFF,AUTO,ARTIFICIAL_MAX)) return Panel::Intake_control::AUTO;
 			return Panel::Intake_control::ON;
@@ -219,8 +219,8 @@ Panel interpret_oi(Joystick_data d){
 		p.gear_score=d.button[SCORE_GEAR_LOC];
 		p.climb=d.button[CLIMBER_LOC];
 		
-		//const Volt AXIS_VALUE = d.axis[2];
-		//static const Volt DEFAULT=-1, ARTIFICIAL_MAX = 1.38;
+		//const float AXIS_VALUE = d.axis[2];
+		//static const float DEFAULT=-1, ARTIFICIAL_MAX = 1.38;
 	
 		//old replaced by set_button:
 		/*#define AXIS_RANGE(axis, last, curr, next, var, val) if (axis > curr-(curr-last)/2 && axis < curr+(next-curr)/2) var = val;
