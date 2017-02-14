@@ -3,7 +3,7 @@ Driver:
  B          - 
  X          - 
  Y          - 
- Start      - 
+ Start      - Climb (Toggle winch)
  Back       - 
  RB         - Low gear
  LB         - Slow
