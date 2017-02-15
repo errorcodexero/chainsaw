@@ -57,14 +57,14 @@ Gunner:
   Pushed in - 
  POV:        
   Center     - 
-  Up         - Shoot
+  Up         - Collect
                AO: Ball lift in
   Up_left    - 
-  Left       - Climb
-               AO: Ball intake out
+  Left       - AO: Ball intake out
   Down_left  - 
-  Down       - AO: Ball lift out
+  Down       - Climb
+               AO: Ball lift out
   Down_right - 
-  Right      - Collect
+  Right      - Shoot
                AO: Ball intake in
   Up_right   - 
