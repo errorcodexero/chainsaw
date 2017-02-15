@@ -1,10 +1,9 @@
-#include "auto_baseline.h"
 #include "auto_baselineext.h"
 #include "teleop.h"
 
 using namespace std;
 
-Executive Auto_baseline::next_mode(Next_mode_info info){
+Executive Auto_baselineext::next_mode(Next_mode_info info){
 	if(!info.autonomous) return Executive{Teleop()};
 	Drivebase::Encoder_ticks encoder_differences={
 	#define X(ENCODER) info.status.drive.ticks.ENCODER - initial_encoders.ENCODER
@@ -25,16 +24,13 @@ Executive Auto_baseline::next_mode(Next_mode_info info){
 	const double IN_RANGE_TIME = 2.0;//seconds - the time that the robot needs to be within a certain distance from the target
 	in_range.set(IN_RANGE_TIME);
 	}
-	if(in_range.done() & (info.panel.auto_select == 3)){
-		return Executive{Auto_baselineext(CONSTRUCT_STRUCT_PARAMS(AUTO_BASELINEEXT_ITEMS))};
+	if(in_range.done()){
+	return Executive{Teleop()};
 	}
-	else if(in_range.done()){
-		return Executive{Teleop()};
-	}
-	return Executive{Auto_baseline(CONSTRUCT_STRUCT_PARAMS(AUTO_BASELINE_ITEMS))};
+	return Executive{Auto_baselineext(CONSTRUCT_STRUCT_PARAMS(AUTO_BASELINEEXT_ITEMS))};
 }
 
-Toplevel::Goal Auto_baseline::run(Run_info info){
+Toplevel::Goal Auto_baselineext::run(Run_info info){
 	Toplevel::Goal goals;
 	double power = -motion_profile.target_speed(ticks_to_inches(info.toplevel_status.drive.ticks.l));//assuming that the left and right encoder values are similar enough
 	goals.drive.left = power;
@@ -42,13 +38,13 @@ Toplevel::Goal Auto_baseline::run(Run_info info){
 		return goals;
 }
 
-bool Auto_baseline::operator==(Auto_baseline const&)const{ return true; }//TODO: update with values in that struct
+bool Auto_baselineext::operator==(Auto_baselineext const&)const{ return true; }//TODO: update with values in that struct
 
-#ifdef AUTO_BASELINE_TEST
+#ifdef AUTO_BASELINEEXT_TEST
 #include "test.h"
 
 int main(){
-	Auto_baseline a = {{0,0,0}};
+	Auto_baselineext a = {{0,0,0}};
 	test_executive(a);
 }
 #endif
