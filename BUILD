@@ -681,7 +681,8 @@ cc_library(
 		"executive/auto_gearboiler.cpp",
 		"executive/auto_gearloading.cpp",
 		"executive/auto_gearmid.cpp",
-		"executive/auto_baselineext.cpp"
+		"executive/auto_baselineext.cpp",
+		"executive/auto_gearboilerext.cpp"
 	],
 	hdrs=[
 		"executive/delay.h",
@@ -694,7 +695,8 @@ cc_library(
 		"executive/auto_gearboiler.h",
 		"executive/auto_gearloading.h",
 		"executive/auto_gearmid.h",
-		"executive/auto_baselineext.h"
+		"executive/auto_baselineext.h",
+		"executive/auto_gearboilerext.h"
 	],
 	deps=[":executive",":posedge_trigger_debounce",":posedge_toggle",":motion_profile"]
 )
@@ -793,6 +795,18 @@ cc_test(
         ],
         timeout = "short"
 )
+
+cc_test(
+        name="auto_gearboilerext_test",
+        srcs=["executive/auto_gearboilerext.cpp","executive/auto_gearboilerext.h"],
+        copts=["-DAUTO_GEARBOILEREXT_TEST"],
+        deps=[
+                ":executive",":executive_impl",
+                ":test"
+        ],
+        timeout = "short"
+)
+
 
 cc_library(
 	name="executive",
