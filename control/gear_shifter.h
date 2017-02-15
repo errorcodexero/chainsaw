@@ -8,19 +8,6 @@
 #include "../util/countdown_timer.h"
 
 struct Gear_shifter{
-<<<<<<< HEAD
-	enum class Output {HIGH, LOW};
-};	
-namespace std:
-
-
-
-
-
-
-
-
-=======
 	#define GEAR_SHIFTER_GOALS X(AUTO) X(LOW) X(HIGH)
 	enum class Goal{
 		#define X(A) A,
@@ -79,6 +66,5 @@ std::set<Gear_shifter::Output> examples(Gear_shifter::Output*);
 Gear_shifter::Status status(Gear_shifter::Status_detail);
 Gear_shifter::Output control(Gear_shifter::Status_detail,Gear_shifter::Goal);
 bool ready(Gear_shifter::Status,Gear_shifter::Goal);
->>>>>>> 49a35cf5f0a34896a3b8bd7573c3c820f4e02ca7
 
 #endif	
