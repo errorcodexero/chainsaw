@@ -16,6 +16,7 @@ struct Auto_gearloading_topeg : public Executive_impl<Auto_gearloading_topeg>{
 		AUTO_GEARLOADING_ITEMS(X)
 	STRUCT_MEMBERS(AUTO_GEARLOADING_TOPEG_ITEMS)
 	Auto_gearloading_topeg(unsigned gear_step1, std::pair<int,int> initial_encoders1):gear_step(gear_step1),initial_encoders(initial_encoders1){}
+	//Auto_gearloading_topeg():gear_step(0),initial_encoders({0,0}){}
 	IMPL_STRUCT(Auto_gearloading_topeg,AUTO_GEARLOADING_TOPEG_ITEMS)
 
 	Executive next_mode(Next_mode_info);

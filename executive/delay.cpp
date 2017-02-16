@@ -18,15 +18,15 @@ Executive auto_mode_convert(Next_mode_info info){
 	if (info.panel.in_use) {
 		switch(info.panel.auto_select){ 
 			case 1: 
-				//return Executive{Auto_null()};
+				return Executive{Auto_null()};
 			case 2:
-				//return Executive{Auto_baseline({0,0,0})};
+				return Executive{Auto_baseline({0,0,0})};
 			case 3:
-				//return Executive{Auto_baseline({0,0,0})};
+				return Executive{Auto_baseline({0,0,0})};
 			case 4:
-				//return Executive{Auto_gearboiler_topeg({0,0})};
+				return Executive{Auto_gearboiler_topeg()};
 			case 5:
-				//return Executive{Auto_gearboiler_topeg({0,0})};
+				return Executive{Auto_gearboiler_topeg()};
 			case 6:
 				//return Executive{Auto_gearloading_topeg({0,0})};
 			case 7:
@@ -44,7 +44,9 @@ Executive auto_mode_convert(Next_mode_info info){
 }
 
 Mode Delay::next_mode(Next_mode_info info){
+	cout << "DELAY FLAG" << "\n";
 	if(!info.autonomous) return Mode{Teleop()};
+	cout << "info " << info.since_switch << "\n";
 	if(info.since_switch > .5) return auto_mode_convert(info);
 	return Mode{Delay()};
 }

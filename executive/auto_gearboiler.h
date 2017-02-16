@@ -15,7 +15,8 @@ struct Auto_gearboiler_topeg : public Executive_impl<Auto_gearboiler_topeg>{
 		X(Countdown_timer,in_auto_range)\
 		AUTO_GEARBOILER_ITEMS(X)
 	STRUCT_MEMBERS(AUTO_GEARBOILER_TOPEG_ITEMS)
-	Auto_gearboiler_topeg(unsigned gear_step1, std::pair<int,int> initial_encoders1):gear_step(gear_step1),initial_encoders(initial_encoders1){}	
+	Auto_gearboiler_topeg(unsigned gear_step1, std::pair<int,int> initial_encoders1):gear_step(gear_step1),initial_encoders(initial_encoders1){}
+	Auto_gearboiler_topeg():gear_step(0),initial_encoders({0,0}){}
 	IMPL_STRUCT(Auto_gearboiler_topeg,AUTO_GEARBOILER_TOPEG_ITEMS)
 
 	Executive next_mode(Next_mode_info);

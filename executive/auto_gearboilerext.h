@@ -15,7 +15,8 @@ struct Auto_gearboilerext_frompeg : public Executive_impl<Auto_gearboilerext_fro
 		X(Countdown_timer,in_auto_range)\
 		AUTO_GEARBOILEREXT_ITEMS(X)
 	STRUCT_MEMBERS(AUTO_GEARBOILEREXT_FROMPEG_ITEMS)
-	Auto_gearboilerext_frompeg(unsigned gear_step1, std::pair<int,int> initial_encoders1):gear_step(gear_step1),initial_encoders(initial_encoders1){}	
+	Auto_gearboilerext_frompeg(unsigned gear_step1, std::pair<int,int> initial_encoders1):gear_step(gear_step1),initial_encoders(initial_encoders1){}
+	Auto_gearboilerext_frompeg(std::pair<int,int> initial_encoders1):initial_encoders(initial_encoders1){}
 	IMPL_STRUCT(Auto_gearboilerext_frompeg,AUTO_GEARBOILEREXT_FROMPEG_ITEMS)
 
 	Executive next_mode(Next_mode_info);
