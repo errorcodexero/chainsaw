@@ -12,18 +12,19 @@ Executive Auto_baseline::next_mode(Next_mode_info info){
 		X(r),
 	};
 
-	const double TARGET_DISTANCE = 9.0*12.0;//inches
-	const double TOLERANCE = 3.0;//inches
+	const double TARGET_DISTANCE = 12.0*12.0;//inches
+	const double TOLERANCE = 6.0;//inches
 
 	motion_profile.set_goal(TARGET_DISTANCE);
 
-	cout<<"\n" << "encoder_differences:"<< encoder_differences<<"   left(inches):"<<ticks_to_inches(encoder_differences.l)<<"   target(inches):"<<TARGET_DISTANCE<<"\n";
+	cout<<"\n" << "auto_baseline: encoder_differences:"<< encoder_differences<<"   left(inches):"<<ticks_to_inches(encoder_differences.l)<<"   target(inches):"<<TARGET_DISTANCE<<"\n";
 	
 	if(ticks_to_inches(encoder_differences.l) >= TARGET_DISTANCE-TOLERANCE && ticks_to_inches(encoder_differences.l) <= TARGET_DISTANCE+TOLERANCE){
-	in_range.update(info.in.now,info.in.robot_mode.enabled);
+		in_range.update(info.in.now,info.in.robot_mode.enabled);
+		cout <<"IN  RANGE"<< in_range << "\n";
 	} else {
-	const double IN_RANGE_TIME = 2.0;//seconds - the time that the robot needs to be within a certain distance from the target
-	in_range.set(IN_RANGE_TIME);
+		const double IN_RANGE_TIME = 2.0;//seconds - the time that the robot needs to be within a certain distance from the target
+		in_range.set(IN_RANGE_TIME);
 	}
 	if(in_range.done() & (info.panel.auto_select == 3)){
 		return Executive{Auto_baselineext(CONSTRUCT_STRUCT_PARAMS(AUTO_BASELINEEXT_ITEMS))};
@@ -36,7 +37,7 @@ Executive Auto_baseline::next_mode(Next_mode_info info){
 
 Toplevel::Goal Auto_baseline::run(Run_info info){
 	Toplevel::Goal goals;
-	double power = -motion_profile.target_speed(ticks_to_inches(info.toplevel_status.drive.ticks.l));//assuming that the left and right encoder values are similar enough
+	double power = motion_profile.target_speed(ticks_to_inches(info.toplevel_status.drive.ticks.l));//assuming that the left and right encoder values are similar enough
 	goals.drive.left = power;
 	goals.drive.right = power;
 		return goals;

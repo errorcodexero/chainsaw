@@ -49,25 +49,22 @@ struct Drivebase_sim{
 	
 	float x=0,y=0,theta=0;//x,y are in distance in feet
 	Time last_time =0;
-	int ticks_left=2;
-	int ticks_right=2;
-	float dist_left=0;
-	float dist_right=0;
+	int ticks_left=3;
+	int ticks_right=3;
 	void update(Time t,bool enable,Output out){
 		Time dt=t-last_time;
 		last_time=t;
 		if(!enable) return;
 		float dtheta = (((out.l-out.r)*5/12.5))*6.25;
-		float speedl= (out.l)*.2;
-		float speedr= (out.r)*.2;
-		dist_left+=speedl*dt;
-		dist_right+=speedr*dt;
+		float speedl= (out.l)*2.5;
+		float speedr= (out.r)*2.5;
+		float dist_left=speedl*dt;
+		float dist_right=speedr*dt;
 		float dist_traveled=(dist_left+dist_right)/2;
 		float dy=dist_traveled*cosf(theta);
 		float dx=dist_traveled*sinf(theta);
 		ticks_left+=inches_to_ticks(dist_left*12);
 		ticks_right+=inches_to_ticks(dist_right*12);
-		cout << "dx:"<<dx<< " dy:" << dy << " dt:" << dtheta << "\n";
 		y+=dy;
 		x+=dx;
 		theta+=dtheta;
@@ -77,9 +74,11 @@ struct Drivebase_sim{
 	Input get()const{
 		auto d=Digital_in::_0;
 		auto p=make_pair(d,d);
-		return {Drivebase::Input{
-			{0,0,0,0,0,0},p,p,{ticks_left,ticks_right}
+		Drivebase::Input in = {Drivebase::Input{
+			{0,0,0,0,0,0},p,p,{-ticks_left,ticks_right}//because encoders are opotistes
 		}};
+		cout<<"drive_in:"<<in<<"\n";
+		return in;
 	}
 
 };
@@ -159,7 +158,7 @@ struct Toplevel_sim{
 
 template<typename SIMULATOR,typename DEVICE>
 void simulate(SIMULATOR sim,DEVICE device){
-	static const Time TIMESTEP=.1;//this will probably change to .01 or .02 later.
+	static const Time TIMESTEP=.05;//this will probably change to .01 or .02 later.
 	auto in=sim.get();
 	for(Time t=0;t<2;t+=TIMESTEP){
 		//TODO: Make the simulator go 2014 style where you only get "significant" changes printed
@@ -274,7 +273,6 @@ int main(){
 		sim_display(sim.get());
 		sim_display(example((Toplevel::Output*)0));
 	}
-	cout<<"\n================================================\n";
 	{
 		Toplevel_sim sim;
 		Main m;
@@ -283,15 +281,21 @@ int main(){
 		all.robot_mode.enabled=true;
 		all.joystick[2].axis[1]=1;
 		auto robotinput = m.toplevel.input_reader(all,sim.get());
-		cout << "robot mode " << all.robot_mode << "\n";	
 		static const Time TIMESTEP=.1;
 		robotinput.robot_mode.autonomous=true;
 		robotinput.robot_mode.enabled=true;
+	
+		//cout << "10" << inches_to_ticks(10) << "\n";
+		//cout << "20" << inches_to_ticks(20) << "\n";
+		//cout << "50" << inches_to_ticks(50) << "\n";
+		//cout << "inverse one " <<ticks_to_inches(inches_to_ticks(10))<< " two " << inches_to_ticks(ticks_to_inches(10)) << "\n";
 		for(Time t=0;t<20;t+=TIMESTEP){
-			cout << "Main " << m << "\n";
-			cout<<t<<"\t"<<sim.get()<<"\n";
+			robotinput.now=t;
+			robotinput.robot_mode.enabled=true;	
+			//cout << "Main " << m << "\n";
+			cout<< "\n" <<t<<"\t"<<sim.get()<<"\n";
 			auto out=m(robotinput);
-			
+			cout << "Mode: " <<m.mode << "\n";	
 			//auto out=example((Toplevel::Output*)0);
 			/*Toplevel::Goal goal;
 			goal.drive.left=1;
@@ -301,6 +305,7 @@ int main(){
 			cout <<"out "  << out << "\n";
 			sim.update(t,1,m.toplevel.output_applicator(out));
 			m.toplevel.estimator.update(t,sim.get(),m.toplevel.output_applicator(out));
+			robotinput = m.toplevel.input_reader(robotinput,sim.get());
 		}
 	}
 	return 0;	

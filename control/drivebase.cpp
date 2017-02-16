@@ -47,7 +47,7 @@ double inches_to_ticks(const float inches){
 	const double WHEEL_CIRCUMFERENCE=WHEEL_DIAMETER*PI;//inches
 	const double INCHES_PER_TICK=WHEEL_CIRCUMFERENCE/(double)TICKS_PER_REVOLUTION;
 	const double ERROR_CORRECTION = 0.181952663;//2017, encoders are geared. Rough calculation.
-	return inches/INCHES_PER_TICK*ERROR_CORRECTION;
+	return inches/(INCHES_PER_TICK*ERROR_CORRECTION);
 }
 
 #define R_ENCODER_PORTS 0,1
@@ -68,7 +68,7 @@ Robot_inputs Drivebase::Input_reader::operator()(Robot_inputs all,Input in)const
 	};
 	encoder(L_ENCODER_PORTS,in.left);
 	encoder(R_ENCODER_PORTS,in.right);
-	all.digital_io.encoder[L_ENCODER_LOC] = in.ticks.l;
+	all.digital_io.encoder[L_ENCODER_LOC] = -in.ticks.l;
 	all.digital_io.encoder[R_ENCODER_LOC] = in.ticks.r;
 	return all;
 }
@@ -88,7 +88,7 @@ Drivebase::Input Drivebase::Input_reader::operator()(Robot_inputs const& in)cons
 		}(),
 		encoder_info(L_ENCODER_PORTS),
 		encoder_info(R_ENCODER_PORTS),
-		{encoderconv(in.digital_io.encoder[L_ENCODER_LOC]),encoderconv(in.digital_io.encoder[R_ENCODER_LOC])}
+		{-encoderconv(in.digital_io.encoder[L_ENCODER_LOC]),encoderconv(in.digital_io.encoder[R_ENCODER_LOC])}
 	};
 }
 

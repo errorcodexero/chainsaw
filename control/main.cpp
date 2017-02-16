@@ -46,7 +46,6 @@ Robot_outputs Main::operator()(Robot_inputs in,ostream&){
 	Toplevel::Goal goals = mode.run(Run_info{in,driver_joystick,panel,toplevel_status});
 	
 	auto next=mode.next_mode(Next_mode_info{in.robot_mode.autonomous,autonomous_start_now,toplevel_status,since_switch.elapsed(),panel,in});
-	
 	since_switch.update(in.now,mode!=next);
 	mode=next;
 		

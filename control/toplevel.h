@@ -11,10 +11,10 @@
 #include "shooter_feed.h"
 
 #define TOPLEVEL_ITEMS \
-	X(Drivebase,drive,)\
 	X(Pump,pump,Pump::Goal::AUTO)\
 	X(Climber,climber,Climber::Goal::STOP)\
 	X(Gear_shifter,shifter,Gear_shifter::Goal::LOW)\
+	X(Drivebase,drive,)\
 	X(Collector,collector,)\
 	X(Gear_collector,gear_collector,) \
 	X(Shooter_feed,shooter_feed,Shooter_feed::Goal::OFF) 
