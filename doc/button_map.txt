@@ -29,35 +29,42 @@ POV:
   Up_right   - 
 
 Gunner:
- A          - Prep for gear collection
- B          - Prep for scoring a gear OR (with AO) shoot
- X          - Collect OR (with AO) prep to shoot
- Y          - Score gear
- Start      - Climb
- Back       - Learn
+ A          - Prep collect gear
+              AO: Gear collector down
+ B          - Score gear
+              AO: Gear grasper open
+ X          - Collect gear
+              AO: Gear grasper closed
+ Y          - Prep score gear
+              AO: Gear collector up
+ Start      - Learn
+ Back       - Toggle ball/gear indicator
  RB         - 
  LB         - Alternative Operation (AO) - changes what other buttons do if held
  RT         - 
- LT         - Speed modifier
+ LT         - Shooter speed modifier
  L_Joy:
-  Up        - Gear lift up OR (with AO) Open gear grabber
-  Down      - Gear lift down OR (with AO) Close gear grabber
-  Left      - Gear lift auto OR (with AO) Set gear grabber to auto
-  Right     -
+  Up        - 
+  Down      - 
+  Left      - 
+  Right     - 
   Pushed in - 
  R_Joy:
-  Up        - Ball lift belts on OR (with AO) intake in
-  Down      - Ball lift belts off OR (with AO) intake out
-  Left      - Ball lift belts auto (with AO) intake auto
+  Up        - AO: Ball collector up
+  Down      - AO: Ball collector down
+  Left      - 
   Right     - 
   Pushed in - 
  POV:        
   Center     - 
-  Up         - Ball arm in OR (with AO) shooter power mode
+  Up         - Collect
+               AO: Ball lift in
   Up_left    - 
-  Left       - Ball arm auto OR (with AO) shooter auto mode
+  Left       - AO: Ball intake out
   Down_left  - 
-  Down       - Ball arm out OR (with AO) shooter rpm mode
+  Down       - Climb
+               AO: Ball lift out
   Down_right - 
-  Right      - 
+  Right      - Shoot
+               AO: Ball intake in
   Up_right   - 
