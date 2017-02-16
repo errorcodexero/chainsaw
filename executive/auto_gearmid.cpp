@@ -1,11 +1,10 @@
-/*
 #include "auto_gearmid.h"
 #include "teleop.h"
 
 using namespace std;
 
 Executive Auto_gearmid_topeg::next_mode(Next_mode_info info){
-i	pair<int,int> encoder_differences=make_pair(info.status.drive.ticks.l-initial_encoders.first,info.status.drive.ticks.r-initial_encoders.second);
+	pair<int,int> encoder_differences=make_pair(info.status.drive.ticks.l-initial_encoders.first,info.status.drive.ticks.r-initial_encoders.second);
 	if(!info.autonomous) return Executive{Teleop()};
 	const double TARGET_DISTANCE = 5.0*12.0;//inches
 	const double TOLERANCE = 6.0;//inches
@@ -23,6 +22,14 @@ i	pair<int,int> encoder_differences=make_pair(info.status.drive.ticks.l-initial_
 		//return make_unique<Auto_br_initialturn>();//TODO 
 	}
 	return Executive{Auto_gearmid_topeg(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARMID_TOPEG_ITEMS))};
+}
+
+Toplevel::Goal Auto_gearmid_topeg::run(Run_info info){
+	Toplevel::Goal goals;
+	double power=-motion_profile.target_speed(ticks_to_inches(info.toplevel_status.drive.ticks.l));
+	goals.drive.left=power;
+	goals.drive.right=power;
+	return goals;
 }
 
 Executive Auto_gearmid_geardrop::next_mode(Next_mode_info info){
@@ -52,4 +59,4 @@ int main(){
 	#undef X
 }
 #endif
-*/
+

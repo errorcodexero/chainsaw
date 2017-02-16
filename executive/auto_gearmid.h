@@ -1,4 +1,4 @@
-/*
+
 #ifndef AUTO_GEARMID_H
 #define AUTO_GEARMID_H
 
@@ -38,4 +38,4 @@ struct Auto_gearmid_geardrop : public Executive_impl<Auto_gearmid_geardrop>{
 
 
 #endif
-*/
+

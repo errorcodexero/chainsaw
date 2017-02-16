@@ -678,7 +678,11 @@ cc_library(
 		"executive/auto_forward.cpp",
 		"executive/auto_distance.cpp",
 		"executive/auto_baseline.cpp",
-		"executive/auto_gearboiler.cpp"
+		"executive/auto_gearboiler.cpp",
+		"executive/auto_gearloading.cpp",
+		"executive/auto_gearmid.cpp",
+		"executive/auto_baselineext.cpp",
+		"executive/auto_gearboilerext.cpp"
 	],
 	hdrs=[
 		"executive/delay.h",
@@ -688,7 +692,11 @@ cc_library(
 		"executive/auto_forward.h",
 		"executive/auto_distance.h",
 		"executive/auto_baseline.h",
-		"executive/auto_gearboiler.h"
+		"executive/auto_gearboiler.h",
+		"executive/auto_gearloading.h",
+		"executive/auto_gearmid.h",
+		"executive/auto_baselineext.h",
+		"executive/auto_gearboilerext.h"
 	],
 	deps=[":executive",":posedge_trigger_debounce",":posedge_toggle",":motion_profile"]
 )
@@ -754,6 +762,51 @@ cc_test(
         ],
         timeout = "short"
 )
+
+cc_test(
+        name="auto_gearloading_test",
+        srcs=["executive/auto_gearloading.cpp","executive/auto_gearloading.h"],
+        copts=["-DAUTO_GEARLOADING_TEST"],
+        deps=[
+                ":executive",":executive_impl",
+                ":test"
+        ],
+        timeout = "short"
+)
+
+cc_test(
+        name="auto_gearmid_test",
+        srcs=["executive/auto_gearmid.cpp","executive/auto_gearmid.h"],
+        copts=["-DAUTO_GEARMID_TEST"],
+        deps=[
+                ":executive",":executive_impl",
+                ":test"
+        ],
+        timeout = "short"
+)
+
+cc_test(
+        name="auto_baselineext_test",
+        srcs=["executive/auto_baselineext.cpp","executive/auto_baselineext.h"],
+        copts=["-DAUTO_BASELINEEXT_TEST"],
+        deps=[
+                ":executive",":executive_impl",
+                ":test"
+        ],
+        timeout = "short"
+)
+
+cc_test(
+        name="auto_gearboilerext_test",
+        srcs=["executive/auto_gearboilerext.cpp","executive/auto_gearboilerext.h"],
+        copts=["-DAUTO_GEARBOILEREXT_TEST"],
+        deps=[
+                ":executive",":executive_impl",
+                ":test"
+        ],
+        timeout = "short"
+)
+
 
 cc_library(
 	name="executive",
