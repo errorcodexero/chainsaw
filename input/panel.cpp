@@ -6,18 +6,18 @@
 #include <cmath>
 
 using namespace std;
-static const unsigned int BALL_COL_AXIS=0,BELT_DIR_AXIS=1,BALL_ARM_AXIS=2,BALL_SHOOTER_AXIS=3,GEAR_HOLDER_AXIS=4,GEAR_COL_AXIS=5,AUTO_SEL_AXIS=6,SHOOTER_DIAL_AXIS=7;//TODO: rename constants
-static const unsigned int BALL_COL_LOC=0,PREP_SHOOT_LOC=1,SHOOT_LOC=2,COL_GEAR_LOC=3,PREP_GEAR_LOC=4,PREP_SCORE_GEAR_LOC=5,SCORE_GEAR_LOC=6,CLIMBER_LOC=7,LEARN_LOC=8;//TODO: rename constants
-static const unsigned int LIFT_LOC_1 = 9, LIFT_LOC_2 = 10;
+static const unsigned int BALL_ARM_AXIS=0,GEAR_GRASPER_AXIS=1,GEAR_COLLECTOR_AXIS=2,SHOOTER_AXIS=3,BALL_INTAKE_AXIS=4,BALL_LIFT_AXIS=5,SPEED_DIAL_AXIS=6,AUTO_SELECTOR_AXIS=7;//TODO: rename constants
+static const unsigned int BALL_COLLECT_LOC=0,LOADING_INDICATOR_LOC=1,SHOOT_LOC=2,PREP_COLLECT_GEAR_LOC=3,PREP_SCORE_GEAR_LOC=4,COLLECT_GEAR_LOC=5,SCORE_GEAR_LOC=6,CLIMB_LOC=7,LEARN_LOC=8;//TODO: rename constants
+static const unsigned int SHOOTER_BELT_ENABLED_LOC=9,SHOOTER_BELT_AUTO_LOC=10,BALL_COLLECTOR_DISABLED_LOC=11,BALL_COLLECTOR_AUTO_LOC=12;
 
 #define BUTTONS \
-	X(learn) X(collect) X(shoot_prep) X(shoot) X(gear_collect) X(gear_prep_collect) X(gear_prep_score) X(gear_score) X(climb)
+	X(ball_collect) X(loading_indicator) X(shoot) X(gear_prep_collect) X(gear_prep_score) X(gear_collect) X(gear_score) X(climb) X(learn)
 #define THREE_POS_SWITCHES \
-	X(gear_lifter) X(gear_grabber) X(shooter) X(arm) X(intake_direction) X(intake_control) X(lift)
+	X(ball_arm) X(gear_grasper) X(gear_collector) X(shooter) X(ball_intake) X(ball_lift) X(shooter_belt) X(ball_collector)
 #define TEN_POS_SWITCHES \
 	X(auto_select)
-
-#define DIALS 
+#define DIALS \
+	X(speed_dial)
 
 #define PANEL_ITEMS \
 	BUTTONS \
@@ -25,67 +25,75 @@ static const unsigned int LIFT_LOC_1 = 9, LIFT_LOC_2 = 10;
 	TEN_POS_SWITCHES \
 	DIALS
 
-
 Panel::Panel():
 	in_use(0),
 	#define X(BUTTON) BUTTON(false),
 	BUTTONS
 	#undef X
-	gear_lifter(Gear_lifter::UP),
-	gear_grabber(Gear_grabber::OPEN),
-	shooter(Shooter::OFF),
-	arm(Arm::STOW),
-	intake_direction(Intake_direction::IN),
-	intake_control(Intake_control::OFF),
-	lift(Lift::UP),
-	auto_select(0)
+	ball_arm(Ball_arm::DOWN),
+	gear_grasper(Gear_grasper::CLOSED),
+	gear_collector(Gear_collector::DOWN),
+	shooter(Shooter::DISABLED),
+	ball_intake(Ball_intake::IN),
+	ball_lift(Ball_lift::IN),
+	shooter_belt(Shooter_belt::DISABLED),
+	ball_collector(Ball_collector::DISABLED),
+	auto_select(0),
+	speed_dial(0)
 {}
 
-ostream& operator<<(ostream& o,Panel::Gear_lifter p){
-	#define X(NAME) if(p==Panel::Gear_lifter::NAME) return o<<""#NAME;
+ostream& operator<<(ostream& o,Panel::Ball_arm a){
+	#define X(NAME) if(a==Panel::Ball_arm::NAME) return o<<""#NAME;
 	X(UP) X(DOWN) X(AUTO)
 	#undef X
 	assert(0);
 }
 
-ostream& operator<<(ostream& o,Panel::Lift l){
-	#define X(STATE) if(l==Panel::Lift::STATE) return o<<""#STATE;
+ostream& operator<<(ostream& o,Panel::Gear_grasper a){
+	#define X(NAME) if(a==Panel::Gear_grasper::NAME) return o<<""#NAME;
+	X(OPEN) X(CLOSED) X(AUTO)
+	#undef X
+	assert(0);
+}
+
+ostream& operator<<(ostream& o,Panel::Gear_collector a){
+	#define X(NAME) if(a==Panel::Gear_collector::NAME) return o<<""#NAME;
 	X(UP) X(DOWN) X(AUTO)
 	#undef X
 	assert(0);
 }
 
-ostream& operator<<(ostream& o,Panel::Gear_grabber p){
-	#define X(NAME) if(p==Panel::Gear_grabber::NAME) return o<<""#NAME;
-	X(OPEN) X(CLOSE) X(AUTO)
+ostream& operator<<(ostream& o,Panel::Shooter a){
+	#define X(NAME) if(a==Panel::Shooter::NAME) return o<<""#NAME;
+	X(ENABLED) X(DISABLED) X(AUTO)
 	#undef X
 	assert(0);
 }
 
-ostream& operator<<(ostream& o,Panel::Shooter p){
-	#define X(NAME) if(p==Panel::Shooter::NAME) return o<<""#NAME;
-	X(ON) X(OFF) X(REVERSE)
+ostream& operator<<(ostream& o,Panel::Ball_intake a){
+	#define X(NAME) if(a==Panel::Ball_intake::NAME) return o<<""#NAME;
+	X(OUT) X(IN) X(AUTO)
 	#undef X
 	assert(0);
 }
 
-ostream& operator<<(ostream& o,Panel::Arm p){
-	#define X(NAME) if(p==Panel::Arm::NAME) return o<<""#NAME;
-	X(LOW) X(STOW) X(AUTO)
+ostream& operator<<(ostream& o,Panel::Ball_lift a){
+	#define X(NAME) if(a==Panel::Ball_lift::NAME) return o<<""#NAME;
+	X(OUT) X(IN) X(AUTO)
 	#undef X
 	assert(0);
 }
 
-ostream& operator<<(ostream& o,Panel::Intake_direction p){
-	#define X(NAME) if(p==Panel::Intake_direction::NAME) return o<<""#NAME;
-	X(IN) X(OUT) X(AUTO)
+ostream& operator<<(ostream& o,Panel::Shooter_belt a){
+	#define X(NAME) if(a==Panel::Shooter_belt::NAME) return o<<""#NAME;
+	X(ENABLED) X(DISABLED) X(AUTO)
 	#undef X
 	assert(0);
 }
 
-ostream& operator<<(ostream& o,Panel::Intake_control p){
-	#define X(NAME) if(p==Panel::Intake_control::NAME) return o<<""#NAME;
-	X(ON) X(OFF) X(AUTO)
+ostream& operator<<(ostream& o,Panel::Ball_collector a){
+	#define X(NAME) if(a==Panel::Ball_collector::NAME) return o<<""#NAME;
+	X(DISABLED) X(AUTO)
 	#undef X
 	assert(0);
 }
@@ -141,98 +149,86 @@ Panel interpret_oi(Joystick_data d){
 		if(!p.in_use) return p;
 	}
 	{//set the auto mode number from the dial value
-		float auto_dial_value = d.axis[AUTO_SEL_AXIS];
+		float auto_dial_value = d.axis[AUTO_SELECTOR_AXIS];
 		p.auto_select = interpret_10_turn_pot(auto_dial_value);
 	}
 	{//two position switches
 	}
 	{//three position switches
-		float gear_lifter = d.axis[GEAR_COL_AXIS];
-		p.gear_lifter = [&]{
-			static const float UP = -1, DOWN = 0, AUTO = 1;
-			if(set_button(gear_lifter,UP,DOWN,AUTO)) return Panel::Gear_lifter::DOWN;
-			if(set_button(gear_lifter,DOWN,AUTO,ARTIFICIAL_MAX)) return Panel::Gear_lifter::AUTO;
-			return Panel::Gear_lifter::UP;
+		float ball_arm = d.axis[BALL_ARM_AXIS];
+		p.ball_arm = [&]{
+			static const float UP=-1,DOWN=0,AUTO=1;
+			if(set_button(ball_arm,UP,DOWN,AUTO)) return Panel::Ball_arm::DOWN;
+			if(set_button(ball_arm,DOWN,AUTO,ARTIFICIAL_MAX)) return Panel::Ball_arm::AUTO;
+			return Panel::Ball_arm::UP;
+		}();
+		
+		float gear_grasper = d.axis[GEAR_GRASPER_AXIS];
+		p.gear_grasper = [&]{
+			static const float OPEN=-1,CLOSED=0,AUTO=1;
+			if(set_button(gear_grasper,OPEN,CLOSED,AUTO)) return Panel::Gear_grasper::CLOSED;
+			if(set_button(gear_grasper,CLOSED,AUTO,ARTIFICIAL_MAX)) return Panel::Gear_grasper::AUTO;
+			return Panel::Gear_grasper::OPEN;
 		}();
 
-		float gear_grabber = d.axis[GEAR_HOLDER_AXIS];
-		p.gear_grabber = [&]{
-			static const float OPEN = -1, CLOSE = 0, AUTO = 1;
-			if(set_button(gear_grabber,OPEN,CLOSE,AUTO)) return Panel::Gear_grabber::CLOSE;
-			if(set_button(gear_grabber,CLOSE,AUTO,ARTIFICIAL_MAX)) return Panel::Gear_grabber::AUTO;
-			return Panel::Gear_grabber::OPEN;
-		}();	
-	 
-		float shooter = d.axis[BALL_SHOOTER_AXIS];
+		float gear_collector = d.axis[GEAR_COLLECTOR_AXIS];
+		p.gear_collector = [&]{
+			static const float UP=-1,DOWN=0,AUTO=1;
+			if(set_button(gear_collector,UP,DOWN,AUTO)) return Panel::Gear_collector::DOWN;
+			if(set_button(gear_collector,DOWN,AUTO,ARTIFICIAL_MAX)) return Panel::Gear_collector::AUTO;
+			return Panel::Gear_collector::UP;
+		}();
+
+		float shooter = d.axis[SHOOTER_AXIS];
 		p.shooter = [&]{
-			static const float ON = -1, OFF = 0, REVERSE = 1;
-			if(set_button(shooter,ON,OFF,REVERSE)) return Panel::Shooter::OFF;
-			if(set_button(shooter,OFF,REVERSE,ARTIFICIAL_MAX)) return Panel::Shooter::REVERSE;
-			return Panel::Shooter::ON;
-		}();
-		
-		
-		float arm = d.axis[BALL_ARM_AXIS];
-		p.arm = [&]{
-			static const float STOW = -1, LOW = 0, AUTO = 1;
-			if(set_button(arm,STOW,LOW,AUTO)) return Panel::Arm::LOW;
-			if(set_button(arm,LOW,AUTO,ARTIFICIAL_MAX)) return Panel::Arm::AUTO;
-			return Panel::Arm::STOW;
-		}();
-			
-		float intake_direction = d.axis[BELT_DIR_AXIS];
-		p.intake_direction = [&]{
-			static const float IN = -1, OUT = 0, AUTO = 1;
-			if(set_button(intake_direction,IN,OUT,AUTO)) return Panel::Intake_direction::OUT;
-			if(set_button(intake_direction,IN,AUTO,ARTIFICIAL_MAX)) return Panel::Intake_direction::AUTO;
-			return Panel::Intake_direction::IN;
+			static const float ENABLED=-1,DISABLED=0,AUTO=1;
+			if(set_button(shooter,ENABLED,DISABLED,AUTO)) return Panel::Shooter::DISABLED;
+			if(set_button(shooter,DISABLED,AUTO,ARTIFICIAL_MAX)) return Panel::Shooter::AUTO;
+			return Panel::Shooter::ENABLED;
 		}();
 
-		float intake_control = d.axis[BALL_COL_AXIS];
-		p.intake_control = [&]{
-			static const float ON = -1, OFF = 0, AUTO = 1;
-			if(set_button(intake_control,ON,OFF,AUTO)) return Panel::Intake_control::OFF;
-			if(set_button(intake_control,OFF,AUTO,ARTIFICIAL_MAX)) return Panel::Intake_control::AUTO;
-			return Panel::Intake_control::ON;
-		}();	
-		{
-			bool lift_1 = d.button[LIFT_LOC_1], lift_2 = d.button[LIFT_LOC_2];
-			p.lift = [&]{
-				if(lift_1) return Panel::Lift::UP;
-				if(lift_2) return Panel::Lift::DOWN;
-				return Panel::Lift::AUTO;
-			}();
-		}
+		float ball_intake = d.axis[BALL_INTAKE_AXIS];
+		p.ball_intake = [&]{
+			static const float OUT=-1,IN=0,AUTO=1;
+			if(set_button(ball_intake,OUT,IN,AUTO)) return Panel::Ball_intake::IN;
+			if(set_button(ball_intake,IN,AUTO,ARTIFICIAL_MAX)) return Panel::Ball_intake::AUTO;
+			return Panel::Ball_intake::OUT;
+		}();
+
+		float ball_lift = d.axis[BALL_LIFT_AXIS];
+		p.ball_lift = [&]{
+			static const float OUT=-1,IN=0,AUTO=1;
+			if(set_button(ball_lift,OUT,IN,AUTO)) return Panel::Ball_lift::IN;
+			if(set_button(ball_lift,IN,AUTO,ARTIFICIAL_MAX)) return Panel::Ball_lift::AUTO;
+			return Panel::Ball_lift::OUT;
+		}();
+
+		bool shooter_belt_enabled = d.button[SHOOTER_BELT_ENABLED_LOC], shooter_belt_auto = d.button[SHOOTER_BELT_AUTO_LOC];
+		p.shooter_belt = [&]{
+			if(shooter_belt_enabled) return Panel::Shooter_belt::ENABLED;
+			if(shooter_belt_auto) return Panel::Shooter_belt::AUTO;
+			return Panel::Shooter_belt::DISABLED;
+		}();
+
+		bool /*ball_collector_disabled = d.button[BALL_COLLECTOR_DISABLED_LOC],*/ ball_collector_auto = d.button[BALL_COLLECTOR_AUTO_LOC];
+		p.ball_collector = [&]{
+			if(ball_collector_auto) return Panel::Ball_collector::AUTO;
+			return Panel::Ball_collector::DISABLED;
+		}();
 	}
 	{//buttons
-		/*//sets all buttons to off beacuse we assume that only one should be pressed on this axis at a time
-		#define X(button) p.button = false;
-		BUTTONS
-		#undef X*/
-		p.learn=d.button[LEARN_LOC];
-		p.collect=d.button[BALL_COL_LOC];
-		p.shoot_prep=d.button[PREP_SHOOT_LOC];
+		p.ball_collect=d.button[BALL_COLLECT_LOC];
+		p.loading_indicator=d.button[LOADING_INDICATOR_LOC];
 		p.shoot=d.button[SHOOT_LOC];
-		p.gear_collect=d.button[COL_GEAR_LOC];
-		p.gear_prep_collect=d.button[PREP_GEAR_LOC];
+		p.gear_prep_collect=d.button[PREP_COLLECT_GEAR_LOC];
 		p.gear_prep_score=d.button[PREP_SCORE_GEAR_LOC];
+		p.gear_collect=d.button[COLLECT_GEAR_LOC];
 		p.gear_score=d.button[SCORE_GEAR_LOC];
-		p.climb=d.button[CLIMBER_LOC];
-		
-		//const float AXIS_VALUE = d.axis[2];
-		//static const float DEFAULT=-1, ARTIFICIAL_MAX = 1.38;
-	
-		//old replaced by set_button:
-		/*#define AXIS_RANGE(axis, last, curr, next, var, val) if (axis > curr-(curr-last)/2 && axis < curr+(next-curr)/2) var = val;
-		AXIS_RANGE(op, DEFAULT, GRABBER_OPEN, GRABBER_CLOSE, p.grabber_open, 1)
-		else AXIS_RANGE(op, GRABBER_OPEN, GRABBER_CLOSE, PREP, p.grabber_close, 1)
-		else AXIS_RANGE(op, GRABBER_CLOSE, PREP, SHOOT, p.prep, 1)
-		else AXIS_RANGE(op, PREP, SHOOT, 1.38, p.shoot, 1)
-		#undef AXIS_RANGE*/
-		
+		p.climb=d.button[CLIMB_LOC];
+		p.learn=d.button[LEARN_LOC];
 	}
 	{//Dials
-		p.speed_dial = -d.axis[SHOOTER_DIAL_AXIS];
+		p.speed_dial = -d.axis[SPEED_DIAL_AXIS];
 	}
 	return p;
 }
@@ -276,6 +272,8 @@ Panel interpret_gamepad(Joystick_data d){
 	p.in_use = get_in_use(d);
 	if(!p.in_use) return p;
 	
+	//TODO: Redo this with new controls
+	/*
 	bool alternative_op = d.button[Gamepad_button::LB];
 
 	if(!alternative_op){
@@ -406,6 +404,7 @@ Panel interpret_gamepad(Joystick_data d){
 				assert(0);
 		}
 	}
+	*/
 	return p;
 }
 
