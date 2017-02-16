@@ -8,7 +8,7 @@
 using namespace std;
 static const unsigned int BALL_ARM_AXIS=0,GEAR_GRASPER_AXIS=1,GEAR_COLLECTOR_AXIS=2,SHOOTER_AXIS=3,BALL_INTAKE_AXIS=4,BALL_LIFT_AXIS=5,SPEED_DIAL_AXIS=6,AUTO_SELECTOR_AXIS=7;//TODO: rename constants
 static const unsigned int BALL_COLLECT_LOC=0,LOADING_INDICATOR_LOC=1,SHOOT_LOC=2,PREP_COLLECT_GEAR_LOC=3,PREP_SCORE_GEAR_LOC=4,COLLECT_GEAR_LOC=5,SCORE_GEAR_LOC=6,CLIMB_LOC=7,LEARN_LOC=8;//TODO: rename constants
-static const unsigned int SHOOTER_BELT_ENABLED_LOC=9,SHOOTER_BELT_AUTO_LOC=10,BALL_COLLECTOR_DISABLED_LOC=11,BALL_COLLECTOR_AUTO_LOC=12;
+static const unsigned int SHOOTER_BELT_AUTO_LOC=9,SHOOTER_BELT_ENABLED_LOC=10,BALL_COLLECTOR_DISABLED_LOC=11,BALL_COLLECTOR_AUTO_LOC=12;
 
 #define BUTTONS \
 	X(ball_collect) X(loading_indicator) X(shoot) X(gear_prep_collect) X(gear_prep_score) X(gear_collect) X(gear_score) X(climb) X(learn)
@@ -157,50 +157,50 @@ Panel interpret_oi(Joystick_data d){
 	{//three position switches
 		float ball_arm = d.axis[BALL_ARM_AXIS];
 		p.ball_arm = [&]{
-			static const float UP=-1,DOWN=0,AUTO=1;
-			if(set_button(ball_arm,UP,DOWN,AUTO)) return Panel::Ball_arm::DOWN;
-			if(set_button(ball_arm,DOWN,AUTO,ARTIFICIAL_MAX)) return Panel::Ball_arm::AUTO;
-			return Panel::Ball_arm::UP;
+			static const float AUTO=-1,DOWN=0,UP=1;
+			if(set_button(ball_arm,AUTO,DOWN,UP)) return Panel::Ball_arm::DOWN;
+			if(set_button(ball_arm,DOWN,UP,ARTIFICIAL_MAX)) return Panel::Ball_arm::UP;
+			return Panel::Ball_arm::AUTO;
 		}();
 		
 		float gear_grasper = d.axis[GEAR_GRASPER_AXIS];
 		p.gear_grasper = [&]{
-			static const float OPEN=-1,CLOSED=0,AUTO=1;
-			if(set_button(gear_grasper,OPEN,CLOSED,AUTO)) return Panel::Gear_grasper::CLOSED;
-			if(set_button(gear_grasper,CLOSED,AUTO,ARTIFICIAL_MAX)) return Panel::Gear_grasper::AUTO;
-			return Panel::Gear_grasper::OPEN;
+			static const float AUTO=-1,CLOSED=0,OPEN=1;
+			if(set_button(gear_grasper,AUTO,CLOSED,OPEN)) return Panel::Gear_grasper::CLOSED;
+			if(set_button(gear_grasper,CLOSED,OPEN,ARTIFICIAL_MAX)) return Panel::Gear_grasper::OPEN;
+			return Panel::Gear_grasper::AUTO;
 		}();
 
 		float gear_collector = d.axis[GEAR_COLLECTOR_AXIS];
 		p.gear_collector = [&]{
-			static const float UP=-1,DOWN=0,AUTO=1;
-			if(set_button(gear_collector,UP,DOWN,AUTO)) return Panel::Gear_collector::DOWN;
-			if(set_button(gear_collector,DOWN,AUTO,ARTIFICIAL_MAX)) return Panel::Gear_collector::AUTO;
-			return Panel::Gear_collector::UP;
+			static const float AUTO=-1,DOWN=0,UP=1;
+			if(set_button(gear_collector,AUTO,DOWN,UP)) return Panel::Gear_collector::DOWN;
+			if(set_button(gear_collector,DOWN,UP,ARTIFICIAL_MAX)) return Panel::Gear_collector::UP;
+			return Panel::Gear_collector::AUTO;
 		}();
 
 		float shooter = d.axis[SHOOTER_AXIS];
 		p.shooter = [&]{
-			static const float ENABLED=-1,DISABLED=0,AUTO=1;
-			if(set_button(shooter,ENABLED,DISABLED,AUTO)) return Panel::Shooter::DISABLED;
-			if(set_button(shooter,DISABLED,AUTO,ARTIFICIAL_MAX)) return Panel::Shooter::AUTO;
-			return Panel::Shooter::ENABLED;
+			static const float AUTO=-1,DISABLED=0,ENABLED=1;
+			if(set_button(shooter,AUTO,DISABLED,ENABLED)) return Panel::Shooter::DISABLED;
+			if(set_button(shooter,DISABLED,ENABLED,ARTIFICIAL_MAX)) return Panel::Shooter::ENABLED;
+			return Panel::Shooter::AUTO;
 		}();
 
 		float ball_intake = d.axis[BALL_INTAKE_AXIS];
 		p.ball_intake = [&]{
-			static const float OUT=-1,IN=0,AUTO=1;
-			if(set_button(ball_intake,OUT,IN,AUTO)) return Panel::Ball_intake::IN;
-			if(set_button(ball_intake,IN,AUTO,ARTIFICIAL_MAX)) return Panel::Ball_intake::AUTO;
-			return Panel::Ball_intake::OUT;
+			static const float AUTO=-1,IN=0,OUT=1;
+			if(set_button(ball_intake,AUTO,IN,OUT)) return Panel::Ball_intake::IN;
+			if(set_button(ball_intake,IN,OUT,ARTIFICIAL_MAX)) return Panel::Ball_intake::OUT;
+			return Panel::Ball_intake::AUTO;
 		}();
 
 		float ball_lift = d.axis[BALL_LIFT_AXIS];
 		p.ball_lift = [&]{
-			static const float OUT=-1,IN=0,AUTO=1;
-			if(set_button(ball_lift,OUT,IN,AUTO)) return Panel::Ball_lift::IN;
-			if(set_button(ball_lift,IN,AUTO,ARTIFICIAL_MAX)) return Panel::Ball_lift::AUTO;
-			return Panel::Ball_lift::OUT;
+			static const float AUTO=-1,IN=0,OUT=1;
+			if(set_button(ball_lift,AUTO,IN,OUT)) return Panel::Ball_lift::IN;
+			if(set_button(ball_lift,IN,OUT,ARTIFICIAL_MAX)) return Panel::Ball_lift::OUT;
+			return Panel::Ball_lift::AUTO;
 		}();
 
 		bool shooter_belt_enabled = d.button[SHOOTER_BELT_ENABLED_LOC], shooter_belt_auto = d.button[SHOOTER_BELT_AUTO_LOC];
