@@ -228,9 +228,9 @@ void Drivebase::Estimator::update(Time now,Drivebase::Input in,Drivebase::Output
 
 Robot_outputs Drivebase::Output_applicator::operator()(Robot_outputs robot,Drivebase::Output b)const{
 	//cout<<"\nOutputs: "<<b<<"\n";
-	robot.pwm[L_MOTOR_LOC_1] = -b.l;
-	robot.pwm[L_MOTOR_LOC_2] = -b.l;
-	robot.pwm[L_MOTOR_LOC_3] = -b.l;
+	robot.pwm[L_MOTOR_LOC_1] = b.l;
+	robot.pwm[L_MOTOR_LOC_2] = b.l;
+	robot.pwm[L_MOTOR_LOC_3] = b.l;
 	robot.pwm[R_MOTOR_LOC_1] = -b.r;
 	robot.pwm[R_MOTOR_LOC_2] = -b.r;
 	robot.pwm[R_MOTOR_LOC_3] = -b.r;
@@ -260,7 +260,7 @@ Robot_outputs Drivebase::Output_applicator::operator()(Robot_outputs robot,Drive
 Drivebase::Output Drivebase::Output_applicator::operator()(Robot_outputs robot)const{
 	//assuming both motors on the same side are set to the same value//FIXME ?
 	return Drivebase::Output{	
-		-robot.pwm[L_MOTOR_LOC_1],
+		robot.pwm[L_MOTOR_LOC_1],
 		-robot.pwm[R_MOTOR_LOC_1],
 	};
 }
