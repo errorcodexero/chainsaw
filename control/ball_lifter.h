@@ -1,7 +1,7 @@
-#ifndef LIFT_H
-#define LIFT_H
+#ifndef BALL_LIFTER_H
+#define BALL_LIFTER_H
 
-struct Lift{
+struct Ball_lifter{
 	enum class Goal{UP, DOWN, OFF};
 	using Input=Nop::Input;
 	typedef Input Status_detail;
@@ -9,8 +9,8 @@ struct Lift{
 	using Input_reader=Nop:: Input_reader;
 	typedef Goal Output;
 	struct Output_applicator{
-		Robot_outputs operator()(Robot_outputs,Intake::Output)const;
-		Lift::Output operator()(Robot_outputs)const;
+		Robot_outputs operator()(Robot_outputs,Ball_lifter::Output)const;
+		Ball_lifter::Output operator()(Robot_outputs)const;
 	};
 	using Estimator=Nop::Estimator;
 

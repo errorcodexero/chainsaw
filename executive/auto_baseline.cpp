@@ -1,4 +1,5 @@
 #include "auto_baseline.h"
+#include "auto_baselineext.h"
 #include "teleop.h"
 
 using namespace std;
@@ -26,7 +27,10 @@ Executive Auto_baseline::next_mode(Next_mode_info info){
 		const double IN_RANGE_TIME = 2.0;//seconds - the time that the robot needs to be within a certain distance from the target
 		in_range.set(IN_RANGE_TIME);
 	}
-	if(in_range.done()){
+	if(in_range.done() & (info.panel.auto_select == 3)){
+		return Executive{Auto_baselineext(CONSTRUCT_STRUCT_PARAMS(AUTO_BASELINEEXT_ITEMS))};
+	}
+	else if(in_range.done()){
 		return Executive{Teleop()};
 	}
 	return Executive{Auto_baseline(CONSTRUCT_STRUCT_PARAMS(AUTO_BASELINE_ITEMS))};
@@ -42,7 +46,6 @@ Toplevel::Goal Auto_baseline::run(Run_info info){
 }
 
 bool Auto_baseline::operator==(Auto_baseline const&)const{ return true; }//TODO: update with values in that struct
-
 
 #ifdef AUTO_BASELINE_TEST
 #include "test.h"

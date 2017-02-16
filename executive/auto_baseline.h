@@ -22,6 +22,5 @@ struct Auto_baseline: public Executive_impl<Auto_baseline>{
 	Toplevel::Goal run(Run_info);
 	bool operator==(Auto_baseline const&)const;
 };
-
 #endif
 

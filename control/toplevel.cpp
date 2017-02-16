@@ -102,7 +102,8 @@ Toplevel::Output::Output():
 	shifter(Gear_shifter::Output::LOW),
 	drive(0.0,0.0),
 	collector(),
-	gear_collector()
+	gear_collector(),
+	shooter_feed(Shooter_feed::Output::OFF)
 {}
 
 bool operator<(Toplevel::Output const& a,Toplevel::Output const& b){
@@ -160,7 +161,8 @@ Toplevel::Status::Status():
 		{0,0}
 	),
 	collector(),
-	gear_collector()
+	gear_collector(),
+	shooter_feed()
 {}
 bool operator==(Toplevel::Status a,Toplevel::Status b){
 	#define X(A,name,C) if(a.name!=b.name) return 0;
@@ -338,7 +340,8 @@ set<Toplevel::Status_detail> examples(Toplevel::Status_detail*){
 		*examples((Gear_shifter::Status_detail*)0).begin(),
 		*examples((Drivebase::Status_detail*)0).begin(),
 		*examples((Collector::Status_detail*)0).begin(),
-		*examples((Gear_collector::Status_detail*)0).begin()
+		*examples((Gear_collector::Status_detail*)0).begin(),
+		*examples((Shooter_feed::Status_detail*)nullptr).begin()
 	}};
 }
 
@@ -357,7 +360,8 @@ set<Toplevel::Input> examples(Toplevel::Input*){
 		*examples((Gear_shifter::Input*)0).begin(),
 		*examples((Drivebase::Input*)0).begin(),
 		*examples((Collector::Input*)0).begin(),
-		*examples((Gear_collector::Input*)0).begin()
+		*examples((Gear_collector::Input*)0).begin(),
+		*examples((Shooter_feed::Input*)nullptr).begin()
 	};
 	return {a};
 }
@@ -443,10 +447,6 @@ pair<Robot_inputs,Robot_inputs> create_pair(Robot_inputs*){
 		r.first.talon_srx[i]=p.first;
 		r.second.talon_srx[i]=p.second;
 	}
-	/*for(unsigned i=0;i<Robot_outputs::CAN_JAGUARS;i++){
-		auto p=create_pair((Can_jaguar_input*)0);
-		r.first.can_jaguar[i]=p.first;
-	}*/
 	//driver station
 	//current
 	for(unsigned i=0;i<Robot_inputs::CURRENT;i++){
@@ -618,7 +618,6 @@ int main(){
 			case 1: return *found.begin();
 			default:
 				return CONFLICT_MESSAGE + as_string(found) + " ------ Check IO's, assignming the same output from multiple parts - EXITING ------";
-				//FIXME assert(0);//check io's. probably assigning more than one thing to the same one
 		}
 	};
 	for(auto a:outputs()){
