@@ -13,14 +13,13 @@ Executive Auto_baseline::next_mode(Next_mode_info info){
 	};
 
 	const double TARGET_DISTANCE = 12.0*12.0;//inches
-	const double TOLERANCE = 4.0;//inches
+	const double TOLERANCE = 6.0;//inches
 
 	motion_profile.set_goal(TARGET_DISTANCE);
 
 	cout<<"\n" << "auto_baseline: encoder_differences:"<< encoder_differences<<"   left(inches):"<<ticks_to_inches(encoder_differences.l)<<"   target(inches):"<<TARGET_DISTANCE<<"\n";
 	
 	if(ticks_to_inches(encoder_differences.l) >= TARGET_DISTANCE-TOLERANCE && ticks_to_inches(encoder_differences.l) <= TARGET_DISTANCE+TOLERANCE){
-		cout << "enabled" << info.in.robot_mode.enabled << "\n";
 		in_range.update(info.in.now,info.in.robot_mode.enabled);
 		cout <<"IN  RANGE"<< in_range << "\n";
 	} else {
@@ -39,7 +38,6 @@ Executive Auto_baseline::next_mode(Next_mode_info info){
 Toplevel::Goal Auto_baseline::run(Run_info info){
 	Toplevel::Goal goals;
 	double power = motion_profile.target_speed(ticks_to_inches(info.toplevel_status.drive.ticks.l));//assuming that the left and right encoder values are similar enough
-	cout << "motion power : " << power << "\n";
 	goals.drive.left = power;
 	goals.drive.right = power;
 		return goals;
