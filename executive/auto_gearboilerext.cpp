@@ -76,7 +76,7 @@ Executive Auto_gearboilerext_driveone::next_mode(Next_mode_info info){
 	}
 	if(in_auto_range.done()){
 		//set_initial_encoders=false;  
-		return Executive{Auto_gearboilerext_geardrop(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARBOILEREXT_ITEMS))}; 
+		return Executive{Auto_gearboilerext_turntwo(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARBOILEREXT_TURNTWO_ITEMS))}; 
 		//return make_unique<Auto_br_initialturn>();//TODO 
 	}
 	return Executive{Auto_gearboilerext_driveone(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARBOILEREXT_DRIVEONE_ITEMS))};
@@ -105,7 +105,7 @@ Executive Auto_gearboilerext_turntwo::next_mode(Next_mode_info info){
 	}
 	if(in_auto_range.done()){
 		//set_initial_encoders=false;  
-		return Executive{Auto_gearboilerext_geardrop(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARBOILEREXT_ITEMS))};
+		return Executive{Auto_gearboilerext_drivetwo(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARBOILEREXT_DRIVETWO_ITEMS))};
 		//return make_unique<Auto_br_initialturn>();//TODO 
 	}
 	return Executive{Auto_gearboilerext_turntwo(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARBOILEREXT_TURNTWO_ITEMS))};
@@ -134,7 +134,7 @@ Executive Auto_gearboilerext_drivetwo::next_mode(Next_mode_info info){
 	}
 	if(in_auto_range.done()){	
 		//set_initial_encoders=false;  
-		return Executive{Auto_gearboilerext_geardrop(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARBOILEREXT_ITEMS))};
+		return Executive{Teleop()};
 		//return make_unique<Auto_br_initialturn>();//TODO 
 	}
 	return Executive{Auto_gearboilerext_drivetwo(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARBOILEREXT_DRIVETWO_ITEMS))};
