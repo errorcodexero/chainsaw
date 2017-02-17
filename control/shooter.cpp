@@ -2,7 +2,7 @@
 #include <cmath>
 #include <cassert>
 
-#define SHOOTER_LOC 0
+#define SHOOTER_LOC 2
 
 const double FIRE_RPM = 6000.0;
 const double FREE_SPIN_RPM = 1000.0;

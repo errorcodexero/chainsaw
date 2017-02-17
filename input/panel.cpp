@@ -6,7 +6,7 @@
 #include <cmath>
 
 using namespace std;
-static const unsigned int BALL_ARM_AXIS=0,GEAR_GRASPER_AXIS=1,GEAR_COLLECTOR_AXIS=2,SHOOTER_AXIS=3,BALL_INTAKE_AXIS=4,BALL_LIFT_AXIS=5,SPEED_DIAL_AXIS=6,AUTO_SELECTOR_AXIS=7;//TODO: rename constants
+static const unsigned int BALL_ARM_AXIS=0,GEAR_GRASPER_AXIS=1,GEAR_COLLECTOR_AXIS=2,SHOOTER_AXIS=3,BALL_INTAKE_AXIS=4,BALL_LIFT_AXIS=5,AUTO_SELECTOR_AXIS=6,SPEED_DIAL_AXIS=7;//TODO: rename constants
 static const unsigned int BALL_COLLECT_LOC=0,LOADING_INDICATOR_LOC=1,SHOOT_LOC=2,PREP_COLLECT_GEAR_LOC=3,PREP_SCORE_GEAR_LOC=4,COLLECT_GEAR_LOC=5,SCORE_GEAR_LOC=6,CLIMB_LOC=7,LEARN_LOC=8;//TODO: rename constants
 static const unsigned int SHOOTER_BELT_AUTO_LOC=9,SHOOTER_BELT_ENABLED_LOC=10,BALL_COLLECTOR_DISABLED_LOC=11,BALL_COLLECTOR_AUTO_LOC=12;
 
@@ -150,7 +150,7 @@ Panel interpret_oi(Joystick_data d){
 	}
 	{//set the auto mode number from the dial value
 		float auto_dial_value = d.axis[AUTO_SELECTOR_AXIS];
-		p.auto_select = interpret_10_turn_pot(auto_dial_value);
+		p.auto_select = interpret_20_turn_pot(auto_dial_value);
 	}
 	{//two position switches
 	}

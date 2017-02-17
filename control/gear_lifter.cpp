@@ -2,7 +2,7 @@
 
 using namespace std;
 
-#define PISTON_LOC 7 //TODO: get real value
+#define PISTON_LOC 2
 
 Gear_lifter::Input::Input():enabled(false){}
 Gear_lifter::Input::Input(bool a):enabled(a){}

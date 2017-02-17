@@ -1,0 +1,11 @@
+  Mode:                           Name in code:
+0.Null				  Auto_null
+1.Baseline			  Auto_baseline
+2.Baseline extended		  Auto_baselineext
+3.Gear Boiler side peg 		  Auto_gearboiler
+4.
+5.Gear loading zone side peg 	  Auto_gearloading
+6.
+7.Gear Mid peg      		  Auto_gearmid
+8.
+9.
