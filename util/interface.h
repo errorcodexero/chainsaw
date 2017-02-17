@@ -132,7 +132,7 @@ std::ostream& operator<<(std::ostream& o,Robot_outputs);
 
 //limitation of FRC coms
 #define JOY_AXES 8
-#define JOY_BUTTONS 12
+#define JOY_BUTTONS 13
 
 struct Joystick_data{
 	Checked_array<double,JOY_AXES> axis;
