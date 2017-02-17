@@ -2,8 +2,8 @@
 
 using namespace std;
 
-#define HALL_EFFECT_LOC 7 //TODO: get real value
-#define PISTON_LOC 6 //TODO: get real value
+#define HALL_EFFECT_LOC 4 //TODO: get real value
+#define PISTON_LOC 1
 
 Gear_grabber::Input::Input():has_gear(false),enabled(false){}
 Gear_grabber::Input::Input(bool a,bool b):has_gear(a),enabled(b){}
