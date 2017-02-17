@@ -57,27 +57,36 @@ POV_section pov_section(int x){
 		case 270: return POV_section::LEFT;
 		case 315: return POV_section::UP_LEFT;
 		default: return POV_section::CENTER;
-
 	}
 }
 
-unsigned interpret_10_turn_pot(Volt v){
-	array<Volt,10> limits={//for red and gold driverstation use
+unsigned interpret_20_turn_pot(Volt v){
+	array<Volt,20> limits={
 		-1.00,
-		-0.75,
-		-0.50,
-		-0.25,
-		0.00,
-		0.20,
-		0.40,
-		0.60,
+		-0.90,
+		-0.80,
+		-0.69,
+		-0.58,
+		-0.48,
+		-0.37,
+		-0.27,
+		-0.16,
+		-0.05,
+		0.04,
+		0.15,
+		0.25,
+		0.36,
+		0.47,
+		0.57,
+		0.69,
 		0.80,
+		0.90,
 		1.00
 	};
-	for(unsigned i=0;i<10;i++){
-		if(v<(limits[i] + 0.05)) return (i!=0) ? (10-i) : 0;
+	for(unsigned i=0;i<20;i++){
+		if(v<(limits[i] + 0.05)) return (i!=9) ? (i + 1) : 0;
 	}
-	return 9;
+	return 19;
 }
 
 #ifdef INPUT_UTIL_TEST

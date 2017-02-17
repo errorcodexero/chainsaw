@@ -150,7 +150,7 @@ Panel interpret_oi(Joystick_data d){
 	}
 	{//set the auto mode number from the dial value
 		float auto_dial_value = d.axis[AUTO_SELECTOR_AXIS];
-		p.auto_select = interpret_10_turn_pot(auto_dial_value);
+		p.auto_select = interpret_20_turn_pot(auto_dial_value);
 	}
 	{//two position switches
 	}

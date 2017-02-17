@@ -28,6 +28,6 @@ namespace Gamepad_axis{
 	//DPADY does not exist, neither does axis 6
 }
 
-unsigned interpret_10_turn_pot(Volt);
+unsigned interpret_20_turn_pot(Volt);
 
 #endif

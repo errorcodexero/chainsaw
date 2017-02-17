@@ -117,6 +117,13 @@ Toplevel::Goal Teleop::run(Run_info info) {
 		return Gear_shifter::Goal::AUTO;
 	}();
 
+	//TODO: FIXME
+	if(info.panel.gear_grasper==Panel::Gear_grasper::OPEN) goals.gear_collector.gear_grabber = Gear_grabber::Goal::OPEN;
+	if(info.panel.gear_grasper==Panel::Gear_grasper::CLOSED) goals.gear_collector.gear_grabber = Gear_grabber::Goal::CLOSE;
+
+	if(info.panel.gear_collector==Panel::Gear_collector::UP) goals.gear_collector.gear_lifter = Gear_lifter::Goal::UP;
+	if(info.panel.gear_collector==Panel::Gear_collector::DOWN) goals.gear_collector.gear_lifter = Gear_lifter::Goal::DOWN;	
+
 	if(info.panel.gear_prep_score){
 		gear_score_protocol(info.toplevel_status,info.in.robot_mode.enabled,info.in.now,goals);
 	} else if(info.panel.gear_score){
