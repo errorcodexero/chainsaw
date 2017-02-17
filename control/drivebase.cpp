@@ -69,7 +69,7 @@ Robot_inputs Drivebase::Input_reader::operator()(Robot_inputs all,Input in)const
 	encoder(L_ENCODER_PORTS,in.left);
 	encoder(R_ENCODER_PORTS,in.right);
 	all.digital_io.encoder[L_ENCODER_LOC] = -in.ticks.l;
-	all.digital_io.encoder[R_ENCODER_LOC] = in.ticks.r;
+	all.digital_io.encoder[R_ENCODER_LOC] = -in.ticks.r;
 	return all;
 }
 
@@ -88,7 +88,7 @@ Drivebase::Input Drivebase::Input_reader::operator()(Robot_inputs const& in)cons
 		}(),
 		encoder_info(L_ENCODER_PORTS),
 		encoder_info(R_ENCODER_PORTS),
-		{-encoderconv(in.digital_io.encoder[L_ENCODER_LOC]),encoderconv(in.digital_io.encoder[R_ENCODER_LOC])}
+		{-encoderconv(in.digital_io.encoder[L_ENCODER_LOC]),-encoderconv(in.digital_io.encoder[R_ENCODER_LOC])}
 	};
 }
 
@@ -228,12 +228,12 @@ void Drivebase::Estimator::update(Time now,Drivebase::Input in,Drivebase::Output
 
 Robot_outputs Drivebase::Output_applicator::operator()(Robot_outputs robot,Drivebase::Output b)const{
 	//cout<<"\nOutputs: "<<b<<"\n";
-	robot.pwm[L_MOTOR_LOC_1] = b.l;
-	robot.pwm[L_MOTOR_LOC_2] = b.l;
-	robot.pwm[L_MOTOR_LOC_3] = b.l;
-	robot.pwm[R_MOTOR_LOC_1] = -b.r;
-	robot.pwm[R_MOTOR_LOC_2] = -b.r;
-	robot.pwm[R_MOTOR_LOC_3] = -b.r;
+	robot.pwm[L_MOTOR_LOC_1] = -b.l; // positive values go forward
+	robot.pwm[L_MOTOR_LOC_2] = -b.l;
+	robot.pwm[L_MOTOR_LOC_3] = -b.l;
+	robot.pwm[R_MOTOR_LOC_1] = b.r;
+	robot.pwm[R_MOTOR_LOC_2] = b.r;
+	robot.pwm[R_MOTOR_LOC_3] = b.r;
 
 	/*
 	cout<<"b.l: "<<b.l<<'\n';
@@ -260,8 +260,8 @@ Robot_outputs Drivebase::Output_applicator::operator()(Robot_outputs robot,Drive
 Drivebase::Output Drivebase::Output_applicator::operator()(Robot_outputs robot)const{
 	//assuming both motors on the same side are set to the same value//FIXME ?
 	return Drivebase::Output{	
-		robot.pwm[L_MOTOR_LOC_1],
-		-robot.pwm[R_MOTOR_LOC_1],
+		-robot.pwm[L_MOTOR_LOC_1],
+		robot.pwm[R_MOTOR_LOC_1],
 	};
 }
 

@@ -183,7 +183,8 @@ bool ready(Climber::Status status,Climber::Goal goal){
 		case Climber::Goal::AUTO_RELEASE:
 			return status == Climber::Status::RELEASED;
 		default:
-			assert(0);
+			return 1;
+			//assert(0);
 	}
 	return false;
 }

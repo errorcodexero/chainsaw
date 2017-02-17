@@ -9,7 +9,7 @@ Executive Auto_gearboiler_topeg::next_mode(Next_mode_info info){
 	const double TARGET_DISTANCE = 5.0*12.0;//inches
 	const double TOLERANCE = 6.0;//inches
 	motion_profile.set_goal(TARGET_DISTANCE);
-	cout<<"\n"<<encoder_differences.first<<"   "<<ticks_to_inches(encoder_differences.first)<<"   "<<TARGET_DISTANCE<<"\n";
+	cout<<"\n Gear boiler :"<<encoder_differences.first<<" current inches:  "<<ticks_to_inches(encoder_differences.first)<<" target inches:  "<<TARGET_DISTANCE<<"\n";
 	if(ticks_to_inches(encoder_differences.first) >= TARGET_DISTANCE-TOLERANCE && ticks_to_inches(encoder_differences.first) <= TARGET_DISTANCE+TOLERANCE){
 		in_auto_range.update(info.in.now,info.in.robot_mode.enabled);
 	}

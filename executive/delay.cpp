@@ -28,7 +28,7 @@ Executive auto_mode_convert(Next_mode_info info){
 			case 5:
 				return Executive{Auto_gearboiler_topeg()};
 			case 6:
-				return Executive{Auto_baseline{{0,0,0}}};
+				return Executive{Auto_gearboiler_topeg()};
 			case 7:
 				//return Executive{Auto_gearloading_topeg({0,0})};
 			case 8:
@@ -37,7 +37,7 @@ Executive auto_mode_convert(Next_mode_info info){
 				//return Executive{Auto_gearmid_topeg({0,0})};
 			case 0:
 			default:
-				return Executive{Auto_null()};
+				return Executive{Auto_baseline({0,0,0})};
 		}
 	}
 	return Executive{Auto_baseline{{0,0,0}}};

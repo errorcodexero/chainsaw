@@ -75,7 +75,7 @@ struct Drivebase_sim{
 		auto d=Digital_in::_0;
 		auto p=make_pair(d,d);
 		Drivebase::Input in = {Drivebase::Input{
-			{0,0,0,0,0,0},p,p,{-ticks_left,ticks_right}//because encoders are opotistes
+			{0,0,0,0,0,0},p,p,{ticks_left,ticks_right}//because encoders are opotistes
 		}};
 		cout<<"drive_in:"<<in<<"\n";
 		return in;
@@ -158,7 +158,7 @@ struct Toplevel_sim{
 
 template<typename SIMULATOR,typename DEVICE>
 void simulate(SIMULATOR sim,DEVICE device){
-	static const Time TIMESTEP=.05;//this will probably change to .01 or .02 later.
+	static const Time TIMESTEP=.01;//this will probably change to .01 or .02 later.
 	auto in=sim.get();
 	for(Time t=0;t<2;t+=TIMESTEP){
 		//TODO: Make the simulator go 2014 style where you only get "significant" changes printed
@@ -281,7 +281,7 @@ int main(){
 		all.robot_mode.enabled=true;
 		all.joystick[2].axis[1]=1;
 		auto robotinput = m.toplevel.input_reader(all,sim.get());
-		static const Time TIMESTEP=.1;
+		static const Time TIMESTEP=.05;
 		robotinput.robot_mode.autonomous=true;
 		robotinput.robot_mode.enabled=true;
 	
@@ -289,7 +289,7 @@ int main(){
 		//cout << "20" << inches_to_ticks(20) << "\n";
 		//cout << "50" << inches_to_ticks(50) << "\n";
 		//cout << "inverse one " <<ticks_to_inches(inches_to_ticks(10))<< " two " << inches_to_ticks(ticks_to_inches(10)) << "\n";
-		for(Time t=0;t<20;t+=TIMESTEP){
+		for(Time t=0;t<60;t+=TIMESTEP){
 			robotinput.now=t;
 			robotinput.robot_mode.enabled=true;	
 			//cout << "Main " << m << "\n";
