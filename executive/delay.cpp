@@ -37,7 +37,7 @@ Executive auto_mode_convert(Next_mode_info info){
 				//return Executive{Auto_gearmid_topeg({0,0})};
 			case 0:
 			default:
-				return Executive{Auto_baseline({0,0,0})};
+				return Executive{Auto_gearmid_topeg()};
 		}
 	}
 	return Executive{Auto_baseline{{0,0,0}}};
