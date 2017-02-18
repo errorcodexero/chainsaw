@@ -2,11 +2,15 @@
 
 using namespace std;
 
+#define GEAR_LIGHT_OUT 4 //TODO: get real value
 #define HALL_EFFECT_LOC 4 //TODO: get real value
 #define PISTON_LOC 1
 
 Gear_grabber::Input::Input():has_gear(false),enabled(false){}
 Gear_grabber::Input::Input(bool a,bool b):has_gear(a),enabled(b){}
+
+Gear_grabber::Output::Output():piston(Gear_grabber::Output::Piston::OPEN),gear_light(false){}
+Gear_grabber::Output::Output(Gear_grabber::Output::Piston a,bool b):piston(a),gear_light(b){}
 
 Gear_grabber::Estimator::Estimator():last(){
 	const Time OPEN_TIME = .2, CLOSE_TIME = .2;
@@ -34,6 +38,14 @@ bool operator==(const Gear_grabber::Estimator a,const Gear_grabber::Estimator b)
 }
 
 bool operator!=(const Gear_grabber::Estimator a,const Gear_grabber::Estimator b){
+	return !(a==b);
+}
+
+bool operator==(Gear_grabber::Output const& a,Gear_grabber::Output const& b){
+	return a.piston == b.piston && a.gear_light == b.gear_light;
+}
+
+bool operator!=(Gear_grabber::Output const& a,Gear_grabber::Output const& b){
 	return !(a==b);
 }
 
@@ -70,10 +82,20 @@ bool operator!=(Gear_grabber::Status_detail const& a,Gear_grabber::Status_detail
 	return !(a==b);
 }
 
+bool operator<(Gear_grabber::Output const& a,Gear_grabber::Output const& b){
+	if(a.piston < b.piston) return true;
+	if(a.piston > b.piston) return false;
+	return !a.gear_light && b.gear_light;
+}
+
 bool operator<(Gear_grabber::Status_detail const& a,Gear_grabber::Status_detail const& b){
 	if(a.state < b.state) return true;
 	if(a.state > b.state) return false;
 	return !a.has_gear && b.has_gear;
+}
+
+ostream& operator<<(ostream& o,Gear_grabber::Output const& a){
+	return o<<"("<<a.piston<<" "<<a.gear_light<<")";
 }
 
 Gear_grabber::Status_detail::Status_detail():state(Gear_grabber::Status_detail::State::OPEN),has_gear(false){}
@@ -90,6 +112,15 @@ set<Gear_grabber::Input> examples(Gear_grabber::Input*){
 
 set<Gear_grabber::Goal> examples(Gear_grabber::Goal*){
 	return {Gear_grabber::Goal::OPEN,Gear_grabber::Goal::CLOSE};
+}
+
+set<Gear_grabber::Output> examples(Gear_grabber::Output*){
+	set<Gear_grabber::Output> outs;
+	for(Gear_grabber::Output::Piston a: examples((Gear_grabber::Goal*)nullptr)){
+		outs.insert({a,true});
+		outs.insert({a,false});
+	}
+	return outs;
 }
 
 set<Gear_grabber::Status_detail> examples(Gear_grabber::Status_detail*){
@@ -116,8 +147,8 @@ Gear_grabber::Status_detail Gear_grabber::Estimator::get()const{
 }
 
 void Gear_grabber::Estimator::update(Time time,Input input,Output output){
-	switch(output){
-		case Gear_grabber::Output::OPEN:
+	switch(output.piston){
+		case Gear_grabber::Output::Piston::OPEN:
 			if(last.state == Gear_grabber::Status_detail::State::OPENING){
 				open_timer.update(time,input.enabled);
 			} else if(last.state != Gear_grabber::Status_detail::State::OPEN){
@@ -129,7 +160,7 @@ void Gear_grabber::Estimator::update(Time time,Input input,Output output){
 				 last.state = Gear_grabber::Status_detail::State::OPEN;
 			}
 			break;
-		case Gear_grabber::Output::CLOSE:
+		case Gear_grabber::Output::Piston::CLOSE:
 			if(last.state == Gear_grabber::Status_detail::State::CLOSING){
 				close_timer.update(time,input.enabled);
 			} else if(last.state != Gear_grabber::Status_detail::State::CLOSED){
@@ -147,17 +178,21 @@ void Gear_grabber::Estimator::update(Time time,Input input,Output output){
 	last.has_gear = input.has_gear;
 }
 
-Gear_grabber::Output control(Gear_grabber::Status /*status*/, Gear_grabber::Goal goal){
-	return goal;
+Gear_grabber::Output control(Gear_grabber::Status status, Gear_grabber::Goal goal){
+	Gear_grabber::Output out;
+	out.piston = goal;
+	out.gear_light = status.has_gear;
+	return out;
 }
 
 Robot_outputs Gear_grabber::Output_applicator::operator()(Robot_outputs r,Output out)const{
-	r.solenoid[PISTON_LOC] = out == Gear_grabber::Output::CLOSE; 
+	r.solenoid[PISTON_LOC] = out.piston == Gear_grabber::Output::Piston::CLOSE;
+	r.panel_output[GEAR_LIGHT_OUT] = Panel_output(GEAR_LIGHT_OUT,out.gear_light); 
 	return r;
 }
 
 Gear_grabber::Output Gear_grabber::Output_applicator::operator()(Robot_outputs r)const{
-	return r.solenoid[PISTON_LOC] ? Gear_grabber::Output::CLOSE : Gear_grabber::Output::OPEN;
+	return {r.solenoid[PISTON_LOC] ? Gear_grabber::Output::Piston::CLOSE : Gear_grabber::Output::Piston::OPEN,r.panel_output[GEAR_LIGHT_OUT].value};
 }
 
 Robot_inputs Gear_grabber::Input_reader::operator()(Robot_inputs r,Input in)const{
