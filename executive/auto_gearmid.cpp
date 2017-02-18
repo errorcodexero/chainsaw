@@ -20,7 +20,7 @@ double Auto_gearmid_topeg::distance_left(Drivebase::Encoder_ticks ticks){
 	return goal-current;
 }	
 
-Executive Auto_gearmid_topeg::next_mode(Next_mode_info info){
+Executive Auto_gearmid_topeg::next_mode(Next_mode_info /*info*/){
 	nyi/*setencoderflag(info.status.drive.ticks);
 	//Drivebase::Encoder_ticks encoder_differences={info.status.drive.ticks.l-initial_encoders.l,info.status.drive.ticks.r-initial_encoders.r};
 	if(!info.autonomous) return Executive{Teleop()};
@@ -41,7 +41,7 @@ Executive Auto_gearmid_topeg::next_mode(Next_mode_info info){
 	return Executive{Auto_gearmid_topeg(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARMID_TOPEG_ITEMS))};*/
 }
 
-Toplevel::Goal Auto_gearmid_topeg::run(Run_info info){
+Toplevel::Goal Auto_gearmid_topeg::run(Run_info /*info*/){
 	
 	Toplevel::Goal goals;
 	//double power=motion_profile.target_speed(ticks_to_inches(info.toplevel_status.drive.ticks.l));
@@ -77,9 +77,9 @@ STEPS
 #ifdef AUTO_GEARMID_TEST
 #include "test.h"
 int main(){
-	#define X(NAME) { Auto_gearmid_##NAME a(0,Drivebase::Encoder_ticks{0,0},false); test_executive(a); }
+	/*#define X(NAME) { Auto_gearmid_##NAME a(0,Drivebase::Encoder_ticks{0,0},false); test_executive(a); }
 	STEPS
-	#undef X
+	#undef X*/
 }
 #endif
 

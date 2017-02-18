@@ -5,6 +5,7 @@
 #include "../util/interface.h"
 
 struct Panel{
+	static const unsigned PORT = 2;
 	bool in_use;
 	//*Buttons:
 	bool ball_collect;

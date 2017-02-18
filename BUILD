@@ -1,6 +1,6 @@
 cc_test(
 	name = "point_test",
-	srcs = ["util/point.cpp","util/point.h","util/interface.h","util/maybe.h","util/driver_station_interface.h","util/maybe_inline.h","util/checked_array.h","util/util.h","util/pwm.h"],
+	srcs = ["util/point.cpp","util/point.h","util/interface.h","util/maybe.h","util/driver_station_interface.h","util/maybe_inline.h","util/checked_array.h","util/util.h"],
 	copts = ["-DPOINT_TEST"],
 	timeout="short"
 )
@@ -15,12 +15,12 @@ cc_test(
 cc_library(
 	name = "point",
 	srcs = ["util/point.cpp"],
-	hdrs = ["util/point.h","util/interface.h","util/maybe.h","util/driver_station_interface.h","util/maybe_inline.h","util/checked_array.h","util/util.h","util/pwm.h"]
+	hdrs = ["util/point.h","util/interface.h","util/maybe.h","util/driver_station_interface.h","util/maybe_inline.h","util/checked_array.h","util/util.h"]
 )
 
 cc_test(
 	name="util_test",
-	#srcs=["util/util.cpp","util/interface.h","util/maybe.h","util/driver_station_interface.h","util/maybe_inline.h","util/checked_array.h","util/util.h","util/pwm.h"],
+	#srcs=["util/util.cpp","util/interface.h","util/maybe.h","util/driver_station_interface.h","util/maybe_inline.h","util/checked_array.h","util/util.h"],
 	srcs=["util/util.cpp"],
 	copts=["-DUTIL_TEST"],
 	deps=[":point"],
@@ -176,16 +176,10 @@ cc_test(
 )
 
 cc_library(
-	name="pwm",
-	srcs=["util/pwm.cpp"],
-	hdrs=["util/pwm.h"],
-)
-
-cc_library(
 	name="interface",
 	srcs=["util/interface.cpp"],
 	hdrs=["util/interface.h"],
-	deps=[":driver_station_interface",":pwm"]
+	deps=[":driver_station_interface"]
 )
 
 cc_library(
@@ -264,14 +258,15 @@ cc_test(
 cc_library(
 	name="motion_profile",
 	srcs=["util/motion_profile.cpp"],
-	hdrs=["util/motion_profile.h"]
+	hdrs=["util/motion_profile.h"],
+	deps=[":interface",":util"]
 )
 
 cc_test(
 	name="motion_profile_test",
 	srcs=["util/motion_profile.cpp","util/motion_profile.h"],
 	copts=["-DMOTION_PROFILE_TEST"],
-	deps=[],
+	deps=[":interface",":util"],
 	timeout="short"
 )
 
@@ -414,14 +409,14 @@ cc_library(
 	name="drivebase",
 	srcs=["control/drivebase.cpp"],
 	hdrs=["control/drivebase.h","util/quick.h"],
-	deps=[":interface",":motor_check",":countdown_timer",":fixVictor"]
+	deps=[":interface",":motor_check",":countdown_timer"]
 )
 
 cc_test(
 	name="drivebase_test",
 	srcs=["control/drivebase.cpp","control/drivebase.h","util/quick.h","control/formal.h"],
 	copts=["-DDRIVEBASE_TEST"],
-	deps=[":interface",":motor_check",":countdown_timer",":fixVictor"],
+	deps=[":interface",":motor_check",":countdown_timer"],
 	timeout="short"
 )
 
@@ -482,6 +477,20 @@ cc_test(
 	name="intake_test",
 	srcs=["control/intake.cpp","control/intake.h","control/nop.h","control/nop.cpp","control/formal.h"],
 	copts=["-DINTAKE_TEST"],
+	deps=[":interface"],
+	timeout="short"
+)
+cc_library(
+	name="ball_lifter",
+	srcs=["control/ball_lifter.cpp","control/nop.cpp"],
+	hdrs=["control/ball_lifter.h","control/nop.h"],
+	deps=[":interface"]
+)
+
+cc_test(
+	name="ball_lifter_test",
+	srcs=["control/ball_lifter.cpp","control/ball_lifter.h","control/nop.h","control/nop.cpp","control/formal.h"],
+	copts=["-DBALL_LIFTER_TEST"],
 	deps=[":interface"],
 	timeout="short"
 )
@@ -759,7 +768,7 @@ cc_test(
         copts=["-DAUTO_GEARBOILER_TEST"],
         deps=[
                 ":executive",":executive_impl",
-                ":test"
+                ":test",":drivebase"
         ],
         timeout = "short"
 )
@@ -770,7 +779,7 @@ cc_test(
         copts=["-DAUTO_GEARLOADING_TEST"],
         deps=[
                 ":executive",":executive_impl",
-                ":test"
+                ":test",":drivebase"
         ],
         timeout = "short"
 )
@@ -781,7 +790,7 @@ cc_test(
         copts=["-DAUTO_GEARMID_TEST"],
         deps=[
                 ":executive",":executive_impl",
-                ":test"
+                ":test",":drivebase"
         ],
         timeout = "short"
 )
@@ -803,7 +812,7 @@ cc_test(
         copts=["-DAUTO_GEARBOILEREXT_TEST"],
         deps=[
                 ":executive",":executive_impl",
-                ":test"
+                ":test", ":drivebase"
         ],
         timeout = "short"
 )

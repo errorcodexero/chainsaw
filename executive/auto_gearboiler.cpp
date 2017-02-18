@@ -3,14 +3,15 @@
 
 using namespace std;
 
-Executive Auto_gearboiler_topeg::next_mode(Next_mode_info info){
+Executive Auto_gearboiler_topeg::next_mode(Next_mode_info /*info*/){
 	nyi/*	pair<int,int> encoder_differences=make_pair(info.status.drive.ticks.l-initial_encoders.first,info.status.drive.ticks.r-initial_encoders.second);
+	Drivebase::Encoder_ticks encoder_differences= info.status.drive.ticks-initial_encoders;
 	if(!info.autonomous) return Executive{Teleop()};
 	const double TARGET_DISTANCE = 5.0*12.0;//inches
 	const double TOLERANCE = 6.0;//inches
 	motion_profile.set_goal(TARGET_DISTANCE);
-	cout<<"\n Gear boiler :"<<encoder_differences.first<<" current inches:  "<<ticks_to_inches(encoder_differences.first)<<" target inches:  "<<TARGET_DISTANCE<<"\n";
-	if(ticks_to_inches(encoder_differences.first) >= TARGET_DISTANCE-TOLERANCE && ticks_to_inches(encoder_differences.first) <= TARGET_DISTANCE+TOLERANCE){
+	cout<<"\n Gear boiler :"<<encoder_differences.l<<" current inches:  "<<ticks_to_inches(encoder_differences.l)<<" target inches:  "<<TARGET_DISTANCE<<"\n";
+	if(ticks_to_inches(encoder_differences.l) >= TARGET_DISTANCE-TOLERANCE && ticks_to_inches(encoder_differences.l) <= TARGET_DISTANCE+TOLERANCE){
 		in_auto_range.update(info.in.now,info.in.robot_mode.enabled);
 	}
 	else{
@@ -24,7 +25,7 @@ Executive Auto_gearboiler_topeg::next_mode(Next_mode_info info){
 	return Executive{Auto_gearboiler_topeg(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARBOILER_TOPEG_ITEMS))};*/
 }
 
-Toplevel::Goal Auto_gearboiler_topeg::run(Run_info info){
+Toplevel::Goal Auto_gearboiler_topeg::run(Run_info /*info*/){
 	Toplevel::Goal goals;
 	nyi/*double power=-motion_profile.target_speed(ticks_to_inches(info.toplevel_status.drive.ticks.l));
 	goals.drive.left=power;
@@ -32,14 +33,15 @@ Toplevel::Goal Auto_gearboiler_topeg::run(Run_info info){
 	return goals;*/
 }
 
-Executive Auto_gearboiler_turn::next_mode(Next_mode_info info){
+Executive Auto_gearboiler_turn::next_mode(Next_mode_info /*info*/){
 	nyi/*pair<int,int> encoder_differences=make_pair(info.status.drive.ticks.l-initial_encoders.first,info.status.drive.ticks.r-initial_encoders.second);
+	Drivebase::Encoder_ticks encoder_differences=info.status.drive.ticks-initial_encoders;
 	if(!info.autonomous) return Executive{Teleop()};	
 	const double TARGET_DISTANCE = 12.0;//inches
 	const double TOLERANCE = .1;//inches
 	motion_profile.set_goal(TARGET_DISTANCE);
-	cout<<"\n"<<encoder_differences.first<<"   "<<ticks_to_inches(encoder_differences.first)<<"   "<<TARGET_DISTANCE<<"\n";
-	if(ticks_to_inches(encoder_differences.first) >= TARGET_DISTANCE-TOLERANCE && ticks_to_inches(encoder_differences.first) <= TARGET_DISTANCE+TOLERANCE){
+	cout<<"\n"<<encoder_differences.l<<"   "<<ticks_to_inches(encoder_differences.l)<<"   "<<TARGET_DISTANCE<<"\n";
+	if(ticks_to_inches(encoder_differences.l) >= TARGET_DISTANCE-TOLERANCE && ticks_to_inches(encoder_differences.l) <= TARGET_DISTANCE+TOLERANCE){
 		in_auto_range.update(info.in.now,info.in.robot_mode.enabled);
 	}
 	else{
@@ -53,7 +55,7 @@ Executive Auto_gearboiler_turn::next_mode(Next_mode_info info){
 	return Executive{Auto_gearboiler_turn(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARBOILER_TURN_ITEMS))};*/
 }
 
-Toplevel::Goal Auto_gearboiler_turn::run(Run_info info){
+Toplevel::Goal Auto_gearboiler_turn::run(Run_info /*info*/){
 	Toplevel::Goal goals;
 	nyi/*double power=-motion_profile.target_speed(ticks_to_inches(info.toplevel_status.drive.ticks.l));
 	goals.drive.left=-power;
@@ -61,14 +63,15 @@ Toplevel::Goal Auto_gearboiler_turn::run(Run_info info){
 	return goals;*/
 }
 
-Executive Auto_gearboiler_approach::next_mode(Next_mode_info info){
+Executive Auto_gearboiler_approach::next_mode(Next_mode_info /*info*/){
 	nyi/*pair<int,int> encoder_differences=make_pair(info.status.drive.ticks.l-initial_encoders.first,info.status.drive.ticks.r-initial_encoders.second);
+	Drivebase::Encoder_ticks encoder_differences=info.status.drive.ticks-initial_encoders;
 	if(!info.autonomous) return Executive{Teleop()};
 	const double TARGET_DISTANCE = 12.0;//inches
 	const double TOLERANCE = 6;//inches
 	motion_profile.set_goal(TARGET_DISTANCE);
-	cout<<"\n"<<encoder_differences.first<<"   "<<ticks_to_inches(encoder_differences.first)<<"   "<<TARGET_DISTANCE<<"\n";
-	if(ticks_to_inches(encoder_differences.first) >= TARGET_DISTANCE-TOLERANCE && ticks_to_inches(encoder_differences.first) <= TARGET_DISTANCE+TOLERANCE){
+	cout<<"\n"<<encoder_differences.l<<"   "<<ticks_to_inches(encoder_differences.l)<<"   "<<TARGET_DISTANCE<<"\n";
+	if(ticks_to_inches(encoder_differences.l) >= TARGET_DISTANCE-TOLERANCE && ticks_to_inches(encoder_differences.l) <= TARGET_DISTANCE+TOLERANCE){
 		in_auto_range.update(info.in.now,info.in.robot_mode.enabled);
 	}
 	else{
@@ -82,7 +85,7 @@ Executive Auto_gearboiler_approach::next_mode(Next_mode_info info){
 	return Executive{Auto_gearboiler_approach(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARBOILER_APPROACH_ITEMS))};*/
 }
 
-Toplevel::Goal Auto_gearboiler_approach::run(Run_info info){
+Toplevel::Goal Auto_gearboiler_approach::run(Run_info /*info*/){
 	Toplevel::Goal goals;
 	nyi/*double power=-motion_profile.target_speed(ticks_to_inches(info.toplevel_status.drive.ticks.l));
 	goals.drive.left=-power;
@@ -114,9 +117,9 @@ STEPS
 #ifdef AUTO_GEARBOILER_TEST
 #include "test.h"
 int main(){
-	#define X(NAME) { Auto_gearboiler_##NAME a(0,std::make_pair(0,0)); test_executive(a); }
+	/*#define X(NAME) { Auto_gearboiler_##NAME a(0,{0,0}); test_executive(a); }
 	STEPS
-	#undef X
+	#undef X*/
 }
 #endif
 

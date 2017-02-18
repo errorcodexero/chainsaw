@@ -4,7 +4,7 @@
 
 using namespace std;
 
-Executive Auto_baseline::next_mode(Next_mode_info info){
+Executive Auto_baseline::next_mode(Next_mode_info /*info*/){
 	nyi/*
 	if(!info.autonomous) return Executive{Teleop()};
 	Drivebase::Encoder_ticks encoder_differences={
@@ -36,7 +36,7 @@ Executive Auto_baseline::next_mode(Next_mode_info info){
 	return Executive{Auto_baseline(CONSTRUCT_STRUCT_PARAMS(AUTO_BASELINE_ITEMS))};*/
 }
 
-Toplevel::Goal Auto_baseline::run(Run_info info){
+Toplevel::Goal Auto_baseline::run(Run_info /*info*/){
 	Toplevel::Goal goals;
 	nyi/*double power = motion_profile.target_speed(ticks_to_inches(info.toplevel_status.drive.ticks.l));//assuming that the left and right encoder values are similar enough
 	goals.drive.left = power;
@@ -50,8 +50,8 @@ bool Auto_baseline::operator==(Auto_baseline const&)const{ return true; }//TODO:
 #include "test.h"
 
 int main(){
-	Auto_baseline a = {{0,0,0}};
-	test_executive(a);
+	/*Auto_baseline a = {{0,0,0}};
+	test_executive(a);*/
 }
 #endif
 

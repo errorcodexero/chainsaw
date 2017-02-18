@@ -242,7 +242,6 @@ void visit(auto f,Robot_outputs a){
 	X(relay) 
 	X(digital_io) 
 	X(talon_srx) 
-	X(panel_output) 
 	X(driver_station)
 	X(pump_auto)
 	#undef X
