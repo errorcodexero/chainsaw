@@ -25,7 +25,7 @@ Robot_outputs Main::operator()(const Robot_inputs in,ostream&){
 	static const unsigned MAIN_JOYSTICK_PORT = 0, GUNNER_JOYSTICK_PORT = 1;
 
 	perf.update(in.now);
-	
+
 	Joystick_data driver_joystick=in.joystick[MAIN_JOYSTICK_PORT];
 	Panel panel=interpret_oi(in.joystick[Panel::PORT]);
 	if(!panel.in_use){
@@ -42,13 +42,13 @@ Robot_outputs Main::operator()(const Robot_inputs in,ostream&){
 	);
 	
 	Toplevel::Status_detail toplevel_status=toplevel.estimator.get();
-	bool autonomous_start_now=autonomous_start(in.robot_mode.autonomous && in.robot_mode.enabled);
 	Toplevel::Goal goals = mode.run(Run_info{in,driver_joystick,panel,toplevel_status});
 	
+	bool autonomous_start_now=autonomous_start(in.robot_mode.autonomous && in.robot_mode.enabled);
 	auto next=mode.next_mode(Next_mode_info{in.robot_mode.autonomous,autonomous_start_now,toplevel_status,since_switch.elapsed(),panel,in});
 	since_switch.update(in.now,mode!=next);
 	mode=next;
-		
+	
 	Toplevel::Output r_out=control(toplevel_status,goals); 
 	auto r=toplevel.output_applicator(Robot_outputs{},r_out);
 	

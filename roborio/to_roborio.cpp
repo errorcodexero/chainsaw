@@ -183,8 +183,10 @@ class To_roborio
 	PowerDistributionPanel *power;
 	Compressor *compressor;
 	DriverStation& driver_station;
+	Pixy::PixyUART uart;
+	Pixy::PixyCam camera;
 public:
-	To_roborio():error_code(0),skipped(0),driver_station(DriverStation::GetInstance())//,gyro(NULL)
+	To_roborio():error_code(0),skipped(0),driver_station(DriverStation::GetInstance()),uart("/dev/ttyS1"),camera(uart)//,gyro(NULL)
 	{
 		power = new PowerDistributionPanel();
 		// Wake the NUC by sending a Wake-on-LAN magic UDP packet:
@@ -270,6 +272,17 @@ public:
 		return ds_info;
 	}
 
+	Camera read_camera(Robot_inputs r){
+		Camera c;
+		c.enabled=r.robot_mode.enabled;
+		if(c.enabled){
+			camera.enable();
+			if(camera.isNewData()) c.blocks=camera.getBlocks();
+		}
+		else camera.disable();
+		return c;
+	}
+
 	pair<Robot_inputs,int> read(Robot_mode robot_mode){
 		int error_code=0;
 		Robot_inputs r;
@@ -280,6 +293,7 @@ public:
 		error_code|=read_analog(r);
 		//error_code|=read_driver_station(r.driver_station);
 		r.current=read_currents();
+		r.camera=read_camera(r);
 		return make_pair(r,error_code);
 	}
 	array<double,Robot_inputs::CURRENT> read_currents(){
