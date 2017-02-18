@@ -486,6 +486,20 @@ cc_test(
 	deps=[":interface"],
 	timeout="short"
 )
+cc_library(
+	name="ball_lifter",
+	srcs=["control/ball_lifter.cpp","control/nop.cpp"],
+	hdrs=["control/ball_lifter.h","control/nop.h"],
+	deps=[":interface"]
+)
+
+cc_test(
+	name="ball_lifter_test",
+	srcs=["control/ball_lifter.cpp","control/ball_lifter.h","control/nop.h","control/nop.cpp","control/formal.h"],
+	copts=["-DBALL_LIFTER_TEST"],
+	deps=[":interface"],
+	timeout="short"
+)
 
 cc_library(
 	name="shooter_feed",
