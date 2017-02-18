@@ -152,12 +152,12 @@ Gear_grabber::Output control(Gear_grabber::Status /*status*/, Gear_grabber::Goal
 }
 
 Robot_outputs Gear_grabber::Output_applicator::operator()(Robot_outputs r,Output out)const{
-	r.solenoid[PISTON_LOC] = out == Gear_grabber::Output::OPEN; 
+	r.solenoid[PISTON_LOC] = out == Gear_grabber::Output::CLOSE; 
 	return r;
 }
 
 Gear_grabber::Output Gear_grabber::Output_applicator::operator()(Robot_outputs r)const{
-	return r.solenoid[PISTON_LOC] ? Gear_grabber::Output::OPEN : Gear_grabber::Output::CLOSE;
+	return r.solenoid[PISTON_LOC] ? Gear_grabber::Output::CLOSE : Gear_grabber::Output::OPEN;
 }
 
 Robot_inputs Gear_grabber::Input_reader::operator()(Robot_inputs r,Input in)const{
