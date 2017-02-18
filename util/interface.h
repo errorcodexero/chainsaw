@@ -78,20 +78,23 @@ struct Panel_output {
 	Panel_output(int, bool);
 };
 
-std::ostream& operator<<(std::ostream&,Digital_out);
-std::ostream& operator<<(std::ostream&,Talon_srx_input);
 std::ostream& operator<<(std::ostream&,Talon_srx_output::Mode);
 std::ostream& operator<<(std::ostream&,Talon_srx_output);
-std::ostream& operator<<(std::ostream&,Panel_output);
 bool operator==(Talon_srx_output,Talon_srx_output);
 bool operator!=(Talon_srx_output,Talon_srx_output);
 bool operator<(Talon_srx_output,Talon_srx_output);
+
+std::ostream& operator<<(std::ostream&,Talon_srx_input);
 bool operator==(Talon_srx_input,Talon_srx_input);
 bool operator!=(Talon_srx_input,Talon_srx_input);
 bool operator<(Talon_srx_input,Talon_srx_input);
+
+std::ostream& operator<<(std::ostream&,Digital_out);
 bool operator<(Digital_out,Digital_out);
 bool operator==(Digital_out,Digital_out);
 bool operator!=(Digital_out,Digital_out);
+
+std::ostream& operator<<(std::ostream&,Panel_output);
 bool operator==(Panel_output,Panel_output);
 
 struct Robot_outputs{
@@ -104,7 +107,7 @@ struct Robot_outputs{
 	static const unsigned RELAYS=4;
 	Checked_array<Relay_output,RELAYS> relay;
 	
-	static const unsigned DIGITAL_IOS=10;//there are really 14 on the cRIO and the roboRIO headers say 26.
+	static const unsigned DIGITAL_IOS=10;//the roboRIO headers say there are 26.
 	Checked_array<Digital_out,DIGITAL_IOS> digital_io;
 	
 	static const unsigned TALON_SRX_OUTPUTS=6;//FIXME: talon initializaitons
@@ -115,6 +118,7 @@ struct Robot_outputs{
 	//could add in some setup for the analog inputs
 	
 	//Smart_dashboard_output smart_dashboard;
+	static const unsigned DRIVER_STATION_DIGITAL_OUTPUTS = Driver_station_output::DIGITAL_OUTPUTS;
 	Driver_station_output driver_station;
 	bool pump_auto;
 

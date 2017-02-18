@@ -407,6 +407,14 @@ pair<Digital_in,Digital_in> create_pair(Digital_in*){
 	return make_pair(Digital_in::_0,Digital_in::_1);
 }
 
+pair<Driver_station_output,Driver_station_output> create_pair(Driver_station_output*){
+	Driver_station_output a;
+	for(unsigned i = 0; i < Driver_station_output::DIGITAL_OUTPUTS; i++){
+		a.digital[i] = 1;
+	}
+	return make_pair(Driver_station_output{},a);
+}
+
 pair<Volt,Volt> create_pair(Volt*){
 	return make_pair(0,1);
 }
@@ -499,6 +507,11 @@ pair<Robot_outputs,Robot_outputs> create_pair(Robot_outputs*){
 		r.first.talon_srx[i]=p.first;
 		r.second.talon_srx[i]=p.second;
 	}
+	{
+		auto p = create_pair((Driver_station_output*)nullptr);
+		r.first.driver_station = p.first;
+		r.second.driver_station = p.second;
+	}
 	r.first.pump_auto=0;
 	r.second.pump_auto=1;
 	return r;
@@ -542,6 +555,7 @@ set<Output> different(Robot_outputs const& a,Robot_outputs const& b){
 	X(TALON_SRX_OUTPUTS,talon_srx,talon_srx)
 	#undef X
 	if(a.pump_auto!=b.pump_auto) r|=Output::pump();
+	if(a.driver_station != b.driver_station) r|=Output::driver_station();
 	return r;
 }
 

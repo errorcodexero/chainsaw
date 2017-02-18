@@ -26,6 +26,10 @@ unsigned Output::index()const{
 NUMBERED_TYPES
 #undef X
 
+Output Output::driver_station(){
+	return Output(Type::DRIVER_STATION,0);
+}
+
 Output Output::pump(){
 	return Output(Type::PUMP,0);
 }

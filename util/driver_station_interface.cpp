@@ -107,7 +107,6 @@ ostream& operator<<(ostream& o,Driver_station_output a){
 int main(){
 	Driver_station_input a;
 	Driver_station_output b;
-	//cout<<format_for_lcd("this\nthat dsf ljkdskjl sdjlf kljsdfkjl sklj djkl v dkljk dkljfsd ljksdljk");
 
 	//Driver_station_input a;
 	string s=as_string(a);
