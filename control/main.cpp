@@ -45,15 +45,15 @@ Robot_outputs Main::operator()(const Robot_inputs in,ostream&){
 	bool autonomous_start_now=autonomous_start(in.robot_mode.autonomous && in.robot_mode.enabled);
 	Toplevel::Goal goals = mode.run(Run_info{in,driver_joystick,panel,toplevel_status});
 	
-	auto next=mode.next_mode(Next_mode_info{in.robot_mode.autonomous,autonomous_start_now,toplevel_status,since_switch.elapsed(),panel,in});
-	since_switch.update(in.now,mode!=next);
+	Executive next = in.robot_mode.autonomous ? mode.next_mode(Next_mode_info{in.robot_mode.autonomous,autonomous_start_now,toplevel_status,since_switch.elapsed(),panel,in}) : Executive{Teleop()};
+	since_switch.update(in.now,mode != next);
 	mode=next;
 		
-	Toplevel::Output r_out=control(toplevel_status,goals); 
-	auto r=toplevel.output_applicator(Robot_outputs{},r_out);
+	Toplevel::Output r_out = control(toplevel_status,goals); 
+	Robot_outputs r = toplevel.output_applicator(Robot_outputs{},r_out);
 	
 	r=force(r);
-	auto input=toplevel.input_reader(in);
+	Toplevel::Input input=toplevel.input_reader(in);
 
 	toplevel.estimator.update(
 		in.now,

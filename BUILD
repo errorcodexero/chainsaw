@@ -690,7 +690,8 @@ cc_library(
 		"executive/auto_gearloading.cpp",
 		"executive/auto_gearmid.cpp",
 		"executive/auto_baselineext.cpp",
-		"executive/auto_gearboilerext.cpp"
+		"executive/auto_gearboilerext.cpp",
+		"executive/auto_guided_turn.cpp"
 	],
 	hdrs=[
 		"executive/delay.h",
@@ -704,7 +705,8 @@ cc_library(
 		"executive/auto_gearloading.h",
 		"executive/auto_gearmid.h",
 		"executive/auto_baselineext.h",
-		"executive/auto_gearboilerext.h"
+		"executive/auto_gearboilerext.h",
+		"executive/auto_guided_turn.h"
 	],
 	deps=[":executive",":posedge_trigger_debounce",":posedge_toggle",":motion_profile"]
 )
@@ -749,6 +751,17 @@ cc_test(
         ],
         timeout = "short"
 )
+cc_test(
+	name="auto_guided_turn_test",
+	srcs=["executive/auto_guided_turn.cpp","executive/auto_guided_turn.h"],
+	copts=["-DAUTO_GUIDED_TURN_TEST"],
+	deps=[
+		":executive",":executive_impl",
+		":test"
+	],
+	timeout = "short"
+)
+
 cc_test(
 	name="auto_baseline_test",
 	srcs=["executive/auto_baseline.cpp","executive/auto_baseline.h"],
