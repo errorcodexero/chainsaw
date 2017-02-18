@@ -18,12 +18,16 @@ struct Drivebase{
 		X(int,r)
 	DECLARE_STRUCT(Encoder_ticks,ENCODER_TICKS)
 
+	#define DISTANCES_ITEMS(X) \
+		X(double,l) \
+		X(double,r)
+	DECLARE_STRUCT(Distances,DISTANCES_ITEMS)
 
 	#define DRIVEBASE_INPUT(X) \
 		X(SINGLE_ARG(std::array<double,MOTORS>),current) \
 		X(Encoder_info,left) \
 		X(Encoder_info,right) \
-		X(SINGLE_ARG(std::pair<double,double>),distance)
+		X(Distances,distance)
 	DECLARE_STRUCT(Input,DRIVEBASE_INPUT)
 
 	struct Input_reader{
@@ -46,7 +50,7 @@ struct Drivebase{
 		X(SINGLE_ARG(std::array<Motor_check::Status,MOTORS>),motor)\
 		X(bool,stall) \
 		X(Speeds,speeds)\
-		X(SINGLE_ARG(std::pair<double,double>),distance)
+		X(Distances,distance)
 	DECLARE_STRUCT(Status,DRIVEBASE_STATUS)
 
 	typedef Status Status_detail;
@@ -81,14 +85,20 @@ Drivebase::Encoder_ticks operator-(Drivebase::Encoder_ticks const&);
 Drivebase::Encoder_ticks operator-(Drivebase::Encoder_ticks const&,Drivebase::Encoder_ticks const&);
 std::ostream& operator<<(std::ostream&,Drivebase::Encoder_ticks const&);
 
-double ticks_to_inches(const int);
+Drivebase::Distances operator+(Drivebase::Distances const&,Drivebase::Distances const&);
+Drivebase::Distances operator-(Drivebase::Distances const&);
+Drivebase::Distances operator-(Drivebase::Distances const&,Drivebase::Distances const&);
 
-double inches_to_ticks(const float);
+double ticks_to_inches(const int);
+int inches_to_ticks(const double);
+Drivebase::Distances ticks_to_inches(const Drivebase::Encoder_ticks);
+Drivebase::Encoder_ticks inches_to_ticks(const Drivebase::Distances);
 
 int encoderconv(Maybe_inline<Encoder_output>);
 
 CMP1(Drivebase::Encoder_ticks)
 CMP1(Drivebase::Speeds)
+CMP1(Drivebase::Distances)
 
 std::ostream& operator<<(std::ostream&,Drivebase::Input const&);
 bool operator<(Drivebase::Input const&,Drivebase::Input const&);

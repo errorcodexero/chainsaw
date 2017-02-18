@@ -75,7 +75,7 @@ struct Drivebase_sim{
 		auto d=Digital_in::_0;
 		auto p=make_pair(d,d);
 		Drivebase::Input in = {Drivebase::Input{
-			{0,0,0,0,0,0},p,p,{ticks_left,ticks_right}//because encoders are opotistes
+			{0,0,0,0,0,0},p,p,ticks_to_inches(Drivebase::Encoder_ticks{ticks_left,ticks_right})//because encoders are opotistes
 		}};
 		//cout<<"drive_in:"<<in<<"\n";
 		return in;
