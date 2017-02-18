@@ -84,7 +84,11 @@ unsigned interpret_20_turn_pot(Volt v){
 		1.00
 	};
 	for(unsigned i=0;i<20;i++){
-		if(v<(limits[i] + 0.05)) return (i!=9) ? (i + 1) : 0;
+		if(v<(limits[i] + 0.05)){
+			if(i==9) return 0;
+			if(i==19) return 10;
+			return i + 1;
+		}
 	}
 	return 19;
 }
