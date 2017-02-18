@@ -192,7 +192,6 @@ public:
 
 		for(unsigned i=0;i<Robot_outputs::SOLENOIDS;i++){
 			solenoid[i]=new Solenoid(i);//don't know of any way to determine module number, so just take the default one.
-			solenoid[i]=new Solenoid(i+1);
 			if(!solenoid[i]) error_code|=8;
 		}
 		//talon_srx_controls.init();

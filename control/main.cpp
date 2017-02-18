@@ -20,7 +20,7 @@ Main::Main():
 	autonomous_start(0)
 {}
 
-Robot_outputs Main::operator()(Robot_inputs in,ostream&){
+Robot_outputs Main::operator()(const Robot_inputs in,ostream&){
 	print_count++;
 	static const unsigned MAIN_JOYSTICK_PORT = 0, GUNNER_JOYSTICK_PORT = 1, PANEL_PORT = 2;
 

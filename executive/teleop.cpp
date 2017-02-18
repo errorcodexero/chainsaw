@@ -26,6 +26,20 @@ bool operator==(Teleop::Nudge const& a,Teleop::Nudge const& b){
 	return 1;
 }
 
+ostream& operator<<(ostream& o,Teleop::Nudge const& a){
+	#define X(t,NAME) o<<""#NAME<<":"<<(a.NAME)<<" ";
+	NUDGE_ITEMS(X)
+	#undef X
+	return o;
+}
+
+ostream& operator<<(ostream& o,Teleop::Gear_collector_mode const& a){
+	#define X(NAME) if(a==Teleop::Gear_collector_mode::NAME) return o<<""#NAME;
+	GEAR_COLLECTOR_MODES
+	#undef X
+	assert(0);
+}
+
 ostream& operator<<(ostream& o,Teleop::Gear_score_step const& a){
 	#define X(NAME) if(a==Teleop::Gear_score_step::NAME) return o<<""#NAME;
 	GEAR_SCORE_STEPS	
@@ -45,7 +59,7 @@ Executive Teleop::next_mode(Next_mode_info info) {
 
 IMPL_STRUCT(Teleop::Teleop,TELEOP_ITEMS)
 
-Teleop::Teleop():gear_score_step(Gear_score_step::CLEAR_BALLS){}
+Teleop::Teleop():gear_collector_mode(Gear_collector_mode::PREP_COLLECT),gear_score_step(Gear_score_step::CLEAR_BALLS){}
 
 void Teleop::gear_score_protocol(Toplevel::Status_detail const& status,const bool enabled,const Time now,Toplevel::Goal& goals){
 	//TODO: set clear_ball_timer somewhere
@@ -92,8 +106,8 @@ Toplevel::Goal Teleop::run(Run_info info) {
 		}
 		const double NUDGE_POWER=.2,ROTATE_NUDGE_POWER=.2;
 		goals.drive.left=([&]{
-			if(!nudges[Nudges::FORWARD].timer.done()) return -NUDGE_POWER;
-			if(!nudges[Nudges::BACKWARD].timer.done()) return NUDGE_POWER;
+			if(!nudges[Nudges::FORWARD].timer.done()) return NUDGE_POWER;
+			if(!nudges[Nudges::BACKWARD].timer.done()) return -NUDGE_POWER;
 			if(!nudges[Nudges::CLOCKWISE].timer.done()) return ROTATE_NUDGE_POWER;
 			if(!nudges[Nudges::COUNTERCLOCKWISE].timer.done()) return -ROTATE_NUDGE_POWER;
 			double power=set_drive_speed(info.driver_joystick.axis[Gamepad_axis::LEFTY],boost,slow);
@@ -101,8 +115,8 @@ Toplevel::Goal Teleop::run(Run_info info) {
 			return -power; //inverted so drivebase values can be positive
 		}());
 		goals.drive.right=clip([&]{
-			if(!nudges[Nudges::FORWARD].timer.done()) return -NUDGE_POWER;
-			if(!nudges[Nudges::BACKWARD].timer.done()) return NUDGE_POWER;
+			if(!nudges[Nudges::FORWARD].timer.done()) return NUDGE_POWER;
+			if(!nudges[Nudges::BACKWARD].timer.done()) return -NUDGE_POWER;
 			if(!nudges[Nudges::CLOCKWISE].timer.done()) return -ROTATE_NUDGE_POWER;	
 			if(!nudges[Nudges::COUNTERCLOCKWISE].timer.done()) return ROTATE_NUDGE_POWER;
 			double power=set_drive_speed(info.driver_joystick.axis[Gamepad_axis::LEFTY],boost,slow);
@@ -117,46 +131,57 @@ Toplevel::Goal Teleop::run(Run_info info) {
 		return Gear_shifter::Goal::AUTO;
 	}();
 
-	//TODO: FIXME
-	if(info.panel.gear_grasper==Panel::Gear_grasper::OPEN) goals.gear_collector.gear_grabber = Gear_grabber::Goal::OPEN;
-	if(info.panel.gear_grasper==Panel::Gear_grasper::CLOSED) goals.gear_collector.gear_grabber = Gear_grabber::Goal::CLOSE;
+	if(info.panel.gear_prep_collect) gear_collector_mode=Gear_collector_mode::PREP_COLLECT;
+	if(info.panel.gear_collect) gear_collector_mode=Gear_collector_mode::COLLECT;
+	if(info.panel.gear_prep_score) gear_collector_mode=Gear_collector_mode::PREP_SCORE;
+	if(info.panel.gear_score) gear_collector_mode=Gear_collector_mode::SCORE;
 
-	if(info.panel.gear_collector==Panel::Gear_collector::UP) goals.gear_collector.gear_lifter = Gear_lifter::Goal::UP;
-	if(info.panel.gear_collector==Panel::Gear_collector::DOWN) goals.gear_collector.gear_lifter = Gear_lifter::Goal::DOWN;	
+	goals.gear_collector=[&]{
+		switch(gear_collector_mode){
+			case Gear_collector_mode::PREP_COLLECT: return Gear_collector::Goal{Gear_grabber::Goal::OPEN,Gear_lifter::Goal::DOWN};
+			case Gear_collector_mode::COLLECT: return Gear_collector::Goal{Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::DOWN};
+			case Gear_collector_mode::PREP_SCORE: return Gear_collector::Goal{Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::UP};
+			case Gear_collector_mode::SCORE: return Gear_collector::Goal{Gear_grabber::Goal::OPEN,Gear_lifter::Goal::UP};
+			default: assert(0);
+		}
+	}();
 
-	if(info.panel.gear_prep_score){
-		gear_score_protocol(info.toplevel_status,info.in.robot_mode.enabled,info.in.now,goals);
-	} else if(info.panel.gear_score){
-		goals.gear_collector.gear_grabber = Gear_grabber::Goal::OPEN;
-	}
+	if((goals.gear_collector.gear_lifter==Gear_lifter::Goal::UP && info.toplevel_status.gear_collector.gear_lifter!=Gear_lifter::Status_detail::UP) || (goals.gear_collector.gear_lifter==Gear_lifter::Goal::DOWN && info.toplevel_status.gear_collector.gear_lifter!=Gear_lifter::Status_detail::DOWN)) goals.gear_collector.gear_grabber=Gear_grabber::Goal::CLOSE;
+
+	if(info.panel.gear_grasper==Panel::Gear_grasper::OPEN) goals.gear_collector.gear_grabber=Gear_grabber::Goal::OPEN;
+	if(info.panel.gear_grasper==Panel::Gear_grasper::CLOSED) goals.gear_collector.gear_grabber=Gear_grabber::Goal::CLOSE;
+	if(info.panel.gear_collector==Panel::Gear_collector::UP) goals.gear_collector.gear_lifter=Gear_lifter::Goal::UP;
+	if(info.panel.gear_collector==Panel::Gear_collector::DOWN) goals.gear_collector.gear_lifter=Gear_lifter::Goal::DOWN;	
+
 	if(info.panel.climb){
 		goals.climber = Climber::Goal::CLIMB;
+	}
+
+	if(info.in.ds_info.connected){
+		cout<<"\n"<<info.toplevel_status.gear_collector.gear_grabber<<"\n";
 	}
 	
 	return goals;
 }
 
-#define TELEOP_ITEMS_NO_TYPE(X)\
-	X(nudges)
-
 bool Teleop::operator<(Teleop const& a)const{
-	#define X(NAME) if(NAME<a.NAME) return 1; if(a.NAME<NAME) return 0;
-	TELEOP_ITEMS_NO_TYPE(X)
+	#define X(t,NAME) if(NAME<a.NAME) return 1; if(a.NAME<NAME) return 0;
+	TELEOP_ITEMS(X)
 	#undef X
 	return 0;
 }
 
 bool Teleop::operator==(Teleop const& a)const{
-	#define X(NAME) if(NAME!=a.NAME) return 0;
-	TELEOP_ITEMS_NO_TYPE(X)
+	#define X(t,NAME) if(NAME!=a.NAME) return 0;
+	TELEOP_ITEMS(X)
 	#undef X
 	return 1;
 }
 
 void Teleop::display(ostream& o)const{
 	o<<"Teleop( ";
-	#define X(NAME) o<<""#NAME<<":"<<(NAME)<<" ";
-	//TELEOP_ITEMS_NO_TYPE(X)
+	#define X(t,NAME) o<<""#NAME<<":"<<(NAME)<<" ";
+	TELEOP_ITEMS(X)
 	#undef X
 	o<<")";
 }

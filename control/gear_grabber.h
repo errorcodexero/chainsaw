@@ -8,8 +8,14 @@
 struct Gear_grabber{
 	enum class Goal{OPEN,CLOSE};
 	
-	typedef Goal Output;
-
+	struct Output{
+		using Piston = Goal;
+		Piston piston;
+		bool gear_light;//indicator light on the OI which shows if the robot has a gear or not
+		Output();
+		Output(Piston,bool);
+	};
+	
 	struct Input{
 		bool has_gear;//hall-effect
 		bool enabled;
@@ -22,8 +28,14 @@ struct Gear_grabber{
 		Robot_inputs operator()(Robot_inputs,Input)const;
 	};
 
-	enum class Status_detail{OPEN,OPENING,CLOSING,CLOSED};
-
+	struct Status_detail{
+		enum class State{OPEN,OPENING,CLOSING,CLOSED};
+		State state;
+		bool has_gear;
+		Status_detail();
+		Status_detail(State,bool);
+	};
+	
 	typedef Status_detail Status;	
 	
 	struct Output_applicator{
@@ -49,17 +61,27 @@ struct Gear_grabber{
 
 
 std::set<Gear_grabber::Goal> examples(Gear_grabber::Goal*);
+std::set<Gear_grabber::Output> examples(Gear_grabber::Output*);
 std::set<Gear_grabber::Input> examples(Gear_grabber::Input*);
 std::set<Gear_grabber::Status_detail> examples(Gear_grabber::Status_detail*);
 
 std::ostream& operator<<(std::ostream&,Gear_grabber);
 std::ostream& operator<<(std::ostream&,const Gear_grabber::Input);
-std::ostream& operator<<(std::ostream&,const Gear_grabber::Goal);
+std::ostream& operator<<(std::ostream&,Gear_grabber::Goal);
+std::ostream& operator<<(std::ostream&,Gear_grabber::Output const&);
 std::ostream& operator<<(std::ostream&,const Gear_grabber::Status_detail);
 
 bool operator==(const Gear_grabber::Input,const Gear_grabber::Input);
 bool operator!=(const Gear_grabber::Input,const Gear_grabber::Input);
 bool operator<(const Gear_grabber::Input,const Gear_grabber::Input);
+
+bool operator<(Gear_grabber::Output const&,Gear_grabber::Output const&);
+bool operator==(Gear_grabber::Output const&,Gear_grabber::Output const&);
+bool operator!=(Gear_grabber::Output const&,Gear_grabber::Output const&);
+
+bool operator<(Gear_grabber::Status_detail const&,Gear_grabber::Status_detail const&);
+bool operator==(Gear_grabber::Status_detail const&,Gear_grabber::Status_detail const&);
+bool operator!=(Gear_grabber::Status_detail const&,Gear_grabber::Status_detail const&);
 
 bool operator==(const Gear_grabber::Estimator,const Gear_grabber::Estimator);
 bool operator!=(const Gear_grabber::Estimator,const Gear_grabber::Estimator);
