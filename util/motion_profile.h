@@ -2,16 +2,6 @@
 #define MOTION_PROFILE_H
 #include <functional>
 #include <assert.h>
-template<class T, class Compare>
-const T& clamp( const T& v, const T& lo, const T& hi, Compare comp ){ //TODO: move to util?
-	return assert( !comp(hi, lo) ),
-	comp(v, lo) ? lo : comp(hi, v) ? hi : v;
-}
-
-template<class T>
-const T& clamp( const T& v, const T& lo, const T& hi ){ //TODO: move to util?
-	return clamp( v, lo, hi, std::less<T>() );
-}
 
 class Motion_profile{
 	double goal;//inches
