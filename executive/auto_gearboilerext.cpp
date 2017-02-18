@@ -4,7 +4,7 @@
 using namespace std;
 
 Executive Auto_gearboilerext_frompeg::next_mode(Next_mode_info info){
-	pair<int,int> encoder_differences=make_pair(info.status.drive.ticks.l-initial_encoders.first,info.status.drive.ticks.r-initial_encoders.second);
+nyi/*	pair<int,int> encoder_differences=make_pair(info.status.drive.ticks.l-initial_encoders.first,info.status.drive.ticks.r-initial_encoders.second);
 	if(!info.autonomous) return Executive{Teleop()};
 	const double TARGET_DISTANCE = 5.0*12.0;//inches
 	const double TOLERANCE = 6.0;//inches
@@ -21,19 +21,19 @@ Executive Auto_gearboilerext_frompeg::next_mode(Next_mode_info info){
 		return Executive{Auto_gearboilerext_turn(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARBOILEREXT_TURN_ITEMS))};
 		//return make_unique<Auto_br_initialturn>();//TODO 
 	}
-	return Executive{Auto_gearboilerext_frompeg(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARBOILEREXT_FROMPEG_ITEMS))};
+	return Executive{Auto_gearboilerext_frompeg(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARBOILEREXT_FROMPEG_ITEMS))};*/
 }
 
 Toplevel::Goal Auto_gearboilerext_frompeg::run(Run_info info){
 	Toplevel::Goal goals;
-	double power=-motion_profile.target_speed(ticks_to_inches(info.toplevel_status.drive.ticks.l));
+	nyi/*double power=-motion_profile.target_speed(ticks_to_inches(info.toplevel_status.drive.ticks.l));
 	goals.drive.left=power;
 	goals.drive.right=power;
-	return goals;
+	return goals;*/
 }
 
 Executive Auto_gearboilerext_turn::next_mode(Next_mode_info info){
-	pair<int,int> encoder_differences=make_pair(info.status.drive.ticks.l-initial_encoders.first,info.status.drive.ticks.r-initial_encoders.second);
+	nyi/*pair<int,int> encoder_differences=make_pair(info.status.drive.ticks.l-initial_encoders.first,info.status.drive.ticks.r-initial_encoders.second);
 	if(!info.autonomous) return Executive{Teleop()};	
 	const double TARGET_DISTANCE = 12.0;//inches
 	const double TOLERANCE = .1;//inches
@@ -50,19 +50,19 @@ Executive Auto_gearboilerext_turn::next_mode(Next_mode_info info){
 		return Executive{Auto_gearboilerext_driveone(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARBOILEREXT_DRIVEONE_ITEMS))};	
 		//return make_unique<Auto_br_initialturn>();//TODO 
 	}
-	return Executive{Auto_gearboilerext_turn(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARBOILEREXT_TURN_ITEMS))};
+	return Executive{Auto_gearboilerext_turn(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARBOILEREXT_TURN_ITEMS))};*/
 }
 
 Toplevel::Goal Auto_gearboilerext_turn::run(Run_info info){
 	Toplevel::Goal goals;
-	double power=-motion_profile.target_speed(ticks_to_inches(info.toplevel_status.drive.ticks.l));
+	nyi/*double power=-motion_profile.target_speed(ticks_to_inches(info.toplevel_status.drive.ticks.l));
 	goals.drive.left=-power;
 	goals.drive.right=power;
-	return goals;
+	return goals;*/
 }
 
 Executive Auto_gearboilerext_driveone::next_mode(Next_mode_info info){
-	pair<int,int> encoder_differences=make_pair(info.status.drive.ticks.l-initial_encoders.first,info.status.drive.ticks.r-initial_encoders.second);
+	nyi/*pair<int,int> encoder_differences=make_pair(info.status.drive.ticks.l-initial_encoders.first,info.status.drive.ticks.r-initial_encoders.second);
 	if(!info.autonomous) return Executive{Teleop()};
 	const double TARGET_DISTANCE = 12.0;//inches
 	const double TOLERANCE = 6;//inches
@@ -79,19 +79,19 @@ Executive Auto_gearboilerext_driveone::next_mode(Next_mode_info info){
 		return Executive{Auto_gearboilerext_turntwo(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARBOILEREXT_TURNTWO_ITEMS))}; 
 		//return make_unique<Auto_br_initialturn>();//TODO 
 	}
-	return Executive{Auto_gearboilerext_driveone(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARBOILEREXT_DRIVEONE_ITEMS))};
+	return Executive{Auto_gearboilerext_driveone(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARBOILEREXT_DRIVEONE_ITEMS))};*/
 }
 
 Toplevel::Goal Auto_gearboilerext_driveone::run(Run_info info){
 	Toplevel::Goal goals;
-	double power=-motion_profile.target_speed(ticks_to_inches(info.toplevel_status.drive.ticks.l));
+	nyi/*double power=-motion_profile.target_speed(ticks_to_inches(info.toplevel_status.drive.ticks.l));
 	goals.drive.left=-power;
 	goals.drive.right=power;
-	return goals;
+	return goals;*/
 }
 
 Executive Auto_gearboilerext_turntwo::next_mode(Next_mode_info info){
-	pair<int,int> encoder_differences=make_pair(info.status.drive.ticks.l-initial_encoders.first,info.status.drive.ticks.r-initial_encoders.second);
+	nyi/*pair<int,int> encoder_differences=make_pair(info.status.drive.ticks.l-initial_encoders.first,info.status.drive.ticks.r-initial_encoders.second);
 	if(!info.autonomous) return Executive{Teleop()};
 	const double TARGET_DISTANCE = 12.0;//inches
 	const double TOLERANCE = 6;//inches
@@ -108,19 +108,19 @@ Executive Auto_gearboilerext_turntwo::next_mode(Next_mode_info info){
 		return Executive{Auto_gearboilerext_drivetwo(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARBOILEREXT_DRIVETWO_ITEMS))};
 		//return make_unique<Auto_br_initialturn>();//TODO 
 	}
-	return Executive{Auto_gearboilerext_turntwo(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARBOILEREXT_TURNTWO_ITEMS))};
+	return Executive{Auto_gearboilerext_turntwo(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARBOILEREXT_TURNTWO_ITEMS))};*/
 }
 
 Toplevel::Goal Auto_gearboilerext_turntwo::run(Run_info info){
 	Toplevel::Goal goals;
-	double power=-motion_profile.target_speed(ticks_to_inches(info.toplevel_status.drive.ticks.l));
+	nyi/*double power=-motion_profile.target_speed(ticks_to_inches(info.toplevel_status.drive.ticks.l));
 	goals.drive.left=-power;
 	goals.drive.right=power;
-	return goals;
+	return goals;*/
 }
 
 Executive Auto_gearboilerext_drivetwo::next_mode(Next_mode_info info){
-	pair<int,int> encoder_differences=make_pair(info.status.drive.ticks.l-initial_encoders.first,info.status.drive.ticks.r-initial_encoders.second);
+	nyi/*pair<int,int> encoder_differences=make_pair(info.status.drive.ticks.l-initial_encoders.first,info.status.drive.ticks.r-initial_encoders.second);
 	if(!info.autonomous) return Executive{Teleop()};
 	const double TARGET_DISTANCE = 12.0;//inches
 	const double TOLERANCE = 6;//inches
@@ -137,15 +137,15 @@ Executive Auto_gearboilerext_drivetwo::next_mode(Next_mode_info info){
 		return Executive{Teleop()};
 		//return make_unique<Auto_br_initialturn>();//TODO 
 	}
-	return Executive{Auto_gearboilerext_drivetwo(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARBOILEREXT_DRIVETWO_ITEMS))};
+	return Executive{Auto_gearboilerext_drivetwo(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARBOILEREXT_DRIVETWO_ITEMS))};*/
 }
 
 Toplevel::Goal Auto_gearboilerext_drivetwo::run(Run_info info){
 	Toplevel::Goal goals;
-	double power=-motion_profile.target_speed(ticks_to_inches(info.toplevel_status.drive.ticks.l));
+	nyi/*double power=-motion_profile.target_speed(ticks_to_inches(info.toplevel_status.drive.ticks.l));
 	goals.drive.left=-power;
 	goals.drive.right=power;
-	return goals;
+	return goals;*/
 }
 
 

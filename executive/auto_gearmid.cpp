@@ -11,8 +11,8 @@ void Auto_gearmid_topeg::setencoderflag(Drivebase::Encoder_ticks ticks){
 		encoderflag=true;
 		initial_encoders=ticks;
 	}
-
 }
+
 double Auto_gearmid_topeg::distance_left(Drivebase::Encoder_ticks ticks){
 	const double goal= 6.0*12.0; //inches
 	int encoder_diff = ticks.l-initial_encoders.l;
@@ -21,7 +21,7 @@ double Auto_gearmid_topeg::distance_left(Drivebase::Encoder_ticks ticks){
 }	
 
 Executive Auto_gearmid_topeg::next_mode(Next_mode_info info){
-	setencoderflag(info.status.drive.ticks);
+	nyi/*setencoderflag(info.status.drive.ticks);
 	//Drivebase::Encoder_ticks encoder_differences={info.status.drive.ticks.l-initial_encoders.l,info.status.drive.ticks.r-initial_encoders.r};
 	if(!info.autonomous) return Executive{Teleop()};
 	const double TOLERANCE = 6.0;//inches
@@ -38,17 +38,17 @@ Executive Auto_gearmid_topeg::next_mode(Next_mode_info info){
 		return Executive{Teleop()};
 		//return make_unique<Auto_br_initialturn>();//TODO 
 	}
-	return Executive{Auto_gearmid_topeg(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARMID_TOPEG_ITEMS))};
+	return Executive{Auto_gearmid_topeg(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARMID_TOPEG_ITEMS))};*/
 }
 
 Toplevel::Goal Auto_gearmid_topeg::run(Run_info info){
 	
 	Toplevel::Goal goals;
 	//double power=motion_profile.target_speed(ticks_to_inches(info.toplevel_status.drive.ticks.l));
-	double power=clamp(distance_left(info.toplevel_status.drive.ticks)/12,-.2,.2);
+	nyi/*double power=clamp(distance_left(info.toplevel_status.drive.ticks)/12,-.2,.2);
 	goals.drive.left=power;
 	goals.drive.right=power;
-	return goals;
+	return goals;*/
 }
 
 Auto_gearmid_geardrop::Auto_gearmid_geardrop():gear_step(0),initial_encoders({0,0}),encoderflag(0){}

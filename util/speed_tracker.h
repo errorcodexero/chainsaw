@@ -8,13 +8,13 @@ struct Speed_tracker{
 	const Time POLL_TIME=0.05; //seconds
 
 	private:
-	int last_ticks;
+	double last_distance;
 	Time last_time;
 	double speed;//inches/second
 	Countdown_timer poll_timer;
 
 	public:
-	void update(Time,int);
+	void update(Time,double);
 	double get()const;
 	
 	Speed_tracker();

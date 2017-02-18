@@ -40,7 +40,7 @@ unique_ptr<Executive_interface> Chain::clone()const{
 
 #ifdef CHAIN_TEST
 int main(){
-	Drive_straight a;
+	Drive_straight a{24};
 	Chain b{Step{a},Executive{Teleop{}}};
 	Chain c{b};
 	auto d=c.next_mode(example((Next_mode_info*)0));

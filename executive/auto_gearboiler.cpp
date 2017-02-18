@@ -4,7 +4,7 @@
 using namespace std;
 
 Executive Auto_gearboiler_topeg::next_mode(Next_mode_info info){
-	pair<int,int> encoder_differences=make_pair(info.status.drive.ticks.l-initial_encoders.first,info.status.drive.ticks.r-initial_encoders.second);
+	nyi/*	pair<int,int> encoder_differences=make_pair(info.status.drive.ticks.l-initial_encoders.first,info.status.drive.ticks.r-initial_encoders.second);
 	if(!info.autonomous) return Executive{Teleop()};
 	const double TARGET_DISTANCE = 5.0*12.0;//inches
 	const double TOLERANCE = 6.0;//inches
@@ -21,19 +21,19 @@ Executive Auto_gearboiler_topeg::next_mode(Next_mode_info info){
 		return Executive{Auto_gearboiler_turn(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARBOILER_TURN_ITEMS))};
 		//return make_unique<Auto_br_initialturn>();//TODO 
 	}
-	return Executive{Auto_gearboiler_topeg(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARBOILER_TOPEG_ITEMS))};
+	return Executive{Auto_gearboiler_topeg(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARBOILER_TOPEG_ITEMS))};*/
 }
 
 Toplevel::Goal Auto_gearboiler_topeg::run(Run_info info){
 	Toplevel::Goal goals;
-	double power=-motion_profile.target_speed(ticks_to_inches(info.toplevel_status.drive.ticks.l));
+	nyi/*double power=-motion_profile.target_speed(ticks_to_inches(info.toplevel_status.drive.ticks.l));
 	goals.drive.left=power;
 	goals.drive.right=power;
-	return goals;
+	return goals;*/
 }
 
 Executive Auto_gearboiler_turn::next_mode(Next_mode_info info){
-	pair<int,int> encoder_differences=make_pair(info.status.drive.ticks.l-initial_encoders.first,info.status.drive.ticks.r-initial_encoders.second);
+	nyi/*pair<int,int> encoder_differences=make_pair(info.status.drive.ticks.l-initial_encoders.first,info.status.drive.ticks.r-initial_encoders.second);
 	if(!info.autonomous) return Executive{Teleop()};	
 	const double TARGET_DISTANCE = 12.0;//inches
 	const double TOLERANCE = .1;//inches
@@ -50,19 +50,19 @@ Executive Auto_gearboiler_turn::next_mode(Next_mode_info info){
 		return Executive{Auto_gearboiler_approach(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARBOILER_APPROACH_ITEMS))};	
 		//return make_unique<Auto_br_initialturn>();//TODO 
 	}
-	return Executive{Auto_gearboiler_turn(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARBOILER_TURN_ITEMS))};
+	return Executive{Auto_gearboiler_turn(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARBOILER_TURN_ITEMS))};*/
 }
 
 Toplevel::Goal Auto_gearboiler_turn::run(Run_info info){
 	Toplevel::Goal goals;
-	double power=-motion_profile.target_speed(ticks_to_inches(info.toplevel_status.drive.ticks.l));
+	nyi/*double power=-motion_profile.target_speed(ticks_to_inches(info.toplevel_status.drive.ticks.l));
 	goals.drive.left=-power;
 	goals.drive.right=power;
-	return goals;
+	return goals;*/
 }
 
 Executive Auto_gearboiler_approach::next_mode(Next_mode_info info){
-	pair<int,int> encoder_differences=make_pair(info.status.drive.ticks.l-initial_encoders.first,info.status.drive.ticks.r-initial_encoders.second);
+	nyi/*pair<int,int> encoder_differences=make_pair(info.status.drive.ticks.l-initial_encoders.first,info.status.drive.ticks.r-initial_encoders.second);
 	if(!info.autonomous) return Executive{Teleop()};
 	const double TARGET_DISTANCE = 12.0;//inches
 	const double TOLERANCE = 6;//inches
@@ -79,15 +79,15 @@ Executive Auto_gearboiler_approach::next_mode(Next_mode_info info){
 		return Executive{Auto_gearboiler_geardrop(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARBOILER_ITEMS))}; 
 		//return make_unique<Auto_br_initialturn>();//TODO 
 	}
-	return Executive{Auto_gearboiler_approach(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARBOILER_APPROACH_ITEMS))};
+	return Executive{Auto_gearboiler_approach(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARBOILER_APPROACH_ITEMS))};*/
 }
 
 Toplevel::Goal Auto_gearboiler_approach::run(Run_info info){
 	Toplevel::Goal goals;
-	double power=-motion_profile.target_speed(ticks_to_inches(info.toplevel_status.drive.ticks.l));
+	nyi/*double power=-motion_profile.target_speed(ticks_to_inches(info.toplevel_status.drive.ticks.l));
 	goals.drive.left=-power;
 	goals.drive.right=power;
-	return goals;
+	return goals;*/
 }
 
 Executive Auto_gearboiler_geardrop::next_mode(Next_mode_info info){
