@@ -92,8 +92,8 @@ Toplevel::Goal Teleop::run(Run_info info) {
 		}
 		const double NUDGE_POWER=.2,ROTATE_NUDGE_POWER=.2;
 		goals.drive.left=([&]{
-			if(!nudges[Nudges::FORWARD].timer.done()) return -NUDGE_POWER;
-			if(!nudges[Nudges::BACKWARD].timer.done()) return NUDGE_POWER;
+			if(!nudges[Nudges::FORWARD].timer.done()) return NUDGE_POWER;
+			if(!nudges[Nudges::BACKWARD].timer.done()) return -NUDGE_POWER;
 			if(!nudges[Nudges::CLOCKWISE].timer.done()) return ROTATE_NUDGE_POWER;
 			if(!nudges[Nudges::COUNTERCLOCKWISE].timer.done()) return -ROTATE_NUDGE_POWER;
 			double power=set_drive_speed(info.driver_joystick.axis[Gamepad_axis::LEFTY],boost,slow);
@@ -101,8 +101,8 @@ Toplevel::Goal Teleop::run(Run_info info) {
 			return power;
 		}());
 		goals.drive.right=clip([&]{
-			if(!nudges[Nudges::FORWARD].timer.done()) return -NUDGE_POWER;
-			if(!nudges[Nudges::BACKWARD].timer.done()) return NUDGE_POWER;
+			if(!nudges[Nudges::FORWARD].timer.done()) return NUDGE_POWER;
+			if(!nudges[Nudges::BACKWARD].timer.done()) return -NUDGE_POWER;
 			if(!nudges[Nudges::CLOCKWISE].timer.done()) return -ROTATE_NUDGE_POWER;	
 			if(!nudges[Nudges::COUNTERCLOCKWISE].timer.done()) return ROTATE_NUDGE_POWER;
 			double power=set_drive_speed(info.driver_joystick.axis[Gamepad_axis::LEFTY],boost,slow);
