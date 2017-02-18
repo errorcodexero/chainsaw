@@ -776,7 +776,7 @@ cc_test(
 
 cc_test(
         name="auto_gearmid_test",
-        srcs=["executive/auto_gearmid.cpp","executive/auto_gearmid.h"],
+        srcs=["executive/auto_gearmid.cpp","executive/auto_gearmid.h", "control/drivebase.h"],
         copts=["-DAUTO_GEARMID_TEST"],
         deps=[
                 ":executive",":executive_impl",

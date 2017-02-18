@@ -3,19 +3,31 @@
 
 using namespace std;
 
-Executive Auto_gearmid_topeg::next_mode(Next_mode_info info){
+Auto_gearmid_topeg::Auto_gearmid_topeg():gear_step(0),initial_encoders({0,0}),encoderflag(0){}
+
+
+void Auto_gearmid_topeg::setencoderflag(Drivebase::Encoder_ticks ticks){
 	if(!encoderflag){
-		encoderflag=false;
-		initial_encoders.first=info.status.drive.ticks.l;
-		initial_encoders.second=info.status.drive.ticks.r;
+		encoderflag=true;
+		initial_encoders=ticks;
 	}
-	pair<int,int> encoder_differences=make_pair(info.status.drive.ticks.l-initial_encoders.first,info.status.drive.ticks.r-initial_encoders.second);
+
+}
+double Auto_gearmid_topeg::distance_left(Drivebase::Encoder_ticks ticks){
+	const double goal= 6.0*12.0; //inches
+	int encoder_diff = ticks.l-initial_encoders.l;
+	double current = ticks_to_inches(encoder_diff);
+	return goal-current;
+}	
+
+Executive Auto_gearmid_topeg::next_mode(Next_mode_info info){
+	setencoderflag(info.status.drive.ticks);
+	Drivebase::Encoder_ticks encoder_differences={info.status.drive.ticks.l-initial_encoders.l,info.status.drive.ticks.r-initial_encoders.r};
 	if(!info.autonomous) return Executive{Teleop()};
-	const double TARGET_DISTANCE = 6.0*12.0;//inches
 	const double TOLERANCE = 6.0;//inches
-	motion_profile.set_goal(TARGET_DISTANCE);
-	cout<<"\n"<<encoder_differences.first<<"   "<<ticks_to_inches(encoder_differences.first)<<"   "<<TARGET_DISTANCE<<"\n";
-	if(ticks_to_inches(encoder_differences.first) >= TARGET_DISTANCE-TOLERANCE && ticks_to_inches(encoder_differences.first) <= TARGET_DISTANCE+TOLERANCE){
+	//motion_profile.set_goal(TARGET_DISTANCE);
+	cout<<"\n"<<encoder_differences.l<<"   "<<ticks_to_inches(encoder_differences.l)<<"\n";
+	if((distance_left(info.status.drive.ticks) >= -TOLERANCE) & (distance_left(info.status.drive.ticks) <= TOLERANCE)){
 		in_auto_range.update(info.in.now,info.in.robot_mode.enabled);
 	}
 	else{
@@ -30,19 +42,18 @@ Executive Auto_gearmid_topeg::next_mode(Next_mode_info info){
 }
 
 Toplevel::Goal Auto_gearmid_topeg::run(Run_info info){
+	
 	Toplevel::Goal goals;
-	double power=motion_profile.target_speed(ticks_to_inches(info.toplevel_status.drive.ticks.l));
+	//double power=motion_profile.target_speed(ticks_to_inches(info.toplevel_status.drive.ticks.l));
+	double power=clamp(distance_left(info.toplevel_status.drive.ticks)/12,-.2,.2);
 	goals.drive.left=power;
 	goals.drive.right=power;
 	return goals;
 }
 
+Auto_gearmid_geardrop::Auto_gearmid_geardrop():gear_step(0),initial_encoders({0,0}),encoderflag(0){}
+
 Executive Auto_gearmid_geardrop::next_mode(Next_mode_info info){
-	if(!encoderflag){
-		encoderflag=0;
-		initial_encoders.first=info.status.drive.ticks.l;
-		initial_encoders.second=info.status.drive.ticks.r;
-	}
 	if(!info.autonomous) return Executive{Teleop()};
 	if(true) return Executive{Teleop()}; //set to gear ready function when intrigrating gear manipulation
 	return Executive{Auto_gearmid_geardrop(CONSTRUCT_STRUCT_PARAMS(AUTO_GEARMID_ITEMS))};
@@ -66,7 +77,7 @@ STEPS
 #ifdef AUTO_GEARMID_TEST
 #include "test.h"
 int main(){
-	#define X(NAME) { Auto_gearmid_##NAME a(0,std::make_pair(0,0),0); test_executive(a); }
+	#define X(NAME) { Auto_gearmid_##NAME a(0,Drivebase::Encoder_ticks{0,0},false); test_executive(a); }
 	STEPS
 	#undef X
 }

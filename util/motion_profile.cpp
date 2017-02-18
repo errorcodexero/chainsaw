@@ -1,26 +1,14 @@
 #include "motion_profile.h"
 #include <iostream>
 #include <assert.h>
-
-template<class T, class Compare>
-const T& clamp( const T& v, const T& lo, const T& hi, Compare comp )
-{
-	return assert( !comp(hi, lo) ),
-	comp(v, lo) ? lo : comp(hi, v) ? hi : v;
-}
-
-template<class T>
-const T& clamp( const T& v, const T& lo, const T& hi )
-{
-	return clamp( v, lo, hi, std::less<T>() );
-}
+#include <algorithm>
 
 double Motion_profile::target_speed(const double current){
-	//float error = goal-current;   broken code 
-	//float motorv = error*vel_modifier;
-	//const float max=1;
-	if(current>=goal-3 && current<=goal+3) return 0; /*clamp(motorv,-max,max);*/ //TODO fix so that it will return proper values.
-	else return .2;
+	float error = goal-current;
+	float motorv = .2; //error*vel_modifier;
+	const float max=.2;
+	//clamp(motorv,-max,max); //TODO fix so that it will return proper values.
+	return clamp((error/12)*motorv,-max,max);
 }
 void Motion_profile::set_goal(double g){
 	goal=g;

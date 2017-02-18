@@ -24,11 +24,11 @@ Executive auto_mode_convert(Next_mode_info info){
 			case 3:
 				return Executive{Auto_baseline({0,0,0})};
 			case 4:
-				return Executive{Auto_gearboiler_topeg()};
+			//	return Executive{Auto_gearboiler_topeg()};
 			case 5:
-				return Executive{Auto_gearboiler_topeg()};
+			//	return Executive{Auto_gearboiler_topeg()};
 			case 6:
-				return Executive{Auto_gearboiler_topeg()};
+			//	return Executive{Auto_gearboiler_topeg()};
 			case 7:
 				//return Executive{Auto_gearloading_topeg({0,0})};
 			case 8:
