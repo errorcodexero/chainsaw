@@ -14,6 +14,13 @@ struct Teleop : Executive_impl<Teleop> {
 		Countdown_timer timer;
 	};
 
+	#define GEAR_COLLECTOR_MODES X(PREP_COLLECT) X(COLLECT) X(PREP_SCORE) X(SCORE)
+	enum class Gear_collector_mode{
+		#define X(NAME) NAME,
+		GEAR_COLLECTOR_MODES
+		#undef X
+	};
+
 	#define GEAR_SCORE_STEPS X(CLEAR_BALLS) X(RAISE_ARM) X(LIFT_GEAR)
 	enum class Gear_score_step{
 		#define X(NAME) NAME,
@@ -24,6 +31,7 @@ struct Teleop : Executive_impl<Teleop> {
 	#define TELEOP_ITEMS(X)\
 		X(SINGLE_ARG(std::array<Nudge,NUDGES>),nudges) \
 		X(Countdown_timer,clear_ball_timer) \
+		X(Gear_collector_mode,gear_collector_mode) \
 		X(Gear_score_step,gear_score_step) 
 	STRUCT_MEMBERS(TELEOP_ITEMS)
 
@@ -39,6 +47,7 @@ struct Teleop : Executive_impl<Teleop> {
 };
 
 std::ostream& operator<<(std::ostream&,Teleop::Nudge const&);
+std::ostream& operator<<(std::ostream&,Teleop::Gear_collector_mode const&);
 std::ostream& operator<<(std::ostream&,Teleop::Gear_score_step const&);
 
 bool operator<(Teleop::Nudge const&,Teleop::Nudge const&);
