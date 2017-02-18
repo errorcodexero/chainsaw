@@ -32,7 +32,8 @@ struct Teleop : Executive_impl<Teleop> {
 		X(SINGLE_ARG(std::array<Nudge,NUDGES>),nudges) \
 		X(Countdown_timer,clear_ball_timer) \
 		X(Gear_collector_mode,gear_collector_mode) \
-		X(Gear_score_step,gear_score_step) 
+		X(Gear_score_step,gear_score_step) \
+		X(int,print_num)
 	STRUCT_MEMBERS(TELEOP_ITEMS)
 
 	void gear_score_protocol(Toplevel::Status_detail const&,const bool,const Time,Toplevel::Goal&);
