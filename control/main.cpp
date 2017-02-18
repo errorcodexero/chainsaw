@@ -22,12 +22,12 @@ Main::Main():
 
 Robot_outputs Main::operator()(const Robot_inputs in,ostream&){
 	print_count++;
-	static const unsigned MAIN_JOYSTICK_PORT = 0, GUNNER_JOYSTICK_PORT = 1, PANEL_PORT = 2;
+	static const unsigned MAIN_JOYSTICK_PORT = 0, GUNNER_JOYSTICK_PORT = 1;
 
 	perf.update(in.now);
 
 	Joystick_data driver_joystick=in.joystick[MAIN_JOYSTICK_PORT];
-	Panel panel=interpret_oi(in.joystick[PANEL_PORT]);
+	Panel panel=interpret_oi(in.joystick[Panel::PORT]);
 	if(!panel.in_use){
 		panel = interpret_gamepad(in.joystick[GUNNER_JOYSTICK_PORT]);
 	}

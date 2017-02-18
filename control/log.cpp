@@ -21,7 +21,7 @@ string get_logfilename(){
 	return name();
 }
 
-#define ROBOT_OUTPUTS(X) X(pwm) X(solenoid) X(relay) X(digital_io) X(talon_srx) X(panel_output) X(driver_station)
+#define ROBOT_OUTPUTS(X) X(pwm) X(solenoid) X(relay) X(digital_io) X(talon_srx) X(driver_station)
 
 #define LOG_INNER(NAME) log(o,header,prefix+"_"#NAME,a.NAME);
 
@@ -134,12 +134,6 @@ template<typename Func>
 void visit(Func f,Talon_srx_output const& r){
 	#define TALON_SRX_OUTPUTS(X) X(power_level)
 	TALON_SRX_OUTPUTS(VISIT)
-}
-
-template<typename Func>
-void visit(Func f,Panel_output const& r){
-	#define PANEL_OUTPUTS(X) X(port) X(value)
-	PANEL_OUTPUTS(VISIT)
 }
 
 template<typename Func>

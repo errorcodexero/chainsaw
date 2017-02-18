@@ -4,13 +4,13 @@
 using namespace std;
 
 Executive Auto_gearboilerext_frompeg::next_mode(Next_mode_info info){
-	pair<int,int> encoder_differences=make_pair(info.status.drive.ticks.l-initial_encoders.first,info.status.drive.ticks.r-initial_encoders.second);
+	Drivebase::Encoder_ticks encoder_differences = info.status.drive.ticks-initial_encoders;
 	if(!info.autonomous) return Executive{Teleop()};
 	const double TARGET_DISTANCE = 5.0*12.0;//inches
 	const double TOLERANCE = 6.0;//inches
 	motion_profile.set_goal(TARGET_DISTANCE);
-	cout<<"\n"<<encoder_differences.first<<"   "<<ticks_to_inches(encoder_differences.first)<<"   "<<TARGET_DISTANCE<<"\n";
-	if(ticks_to_inches(encoder_differences.first) >= TARGET_DISTANCE-TOLERANCE && ticks_to_inches(encoder_differences.first) <= TARGET_DISTANCE+TOLERANCE){
+	cout<<"\n"<<encoder_differences.l<<"   "<<ticks_to_inches(encoder_differences.l)<<"   "<<TARGET_DISTANCE<<"\n";
+	if(ticks_to_inches(encoder_differences.l) >= TARGET_DISTANCE-TOLERANCE && ticks_to_inches(encoder_differences.l) <= TARGET_DISTANCE+TOLERANCE){
 		in_auto_range.update(info.in.now,info.in.robot_mode.enabled);
 	}
 	else{
@@ -33,13 +33,13 @@ Toplevel::Goal Auto_gearboilerext_frompeg::run(Run_info info){
 }
 
 Executive Auto_gearboilerext_turn::next_mode(Next_mode_info info){
-	pair<int,int> encoder_differences=make_pair(info.status.drive.ticks.l-initial_encoders.first,info.status.drive.ticks.r-initial_encoders.second);
+	Drivebase::Encoder_ticks encoder_differences = info.status.drive.ticks-initial_encoders;
 	if(!info.autonomous) return Executive{Teleop()};	
 	const double TARGET_DISTANCE = 12.0;//inches
 	const double TOLERANCE = .1;//inches
 	motion_profile.set_goal(TARGET_DISTANCE);
-	cout<<"\n"<<encoder_differences.first<<"   "<<ticks_to_inches(encoder_differences.first)<<"   "<<TARGET_DISTANCE<<"\n";
-	if(ticks_to_inches(encoder_differences.first) >= TARGET_DISTANCE-TOLERANCE && ticks_to_inches(encoder_differences.first) <= TARGET_DISTANCE+TOLERANCE){
+	cout<<"\n"<<encoder_differences.l<<"   "<<ticks_to_inches(encoder_differences.l)<<"   "<<TARGET_DISTANCE<<"\n";
+	if(ticks_to_inches(encoder_differences.l) >= TARGET_DISTANCE-TOLERANCE && ticks_to_inches(encoder_differences.l) <= TARGET_DISTANCE+TOLERANCE){
 		in_auto_range.update(info.in.now,info.in.robot_mode.enabled);
 	}
 	else{
@@ -62,13 +62,13 @@ Toplevel::Goal Auto_gearboilerext_turn::run(Run_info info){
 }
 
 Executive Auto_gearboilerext_driveone::next_mode(Next_mode_info info){
-	pair<int,int> encoder_differences=make_pair(info.status.drive.ticks.l-initial_encoders.first,info.status.drive.ticks.r-initial_encoders.second);
+	Drivebase::Encoder_ticks encoder_differences = info.status.drive.ticks-initial_encoders;
 	if(!info.autonomous) return Executive{Teleop()};
 	const double TARGET_DISTANCE = 12.0;//inches
 	const double TOLERANCE = 6;//inches
 	motion_profile.set_goal(TARGET_DISTANCE);
-	cout<<"\n"<<encoder_differences.first<<"   "<<ticks_to_inches(encoder_differences.first)<<"   "<<TARGET_DISTANCE<<"\n";
-	if(ticks_to_inches(encoder_differences.first) >= TARGET_DISTANCE-TOLERANCE && ticks_to_inches(encoder_differences.first) <= TARGET_DISTANCE+TOLERANCE){
+	cout<<"\n"<<encoder_differences.l<<"   "<<ticks_to_inches(encoder_differences.l)<<"   "<<TARGET_DISTANCE<<"\n";
+	if(ticks_to_inches(encoder_differences.l) >= TARGET_DISTANCE-TOLERANCE && ticks_to_inches(encoder_differences.l) <= TARGET_DISTANCE+TOLERANCE){
 		in_auto_range.update(info.in.now,info.in.robot_mode.enabled);
 	}
 	else{
@@ -91,13 +91,13 @@ Toplevel::Goal Auto_gearboilerext_driveone::run(Run_info info){
 }
 
 Executive Auto_gearboilerext_turntwo::next_mode(Next_mode_info info){
-	pair<int,int> encoder_differences=make_pair(info.status.drive.ticks.l-initial_encoders.first,info.status.drive.ticks.r-initial_encoders.second);
+	Drivebase::Encoder_ticks encoder_differences=info.status.drive.ticks-initial_encoders;
 	if(!info.autonomous) return Executive{Teleop()};
 	const double TARGET_DISTANCE = 12.0;//inches
 	const double TOLERANCE = 6;//inches
 	motion_profile.set_goal(TARGET_DISTANCE);
-	cout<<"\n"<<encoder_differences.first<<"   "<<ticks_to_inches(encoder_differences.first)<<"   "<<TARGET_DISTANCE<<"\n";
-	if(ticks_to_inches(encoder_differences.first) >= TARGET_DISTANCE-TOLERANCE && ticks_to_inches(encoder_differences.first) <= TARGET_DISTANCE+TOLERANCE){
+	cout<<"\n"<<encoder_differences.l<<"   "<<ticks_to_inches(encoder_differences.l)<<"   "<<TARGET_DISTANCE<<"\n";
+	if(ticks_to_inches(encoder_differences.l) >= TARGET_DISTANCE-TOLERANCE && ticks_to_inches(encoder_differences.l) <= TARGET_DISTANCE+TOLERANCE){
 		in_auto_range.update(info.in.now,info.in.robot_mode.enabled);
 	}
 	else{
@@ -120,13 +120,13 @@ Toplevel::Goal Auto_gearboilerext_turntwo::run(Run_info info){
 }
 
 Executive Auto_gearboilerext_drivetwo::next_mode(Next_mode_info info){
-	pair<int,int> encoder_differences=make_pair(info.status.drive.ticks.l-initial_encoders.first,info.status.drive.ticks.r-initial_encoders.second);
+	Drivebase::Encoder_ticks encoder_differences=info.status.drive.ticks-initial_encoders;
 	if(!info.autonomous) return Executive{Teleop()};
 	const double TARGET_DISTANCE = 12.0;//inches
 	const double TOLERANCE = 6;//inches
 	motion_profile.set_goal(TARGET_DISTANCE);
-	cout<<"\n"<<encoder_differences.first<<"   "<<ticks_to_inches(encoder_differences.first)<<"   "<<TARGET_DISTANCE<<"\n";
-	if(ticks_to_inches(encoder_differences.first) >= TARGET_DISTANCE-TOLERANCE && ticks_to_inches(encoder_differences.first) <= TARGET_DISTANCE+TOLERANCE){
+	cout<<"\n"<<encoder_differences.l<<"   "<<ticks_to_inches(encoder_differences.l)<<"   "<<TARGET_DISTANCE<<"\n";
+	if(ticks_to_inches(encoder_differences.l) >= TARGET_DISTANCE-TOLERANCE && ticks_to_inches(encoder_differences.l) <= TARGET_DISTANCE+TOLERANCE){
 	in_auto_range.update(info.in.now,info.in.robot_mode.enabled);
 	}
 	else{
@@ -166,7 +166,7 @@ STEPS
 #ifdef AUTO_GEARBOILEREXT_TEST
 #include "test.h"
 int main(){
-	#define X(NAME) { Auto_gearboilerext_##NAME a(0,std::make_pair(0,0)); test_executive(a); }
+	#define X(NAME) { Auto_gearboilerext_##NAME a(0,{0,0}); test_executive(a); }
 	STEPS
 	#undef X
 }

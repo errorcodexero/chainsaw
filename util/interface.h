@@ -6,11 +6,12 @@
 #include "driver_station_interface.h"
 #include "maybe_inline.h"
 #include "checked_array.h"
-#include "pwm.h"
 #include "../pixycam/PixyUART.h"
 
 typedef double Time;//Seconds
 typedef bool Solenoid_output;
+
+using Pwm_output = double;
 
 enum class Relay_output{_00,_01,_10,_11};
 std::ostream& operator<<(std::ostream&,Relay_output);
@@ -70,33 +71,24 @@ struct Talon_srx_output{
 	static Talon_srx_output closed_loop(double);
 };
 
-enum Panel_outputs{GEAR,COLLECTOR_MODE,COLLECTOR_STATUS, PANEL_OUTPUTS=5};
-enum class Panel_output_ports{GEAR = 4};
-struct Panel_output {
-	int port;
-	bool value;
-	Panel_output():port(0),value(0){}
-	Panel_output(int, bool);
-};
-
-std::ostream& operator<<(std::ostream&,Digital_out);
-std::ostream& operator<<(std::ostream&,Talon_srx_input);
 std::ostream& operator<<(std::ostream&,Talon_srx_output::Mode);
 std::ostream& operator<<(std::ostream&,Talon_srx_output);
-std::ostream& operator<<(std::ostream&,Panel_output);
 bool operator==(Talon_srx_output,Talon_srx_output);
 bool operator!=(Talon_srx_output,Talon_srx_output);
 bool operator<(Talon_srx_output,Talon_srx_output);
+
+std::ostream& operator<<(std::ostream&,Talon_srx_input);
 bool operator==(Talon_srx_input,Talon_srx_input);
 bool operator!=(Talon_srx_input,Talon_srx_input);
 bool operator<(Talon_srx_input,Talon_srx_input);
+
+std::ostream& operator<<(std::ostream&,Digital_out);
 bool operator<(Digital_out,Digital_out);
 bool operator==(Digital_out,Digital_out);
 bool operator!=(Digital_out,Digital_out);
-bool operator==(Panel_output,Panel_output);
 
 struct Robot_outputs{
-	static const unsigned PWMS=10;//Number of ports on the digital sidecar; roboRIO headers say 20 but there aren't that many ports on the board.
+	static const unsigned PWMS=10;//Number of ports on the digital sidecar; there can be up to 20 using the MXP on the roboRIO which we don't do
 	Checked_array<Pwm_output,PWMS> pwm;
 	
 	static const unsigned SOLENOIDS=8;
@@ -105,17 +97,15 @@ struct Robot_outputs{
 	static const unsigned RELAYS=4;
 	Checked_array<Relay_output,RELAYS> relay;
 	
-	static const unsigned DIGITAL_IOS=10;//there are really 14 on the cRIO and the roboRIO headers say 26.
+	static const unsigned DIGITAL_IOS=10;//there are actually 26 on the roboRIO if you count the MXP, but that varies depending on whether they're set as dios or pwm
 	Checked_array<Digital_out,DIGITAL_IOS> digital_io;
 	
 	static const unsigned TALON_SRX_OUTPUTS=6;//FIXME: talon initializaitons
 	Checked_array<Talon_srx_output, TALON_SRX_OUTPUTS> talon_srx;
 	
-	Checked_array<Panel_output,PANEL_OUTPUTS> panel_output;
-		
 	//could add in some setup for the analog inputs
 	
-	//Smart_dashboard_output smart_dashboard;
+	static const unsigned DRIVER_STATION_DIGITAL_OUTPUTS = Driver_station_output::DIGITAL_OUTPUTS;
 	Driver_station_output driver_station;
 	bool pump_auto;
 
@@ -131,7 +121,7 @@ bool operator==(Robot_outputs,Robot_outputs);
 bool operator!=(Robot_outputs,Robot_outputs);
 std::ostream& operator<<(std::ostream& o,Robot_outputs);
 
-//limitation of FRC coms
+//limitation of FRC coms//TODO look into this
 #define JOY_AXES 8
 #define JOY_BUTTONS 13
 
@@ -197,14 +187,13 @@ typedef double Rad; //radians, clockwise
 
 struct Robot_inputs{
 	Robot_mode robot_mode;
-	Time now;//time since boot.
+	Time now;//time since robot code started running.
 
 	DS_info ds_info;
 
-	static const unsigned JOYSTICKS=3; //limitation of FRC coms was 4, now highter
+	static const unsigned JOYSTICKS=6; //ports are 0-5
 	Checked_array<Joystick_data,JOYSTICKS> joystick;
 
-	//std::array<Digital_in,Robot_outputs::DIGITAL_IOS> digital_io;
 	Digital_inputs digital_io;	
 
 	static const unsigned ANALOG_INPUTS=4;
