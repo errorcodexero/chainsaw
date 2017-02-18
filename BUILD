@@ -1,6 +1,14 @@
+cc_library(
+	name="pixy_uart",
+	srcs=["pixycam/PixyUART.cpp","pixycam/PixyImpl.cpp","pixycam/PixyBlock.cpp"],
+	hdrs=["pixycam/PixyUART.h","pixycam/Pixy.h"],
+	linkopts=["-pthread"]
+)
+
 cc_test(
 	name = "point_test",
 	srcs = ["util/point.cpp","util/point.h","util/interface.h","util/maybe.h","util/driver_station_interface.h","util/maybe_inline.h","util/checked_array.h","util/util.h","util/pwm.h"],
+	deps=[":pixy_uart"],
 	copts = ["-DPOINT_TEST"],
 	timeout="short"
 )
@@ -15,7 +23,8 @@ cc_test(
 cc_library(
 	name = "point",
 	srcs = ["util/point.cpp"],
-	hdrs = ["util/point.h","util/interface.h","util/maybe.h","util/driver_station_interface.h","util/maybe_inline.h","util/checked_array.h","util/util.h","util/pwm.h"]
+	hdrs = ["util/point.h","util/interface.h","util/maybe.h","util/driver_station_interface.h","util/maybe_inline.h","util/checked_array.h","util/util.h","util/pwm.h"],
+	deps=[":pixy_uart"]
 )
 
 cc_test(
@@ -53,7 +62,7 @@ cc_test(
 	name="interface_test",
 	srcs=["util/interface.cpp"],
 	copts=["-DINTERFACE_TEST"],
-	deps=[":driver_station_interface"],
+	deps=[":driver_station_interface",":pixy_uart"],
 	timeout="short"
 )
 
@@ -185,7 +194,7 @@ cc_library(
 	name="interface",
 	srcs=["util/interface.cpp"],
 	hdrs=["util/interface.h"],
-	deps=[":driver_station_interface",":pwm"]
+	deps=[":driver_station_interface",":pwm",":pixy_uart"]
 )
 
 cc_library(

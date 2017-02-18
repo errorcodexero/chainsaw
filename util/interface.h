@@ -7,6 +7,7 @@
 #include "maybe_inline.h"
 #include "checked_array.h"
 #include "pwm.h"
+#include "../pixycam/PixyUART.h"
 
 typedef double Time;//Seconds
 typedef bool Solenoid_output;
@@ -186,6 +187,11 @@ bool operator==(Digital_inputs const&,Digital_inputs const&);
 bool operator!=(Digital_inputs const&,Digital_inputs const&);
 std::ostream& operator<<(std::ostream&,Digital_inputs const&);
 
+struct Camera{
+	bool enabled;
+	std::vector<Pixy::Block> blocks;
+};
+
 typedef float Volt;
 typedef double Rad; //radians, clockwise
 
@@ -213,6 +219,8 @@ struct Robot_inputs{
 	static const unsigned CURRENT=16;
 	Checked_array<double,CURRENT> current;
 	bool pump;
+
+	Camera camera;
 
 	Robot_inputs();
 };

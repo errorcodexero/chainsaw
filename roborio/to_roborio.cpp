@@ -183,8 +183,10 @@ class To_roborio
 	PowerDistributionPanel *power;
 	Compressor *compressor;
 	DriverStation& driver_station;
+	Pixy::PixyUART uart;
+	Pixy::PixyCam camera;
 public:
-	To_roborio():error_code(0),skipped(0),driver_station(DriverStation::GetInstance())//,gyro(NULL)
+	To_roborio():error_code(0),skipped(0),driver_station(DriverStation::GetInstance()),uart("/dev/ttyS1"),camera(uart)//,gyro(NULL)
 	{
 		power = new PowerDistributionPanel();
 		// Wake the NUC by sending a Wake-on-LAN magic UDP packet:
