@@ -9,7 +9,8 @@ HIGH PRIORITY:
 		- Lift
 		- Arm
 		- Intake
-	- Hopper?
+	- OI
+	- Shooter feed
 	- Shooter
 	- Autonomous:
 		- Simple one that only crosses the base line
@@ -54,5 +55,4 @@ LOG LIST:
 
 Eric's random thoughts:
 	-Sim stuff could benefit from using Monitor
-	-There shouldn't be seperate "panel output" and driver station output
 	-There's a better way to do SLOW_PRINT
