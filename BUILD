@@ -751,7 +751,7 @@ cc_test(
         copts=["-DAUTO_GEARBOILER_TEST"],
         deps=[
                 ":executive",":executive_impl",
-                ":test"
+                ":test",":drivebase"
         ],
         timeout = "short"
 )
@@ -762,7 +762,7 @@ cc_test(
         copts=["-DAUTO_GEARLOADING_TEST"],
         deps=[
                 ":executive",":executive_impl",
-                ":test"
+                ":test",":drivebase"
         ],
         timeout = "short"
 )
@@ -773,7 +773,7 @@ cc_test(
         copts=["-DAUTO_GEARMID_TEST"],
         deps=[
                 ":executive",":executive_impl",
-                ":test"
+                ":test",":drivebase"
         ],
         timeout = "short"
 )
@@ -795,7 +795,7 @@ cc_test(
         copts=["-DAUTO_GEARBOILEREXT_TEST"],
         deps=[
                 ":executive",":executive_impl",
-                ":test"
+                ":test", ":drivebase"
         ],
         timeout = "short"
 )

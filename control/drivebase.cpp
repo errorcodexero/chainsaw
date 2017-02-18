@@ -98,6 +98,31 @@ float range(const Robot_inputs in){
 	return inches;
 }
 
+Drivebase::Encoder_ticks operator+(Drivebase::Encoder_ticks const& a,Drivebase::Encoder_ticks const& b){
+	Drivebase::Encoder_ticks sum = {
+		#define X(TYPE,SIDE) 0,
+		ENCODER_TICKS(X)
+		#undef X
+	};
+	#define X(TYPE,SIDE) sum.SIDE = a.SIDE + b.SIDE;
+	ENCODER_TICKS(X)
+	#undef X
+	return sum;
+}
+
+Drivebase::Encoder_ticks operator-(Drivebase::Encoder_ticks const& a){
+	Drivebase::Encoder_ticks opposite = {
+		#define X(TYPE,SIDE) -a.SIDE,
+		ENCODER_TICKS(X)
+		#undef X
+	};
+	return opposite;
+}
+
+Drivebase::Encoder_ticks operator-(Drivebase::Encoder_ticks const& a,Drivebase::Encoder_ticks const& b){
+	return a + (-b);
+}
+
 IMPL_STRUCT(Drivebase::Encoder_ticks::Encoder_ticks,ENCODER_TICKS)
 IMPL_STRUCT(Drivebase::Speeds::Speeds,SPEEDS_ITEMS)
 
@@ -290,7 +315,14 @@ bool ready(Drivebase::Status,Drivebase::Goal){ return 1; }
 #ifdef DRIVEBASE_TEST
 #include "formal.h"
 int main(){
-	Drivebase d;
-	tester(d);
+	{
+		Drivebase d;
+		tester(d);
+	}
+	{
+		Drivebase::Encoder_ticks a = {100,100}, b = {10,10};
+		Drivebase::Encoder_ticks diff = a - b, sum = a + b, opp = -a;
+		cout<<"\na:"<<a<<" b:"<<b<<" diff:"<<diff<<" sum:"<<sum<<" opp:"<<opp<<"\n";
+	}
 }
 #endif

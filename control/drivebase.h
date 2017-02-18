@@ -18,6 +18,7 @@ struct Drivebase{
 		X(int,r)
 	DECLARE_STRUCT(Encoder_ticks,ENCODER_TICKS)
 
+
 	#define DRIVEBASE_INPUT(X) \
 		X(SINGLE_ARG(std::array<double,MOTORS>),current) \
 		X(Encoder_info,left) \
@@ -75,6 +76,9 @@ struct Drivebase{
 bool operator==(Drivebase::Encoder_ticks const&,Drivebase::Encoder_ticks const&);
 bool operator!=(Drivebase::Encoder_ticks const&,Drivebase::Encoder_ticks const&);
 bool operator<(Drivebase::Encoder_ticks const&,Drivebase::Encoder_ticks const&);
+Drivebase::Encoder_ticks operator+(Drivebase::Encoder_ticks const&,Drivebase::Encoder_ticks const&);
+Drivebase::Encoder_ticks operator-(Drivebase::Encoder_ticks const&);
+Drivebase::Encoder_ticks operator-(Drivebase::Encoder_ticks const&,Drivebase::Encoder_ticks const&);
 std::ostream& operator<<(std::ostream&,Drivebase::Encoder_ticks const&);
 
 double ticks_to_inches(const int);
@@ -85,7 +89,6 @@ int encoderconv(Maybe_inline<Encoder_output>);
 
 CMP1(Drivebase::Encoder_ticks)
 CMP1(Drivebase::Speeds)
-
 
 std::ostream& operator<<(std::ostream&,Drivebase::Input const&);
 bool operator<(Drivebase::Input const&,Drivebase::Input const&);
