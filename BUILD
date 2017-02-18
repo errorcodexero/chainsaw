@@ -258,14 +258,15 @@ cc_test(
 cc_library(
 	name="motion_profile",
 	srcs=["util/motion_profile.cpp"],
-	hdrs=["util/motion_profile.h"]
+	hdrs=["util/motion_profile.h"],
+	deps=[":interface"]
 )
 
 cc_test(
 	name="motion_profile_test",
 	srcs=["util/motion_profile.cpp","util/motion_profile.h"],
 	copts=["-DMOTION_PROFILE_TEST"],
-	deps=[],
+	deps=[":interface"],
 	timeout="short"
 )
 
