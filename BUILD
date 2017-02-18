@@ -268,14 +268,14 @@ cc_library(
 	name="motion_profile",
 	srcs=["util/motion_profile.cpp"],
 	hdrs=["util/motion_profile.h"],
-	deps=[":interface"]
+	deps=[":interface",":util"]
 )
 
 cc_test(
 	name="motion_profile_test",
 	srcs=["util/motion_profile.cpp","util/motion_profile.h"],
 	copts=["-DMOTION_PROFILE_TEST"],
-	deps=[":interface"],
+	deps=[":interface",":util"],
 	timeout="short"
 )
 
@@ -486,6 +486,20 @@ cc_test(
 	name="intake_test",
 	srcs=["control/intake.cpp","control/intake.h","control/nop.h","control/nop.cpp","control/formal.h"],
 	copts=["-DINTAKE_TEST"],
+	deps=[":interface"],
+	timeout="short"
+)
+cc_library(
+	name="ball_lifter",
+	srcs=["control/ball_lifter.cpp","control/nop.cpp"],
+	hdrs=["control/ball_lifter.h","control/nop.h"],
+	deps=[":interface"]
+)
+
+cc_test(
+	name="ball_lifter_test",
+	srcs=["control/ball_lifter.cpp","control/ball_lifter.h","control/nop.h","control/nop.cpp","control/formal.h"],
+	copts=["-DBALL_LIFTER_TEST"],
 	deps=[":interface"],
 	timeout="short"
 )

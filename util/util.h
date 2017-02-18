@@ -20,6 +20,17 @@
 int write_file(std::string const& filename,std::string const& contents);
 int read_file(std::string const& filename,std::string &out);//I don't like out parameters.
 
+template<class T, class Compare>
+const T& clamp(const T& v, const T& lo, const T& hi, Compare comp){ 
+	return assert( !comp(hi, lo) ),
+	comp(v, lo) ? lo : comp(hi, v) ? hi : v;
+}
+
+template<class T>
+const T& clamp(const T& v, const T& lo, const T& hi){
+	return clamp( v, lo, hi, std::less<T>() );
+}
+
 template<typename A,typename B>
 std::ostream& operator<<(std::ostream& o,std::pair<A,B> const& p){
 	return o<<"("<<p.first<<","<<p.second<<")";

@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <algorithm>
 #include "interface.h"
+#include "util.h"
 
 using namespace std;
 
