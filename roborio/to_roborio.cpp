@@ -353,11 +353,14 @@ public:
 			int r=set_relay(i,out.relay[i]);
 			if(r) error_code|=32;
 		}
-		digital_io.set(out.digital_io);
 		
-		Joystick panel(2);
-		for(unsigned i=0;i<Panel_outputs::PANEL_OUTPUTS;i++){
-			panel.SetOutput(out.panel_output[i].port, out.panel_output[i].value);
+		digital_io.set(out.digital_io);
+	
+		{	
+			Joystick panel(Panel::PORT);
+			for(unsigned i=0;i<Driver_station_output::DIGITAL_OUTPUTS;i++){
+				panel.SetOutput(i, out.driver_station.digital[i]);
+			}
 		}
 		{
 			Checked_array<bool,Robot_outputs::TALON_SRX_OUTPUTS> enable_all;

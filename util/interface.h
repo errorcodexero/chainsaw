@@ -69,15 +69,6 @@ struct Talon_srx_output{
 	static Talon_srx_output closed_loop(double);
 };
 
-enum Panel_outputs{GEAR,COLLECTOR_MODE,COLLECTOR_STATUS, PANEL_OUTPUTS=5};
-enum class Panel_output_ports{GEAR = 4};
-struct Panel_output {
-	int port;
-	bool value;
-	Panel_output():port(0),value(0){}
-	Panel_output(int, bool);
-};
-
 std::ostream& operator<<(std::ostream&,Talon_srx_output::Mode);
 std::ostream& operator<<(std::ostream&,Talon_srx_output);
 bool operator==(Talon_srx_output,Talon_srx_output);
@@ -93,9 +84,6 @@ std::ostream& operator<<(std::ostream&,Digital_out);
 bool operator<(Digital_out,Digital_out);
 bool operator==(Digital_out,Digital_out);
 bool operator!=(Digital_out,Digital_out);
-
-std::ostream& operator<<(std::ostream&,Panel_output);
-bool operator==(Panel_output,Panel_output);
 
 struct Robot_outputs{
 	static const unsigned PWMS=10;//Number of ports on the digital sidecar; roboRIO headers say 20 but there aren't that many ports on the board.
@@ -113,8 +101,6 @@ struct Robot_outputs{
 	static const unsigned TALON_SRX_OUTPUTS=6;//FIXME: talon initializaitons
 	Checked_array<Talon_srx_output, TALON_SRX_OUTPUTS> talon_srx;
 	
-	Checked_array<Panel_output,PANEL_OUTPUTS> panel_output;
-		
 	//could add in some setup for the analog inputs
 	
 	//Smart_dashboard_output smart_dashboard;
