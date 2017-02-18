@@ -20,6 +20,8 @@ class Step{
 	bool operator<(Step const&)const;
 };
 
+std::ostream& operator<<(std::ostream&,Step const&);
+
 struct Step_impl{
 	virtual ~Step_impl();
 
@@ -54,6 +56,19 @@ struct Step_impl_inner:Step_impl{
 	bool operator<(Step const&)const{
 		nyi
 	}
+};
+
+struct Drive_straight:Step_impl_inner<Drive_straight>{
+	Toplevel::Goal run(Run_info);
+	bool done(Next_mode_info);
+	std::unique_ptr<Step_impl> clone()const;
+	bool operator==(Drive_straight const&)const;
+};
+
+struct Turn:Step_impl{
+	Toplevel::Goal run(Run_info);
+	bool done(Next_mode_info);
+	//Step clone()const;
 };
 
 #endif

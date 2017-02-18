@@ -10,7 +10,6 @@ cc_test(
 	srcs = ["util/type.cpp","util/type.h"],
 	copts = ["-DTYPE_TEST"],
 	timeout="short"
-
 )
 
 cc_library(
@@ -845,10 +844,25 @@ cc_test(
 	timeout="short"
 )
 
+cc_library(
+	name="step",
+	srcs=["executive/step.cpp"],
+	hdrs=["executive/step.h"],
+	deps=[":executive_impl"]
+)
+
 cc_test(
 	name="step_test",
 	srcs=["executive/step.cpp","executive/step.h"],
 	copts=["-DSTEP_TEST"],
 	deps=[":executive_impl"],
+	timeout="short"
+)
+
+cc_test(
+	name="chain_test",
+	srcs=["executive/chain.cpp","executive/chain.h"],
+	copts=["-DCHAIN_TEST"],
+	deps=[":step"],
 	timeout="short"
 )

@@ -22,11 +22,11 @@ double Auto_gearmid_topeg::distance_left(Drivebase::Encoder_ticks ticks){
 
 Executive Auto_gearmid_topeg::next_mode(Next_mode_info info){
 	setencoderflag(info.status.drive.ticks);
-	Drivebase::Encoder_ticks encoder_differences={info.status.drive.ticks.l-initial_encoders.l,info.status.drive.ticks.r-initial_encoders.r};
+	//Drivebase::Encoder_ticks encoder_differences={info.status.drive.ticks.l-initial_encoders.l,info.status.drive.ticks.r-initial_encoders.r};
 	if(!info.autonomous) return Executive{Teleop()};
 	const double TOLERANCE = 6.0;//inches
 	//motion_profile.set_goal(TARGET_DISTANCE);
-	cout<<"\n"<<encoder_differences.l<<"   "<<ticks_to_inches(encoder_differences.l)<<"\n";
+	//cout<<"\n"<<encoder_differences.l<<"   "<<ticks_to_inches(encoder_differences.l)<<"\n";
 	if((distance_left(info.status.drive.ticks) >= -TOLERANCE) & (distance_left(info.status.drive.ticks) <= TOLERANCE)){
 		in_auto_range.update(info.in.now,info.in.robot_mode.enabled);
 	}
