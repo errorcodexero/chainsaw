@@ -18,31 +18,6 @@ ostream& operator<<(ostream& o,Step const& a){
 	return o;
 }
 
-struct Drive_straight:Step_impl_inner<Drive_straight>{
-	Toplevel::Goal run(Run_info);
-	bool done(Next_mode_info);
-	unique_ptr<Step_impl> clone()const;
-	bool operator==(Drive_straight const&)const;
-};
-
-struct Turn:Step_impl{
-	Toplevel::Goal run(Run_info);
-	bool done(Next_mode_info);
-	//Step clone()const;
-};
-
-struct Chain:Executive_impl<Chain>{
-	Step step;
-	Executive next;
-
-	Chain(Step,Executive);
-
-	Toplevel::Goal run(Run_info);
-	Executive next_mode(Next_mode_info);
-	bool operator==(Chain const&)const;
-	unique_ptr<Executive_interface> clone()const;
-};
-
 //This part stays in the CPP file.
 
 //Step::Step(Step_impl const& a):impl(a.clone().get()){}
@@ -95,35 +70,6 @@ unique_ptr<Step_impl> Drive_straight::clone()const{
 
 bool Drive_straight::operator==(Drive_straight const&)const{
 	nyi
-}
-
-Chain::Chain(Step a,Executive next1):step(a),next(next1){}
-
-/*Chain::Chain(Chain const& a):step(a.step){
-	if(a.next)nyi
-}*/
-
-Toplevel::Goal Chain::run(Run_info){
-	return Toplevel::Goal{};
-}
-
-Executive Chain::next_mode(Next_mode_info a){
-	if(step.done(a)){
-		/*if(next) return next->clone();
-		return unique_ptr<Mode>();*/
-		return next;
-	}
-	return Executive{*this};
-}
-
-bool Chain::operator==(Chain const&)const{
-	return 1;
-}
-
-unique_ptr<Executive_interface> Chain::clone()const{
-	return unique_ptr<Executive_interface>(new Chain(*this));
-	//return make_unique<Chain>(step);
-	//assert(0);
 }
 
 Step_impl const& Step::get()const{
@@ -208,12 +154,12 @@ void test_step(T t){
 }
 
 int main(){
-	Drive_straight a;
+	/*Drive_straight a;
 	Chain b{Step{a},Executive{Teleop{}}};
 	Chain c{b};
 	auto d=c.next_mode(example((Next_mode_info*)0));
 	PRINT(c.step);
-	PRINT(d);
+	PRINT(d);*/
 
 	Do_list dl{{}};
 	//PRINT(dl);

@@ -68,15 +68,6 @@ Digital_out Digital_out::encoder(int encoder_index,bool input_a){
 	return r;
 }
 
-Panel_output::Panel_output(int p, bool v) {
-	port = p;
-	value = v;
-}
-
-bool operator==(Panel_output a,Panel_output b){
-	return a.port==b.port && a.value==b.value;
-}
-
 std::ostream& operator<<(std::ostream& o,Digital_out a){
 	switch(a.type()){
 		case Digital_out::Type::INPUT:
@@ -132,11 +123,6 @@ std::ostream& operator<<(std::ostream& o, Talon_srx_output a){
 	o<<" pid:"<<a.pid;
 	if(a.mode==Talon_srx_output::Mode::VOLTAGE) o<<" power_level:"<<a.power_level;
 	else if(a.mode==Talon_srx_output::Mode::SPEED) o<<" speed:"<<a.speed;
-	return o<<")";
-}
-
-std::ostream& operator<<(std::ostream& o, Panel_output in) {
-	o<<"(port:"<<in.port<<" value:"<<in.value;
 	return o<<")";
 }
 
@@ -361,10 +347,6 @@ ostream& operator<<(ostream& o,Robot_outputs a){
 	o<<" talon_srx:";
 	for(unsigned i=0;i<a.Robot_outputs::TALON_SRX_OUTPUTS;i++){
 		o<<a.talon_srx[i];
-	}
-	o<<" panel_output:";
-	for(unsigned i=0;i<Panel_outputs::PANEL_OUTPUTS;i++){
-		o<<a.panel_output[i];
 	}
 	o<<" driver_station_output:"<<a.driver_station;
 	o<<" pump_auto:"<<a.pump_auto;

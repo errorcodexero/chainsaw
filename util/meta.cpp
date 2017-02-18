@@ -11,7 +11,6 @@ using namespace std;
 	X(RELAY,Relay_id,relay)\
 	X(DIGITAL_IO,Digital_io_id,digital_io)\
 	X(TALON_SRX,Talon_srx_id,talon_srx)\
-	X(PANEL_OUTPUT,Panel_output_id,panel_output)\
 	X(DRIVER_STATION,Driver_station,driver_station)\
 	X(PUMP_AUTO,Pump_auto,pump_auto)
 
@@ -19,7 +18,6 @@ using namespace std;
 	struct B{}; \
 	std::ostream& operator<<(ostream& o,B){ return o<<""#A; } \
 	bool operator<(B,B){ return 0; }
-X(PANEL_OUTPUT,Panel_output_id,panel_output)
 X(DRIVER_STATION,Driver_station,driver_station)
 X(PUMP_AUTO,Pump_auto,pump_auto)
 	X(ROBOT_MODE,Robot_mode_in,robot_mode)\
@@ -135,7 +133,6 @@ set<Robot_output> differences(Robot_outputs const& a,Robot_outputs const& b){
 	#undef CHECK_NUMBERED
 
 	#define X(A,B,C) if(a.C!=b.C) r|=Robot_output{B{}};
-	X(PANEL_OUTPUT,Panel_output_id,panel_output)\
 	X(DRIVER_STATION,Driver_station,driver_station)\
 	X(PUMP_AUTO,Pump_auto,pump_auto)
 	#undef X

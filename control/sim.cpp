@@ -69,8 +69,7 @@ struct Drivebase_sim{
 		y+=dy;
 		x+=dx;
 		theta+=dtheta;
-		cout << "x:" << x << " y:" << y << "\n";
-	
+		//cout << "x:" << x << " y:" << y << "\n";
 	}
 	Input get()const{
 		auto d=Digital_in::_0;
@@ -78,7 +77,7 @@ struct Drivebase_sim{
 		Drivebase::Input in = {Drivebase::Input{
 			{0,0,0,0,0,0},p,p,{ticks_left,ticks_right}//because encoders are opotistes
 		}};
-		cout<<"drive_in:"<<in<<"\n";
+		//cout<<"drive_in:"<<in<<"\n";
 		return in;
 	}
 
@@ -230,6 +229,24 @@ void visit(F f,Toplevel::Input const& a){
 
 void visit(auto f,Nop::Input){}
 
+void visit(auto f,Toplevel::Status_detail a){
+	#define X(A,B,C) f(""#B,a.B);
+	TOPLEVEL_ITEMS
+	#undef X
+}
+
+void visit(auto f,Robot_outputs a){
+	#define X(B) f(""#B,a.B);
+	X(pwm) 
+	X(solenoid) 
+	X(relay) 
+	X(digital_io) 
+	X(talon_srx) 
+	X(driver_station)
+	X(pump_auto)
+	#undef X
+}
+
 struct Display{
 	int indent_level=0;
 
@@ -267,13 +284,68 @@ void sim_display(T t){
 	Display{}("robot",t);
 }
 
+struct Dedup_print{
+	string last;
+
+	void operator()(string prefix,string msg){
+		if(msg!=last){
+			cout<<prefix<<msg<<"\n";
+			last=msg;
+		}
+	}
+
+	void operator()(string prefix,auto a){
+		(*this)(prefix,as_string(a));
+	}
+};
+
+struct Dedup2{
+	string intro;
+	map<string,string> last;
+
+	struct Inner{
+		Dedup2 *parent;
+		string prefix;
+
+		void operator()(string s,auto a){
+			visit(
+				Inner{parent,prefix+"."+s},
+				a
+			);
+		}
+
+		void terminal(auto a){
+			auto s=as_string(a);
+			if(s!=parent->last[prefix]){
+				cout<<parent->intro<<prefix<<":"<<s<<"\n";
+				parent->last[prefix]=s;
+			}
+		}
+	};
+
+	void operator()(string intro,auto a){
+		this->intro=intro;
+		visit(
+			//*this,prefix,
+			/*[](auto prefix1,auto value){
+				cout<<"p1:"<<prefix1<<":"<<value;
+			}*/
+			Inner{this,""},
+			a
+		);
+	}
+};
+
 int main(){
-	{
+	/*{
 		Toplevel_sim sim;
 		sim_display(sim);
 		sim_display(sim.get());
 		sim_display(example((Toplevel::Output*)0));
-	}
+	}*/
+
+	//Dedup_print mode,outp,inp,statusp;
+	Dedup2 mode,outp,inp,statusp;
 	{
 		Toplevel_sim sim;
 		Main m;
@@ -290,20 +362,24 @@ int main(){
 		//cout << "20" << inches_to_ticks(20) << "\n";
 		//cout << "50" << inches_to_ticks(50) << "\n";
 		//cout << "inverse one " <<ticks_to_inches(inches_to_ticks(10))<< " two " << inches_to_ticks(ticks_to_inches(10)) << "\n";
-		for(Time t=0;t<60;t+=TIMESTEP){
+		for(Time t=0;t<15;t+=TIMESTEP){//set to 15 seconds for autonomous testing.
 			robotinput.now=t;
 			robotinput.robot_mode.enabled=true;	
 			//cout << "Main " << m << "\n";
-			cout<< "\n" <<t<<"\t"<<sim.get()<<"\n";
+			//cout<< "\n" <<t<<"\t"<<sim.get()<<"\n";
+			inp(as_string(t)+"\tin",sim.get());
 			auto out=m(robotinput);
-			cout << "Mode: " <<m.mode << "\n";	
+			//cout << "Mode: " <<m.mode << "\n";	
+			mode(as_string(t)+"\tmode",m.mode);
 			//auto out=example((Toplevel::Output*)0);
 			/*Toplevel::Goal goal;
 			goal.drive.left=1;
-			goal.drive.right=1;
+			goal.drive.right=1;*/
 			auto status_detail=m.toplevel.estimator.get();
-			auto out=control(status_detail,goal);*/
-			cout <<"out "  << out << "\n";
+			statusp(as_string(t)+"\tstatus_det",status_detail);
+			//auto out=control(status_detail,goal);*/
+			//cout <<"out "  << out << "\n";
+			outp(as_string(t)+ "\tout",out);
 			sim.update(t,1,m.toplevel.output_applicator(out));
 			m.toplevel.estimator.update(t,sim.get(),m.toplevel.output_applicator(out));
 			robotinput = m.toplevel.input_reader(robotinput,sim.get());

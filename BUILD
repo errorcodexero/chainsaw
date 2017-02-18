@@ -1,6 +1,6 @@
 cc_test(
 	name = "point_test",
-	srcs = ["util/point.cpp","util/point.h","util/interface.h","util/maybe.h","util/driver_station_interface.h","util/maybe_inline.h","util/checked_array.h","util/util.h","util/pwm.h"],
+	srcs = ["util/point.cpp","util/point.h","util/interface.h","util/maybe.h","util/driver_station_interface.h","util/maybe_inline.h","util/checked_array.h","util/util.h"],
 	copts = ["-DPOINT_TEST"],
 	timeout="short"
 )
@@ -10,18 +10,17 @@ cc_test(
 	srcs = ["util/type.cpp","util/type.h"],
 	copts = ["-DTYPE_TEST"],
 	timeout="short"
-
 )
 
 cc_library(
 	name = "point",
 	srcs = ["util/point.cpp"],
-	hdrs = ["util/point.h","util/interface.h","util/maybe.h","util/driver_station_interface.h","util/maybe_inline.h","util/checked_array.h","util/util.h","util/pwm.h"]
+	hdrs = ["util/point.h","util/interface.h","util/maybe.h","util/driver_station_interface.h","util/maybe_inline.h","util/checked_array.h","util/util.h"]
 )
 
 cc_test(
 	name="util_test",
-	#srcs=["util/util.cpp","util/interface.h","util/maybe.h","util/driver_station_interface.h","util/maybe_inline.h","util/checked_array.h","util/util.h","util/pwm.h"],
+	#srcs=["util/util.cpp","util/interface.h","util/maybe.h","util/driver_station_interface.h","util/maybe_inline.h","util/checked_array.h","util/util.h"],
 	srcs=["util/util.cpp"],
 	copts=["-DUTIL_TEST"],
 	deps=[":point"],
@@ -177,16 +176,10 @@ cc_test(
 )
 
 cc_library(
-	name="pwm",
-	srcs=["util/pwm.cpp"],
-	hdrs=["util/pwm.h"],
-)
-
-cc_library(
 	name="interface",
 	srcs=["util/interface.cpp"],
 	hdrs=["util/interface.h"],
-	deps=[":driver_station_interface",":pwm"]
+	deps=[":driver_station_interface"]
 )
 
 cc_library(
@@ -265,14 +258,15 @@ cc_test(
 cc_library(
 	name="motion_profile",
 	srcs=["util/motion_profile.cpp"],
-	hdrs=["util/motion_profile.h"]
+	hdrs=["util/motion_profile.h"],
+	deps=[":interface"]
 )
 
 cc_test(
 	name="motion_profile_test",
 	srcs=["util/motion_profile.cpp","util/motion_profile.h"],
 	copts=["-DMOTION_PROFILE_TEST"],
-	deps=[],
+	deps=[":interface"],
 	timeout="short"
 )
 
@@ -415,14 +409,14 @@ cc_library(
 	name="drivebase",
 	srcs=["control/drivebase.cpp"],
 	hdrs=["control/drivebase.h","util/quick.h"],
-	deps=[":interface",":motor_check",":countdown_timer",":fixVictor"]
+	deps=[":interface",":motor_check",":countdown_timer"]
 )
 
 cc_test(
 	name="drivebase_test",
 	srcs=["control/drivebase.cpp","control/drivebase.h","util/quick.h","control/formal.h"],
 	copts=["-DDRIVEBASE_TEST"],
-	deps=[":interface",":motor_check",":countdown_timer",":fixVictor"],
+	deps=[":interface",":motor_check",":countdown_timer"],
 	timeout="short"
 )
 
@@ -772,7 +766,7 @@ cc_test(
         copts=["-DAUTO_GEARBOILER_TEST"],
         deps=[
                 ":executive",":executive_impl",
-                ":test"
+                ":test",":drivebase"
         ],
         timeout = "short"
 )
@@ -783,7 +777,7 @@ cc_test(
         copts=["-DAUTO_GEARLOADING_TEST"],
         deps=[
                 ":executive",":executive_impl",
-                ":test"
+                ":test",":drivebase"
         ],
         timeout = "short"
 )
@@ -794,7 +788,7 @@ cc_test(
         copts=["-DAUTO_GEARMID_TEST"],
         deps=[
                 ":executive",":executive_impl",
-                ":test"
+                ":test",":drivebase"
         ],
         timeout = "short"
 )
@@ -816,7 +810,7 @@ cc_test(
         copts=["-DAUTO_GEARBOILEREXT_TEST"],
         deps=[
                 ":executive",":executive_impl",
-                ":test"
+                ":test", ":drivebase"
         ],
         timeout = "short"
 )
@@ -859,10 +853,25 @@ cc_test(
 	timeout="short"
 )
 
+cc_library(
+	name="step",
+	srcs=["executive/step.cpp"],
+	hdrs=["executive/step.h"],
+	deps=[":executive_impl"]
+)
+
 cc_test(
 	name="step_test",
 	srcs=["executive/step.cpp","executive/step.h"],
 	copts=["-DSTEP_TEST"],
 	deps=[":executive_impl"],
+	timeout="short"
+)
+
+cc_test(
+	name="chain_test",
+	srcs=["executive/chain.cpp","executive/chain.h"],
+	copts=["-DCHAIN_TEST"],
+	deps=[":step"],
 	timeout="short"
 )

@@ -1,5 +1,4 @@
 #include "drivebase.h"
-#include "../util/fixVictor.h"
 #include <iostream>
 #include <math.h>
 #include "../util/util.h"
@@ -99,6 +98,31 @@ float range(const Robot_inputs in){
 	return inches;
 }
 
+Drivebase::Encoder_ticks operator+(Drivebase::Encoder_ticks const& a,Drivebase::Encoder_ticks const& b){
+	Drivebase::Encoder_ticks sum = {
+		#define X(TYPE,SIDE) 0,
+		ENCODER_TICKS(X)
+		#undef X
+	};
+	#define X(TYPE,SIDE) sum.SIDE = a.SIDE + b.SIDE;
+	ENCODER_TICKS(X)
+	#undef X
+	return sum;
+}
+
+Drivebase::Encoder_ticks operator-(Drivebase::Encoder_ticks const& a){
+	Drivebase::Encoder_ticks opposite = {
+		#define X(TYPE,SIDE) -a.SIDE,
+		ENCODER_TICKS(X)
+		#undef X
+	};
+	return opposite;
+}
+
+Drivebase::Encoder_ticks operator-(Drivebase::Encoder_ticks const& a,Drivebase::Encoder_ticks const& b){
+	return a + (-b);
+}
+
 IMPL_STRUCT(Drivebase::Encoder_ticks::Encoder_ticks,ENCODER_TICKS)
 IMPL_STRUCT(Drivebase::Speeds::Speeds,SPEEDS_ITEMS)
 
@@ -194,24 +218,14 @@ double get_output(Drivebase::Output out,Drivebase::Motor m){
 	#undef X
 	assert(0);
 }
-double sum(std::array<double, 6ul> a){
-	double sum = 0;
-	for(unsigned int i=0;i<a.size();i++)
-		sum+=a[i];
 
-	return sum;
-}
-double mean(std::array<double, 6ul> a){
-	return sum(a)/a.size();
-}
 void Drivebase::Estimator::update(Time now,Drivebase::Input in,Drivebase::Output out){\
 	timer.update(now,true);
 	static const double POLL_TIME = .05;//seconds
 	if(timer.done()){
-		last.ticks = in.ticks;
-		last.ticks.l = -last.ticks.l;//because encoder is reversed
 		last.speeds.l = ticks_to_inches((last.ticks.l-in.ticks.l)/POLL_TIME);
 		last.speeds.r = ticks_to_inches((last.ticks.r-in.ticks.r)/POLL_TIME);
+		last.ticks = in.ticks;
 		timer.set(POLL_TIME);
 	}
 	
@@ -301,7 +315,14 @@ bool ready(Drivebase::Status,Drivebase::Goal){ return 1; }
 #ifdef DRIVEBASE_TEST
 #include "formal.h"
 int main(){
-	Drivebase d;
-	tester(d);
+	{
+		Drivebase d;
+		tester(d);
+	}
+	{
+		Drivebase::Encoder_ticks a = {100,100}, b = {10,10};
+		Drivebase::Encoder_ticks diff = a - b, sum = a + b, opp = -a;
+		cout<<"\na:"<<a<<" b:"<<b<<" diff:"<<diff<<" sum:"<<sum<<" opp:"<<opp<<"\n";
+	}
 }
 #endif

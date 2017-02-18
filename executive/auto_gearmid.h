@@ -1,4 +1,3 @@
-
 #ifndef AUTO_GEARMID_H
 #define AUTO_GEARMID_H
 
