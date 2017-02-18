@@ -94,6 +94,12 @@ bool operator!=(Driver_station_output a,Driver_station_output b){
 	return !(a==b);
 }
 
+Driver_station_output::Driver_station_output(){
+	for(unsigned i = 0; i < DIGITAL_OUTPUTS; i++){
+		digital[i] = 0;
+	}
+}
+
 ostream& operator<<(ostream& o,Driver_station_output a){
 	o<<"(";
 	o<<"digital:";
@@ -108,7 +114,6 @@ int main(){
 	Driver_station_input a;
 	Driver_station_output b;
 
-	//Driver_station_input a;
 	string s=as_string(a);
 	cout<<"ss="<<s<<"\n";
 	auto d=Driver_station_input::parse(as_string(a));

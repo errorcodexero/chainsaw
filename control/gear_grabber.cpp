@@ -231,6 +231,7 @@ int main(){
 		tester(g);
 	}
 	{
+		cout<<"\n==========================================================\n";
 		Gear_grabber g;
 		Gear_grabber::Goal goal = Gear_grabber::Goal::CLOSE;
 		const bool ENABLED = true;
