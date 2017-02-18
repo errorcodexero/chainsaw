@@ -23,9 +23,9 @@ namespace Gamepad_button{
 	static const unsigned A=0,B=1,X=2,Y=3,LB=4,RB=5,BACK=6,START=7,L_JOY=8,R_JOY=9;
 }
 namespace Gamepad_axis{
+	//how the logitech gamepads appear in the driver station
 	//How the axes appear in the DS; though
 	static const unsigned LEFTX=0,LEFTY=1,LTRIGGER=2,RTRIGGER=3,RIGHTX=4,RIGHTY=5,DPAD=6;
-	//DPADY does not exist, neither does axis 6
 }
 
 unsigned interpret_20_turn_pot(Volt);
