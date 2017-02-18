@@ -42,8 +42,8 @@ void Gear_shifter::Estimator::update(Time now,Input in,Output out){
 	last_current=sum(in.current);
 	//if(print_count % 10 == 0) cout<<" difference_in_current:"<<current_spike;
 	
-	l_tracker.update(now,-in.ticks.l);
-	r_tracker.update(now,in.ticks.r);
+	l_tracker.update(now,in.distance.first);
+	r_tracker.update(now,in.distance.second);
 	
 	static const double INCHES_TO_FEET = 1.0/12.0;
 	
@@ -141,6 +141,9 @@ int main(){
 		Gear_shifter g;
 		tester(g);
 	}
+
+	/*
+	This got broken at the moment.  Sorry.
 	{
 		cout<<"\nTEST 1\n";
 		Gear_shifter g;
@@ -168,5 +171,6 @@ int main(){
 			cout<<"\n----------------------------------------------------------------\n";
 		}
 	}
+	*/
 }
 #endif

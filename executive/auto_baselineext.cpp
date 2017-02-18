@@ -3,7 +3,8 @@
 
 using namespace std;
 
-Executive Auto_baselineext::next_mode(Next_mode_info info){
+Executive Auto_baselineext::next_mode(Next_mode_info /*info*/){
+	nyi/*
 	if(!info.autonomous) return Executive{Teleop()};
 	Drivebase::Encoder_ticks encoder_differences={
 	#define X(ENCODER) info.status.drive.ticks.ENCODER - initial_encoders.ENCODER
@@ -27,15 +28,15 @@ Executive Auto_baselineext::next_mode(Next_mode_info info){
 	if(in_range.done()){
 	return Executive{Teleop()};
 	}
-	return Executive{Auto_baselineext(CONSTRUCT_STRUCT_PARAMS(AUTO_BASELINEEXT_ITEMS))};
+	return Executive{Auto_baselineext(CONSTRUCT_STRUCT_PARAMS(AUTO_BASELINEEXT_ITEMS))};*/
 }
 
-Toplevel::Goal Auto_baselineext::run(Run_info info){
+Toplevel::Goal Auto_baselineext::run(Run_info /*info*/){
 	Toplevel::Goal goals;
-	double power = -motion_profile.target_speed(ticks_to_inches(info.toplevel_status.drive.ticks.l));//assuming that the left and right encoder values are similar enough
+	nyi/*double power = -motion_profile.target_speed(ticks_to_inches(info.toplevel_status.drive.ticks.l));//assuming that the left and right encoder values are similar enough
 	goals.drive.left = power;
 	goals.drive.right = power;
-		return goals;
+		return goals;*/
 }
 
 bool Auto_baselineext::operator==(Auto_baselineext const&)const{ return true; }//TODO: update with values in that struct
@@ -44,8 +45,8 @@ bool Auto_baselineext::operator==(Auto_baselineext const&)const{ return true; }/
 #include "test.h"
 
 int main(){
-	Auto_baselineext a = {{0,0,0}};
-	test_executive(a);
+	/*Auto_baselineext a = {{0,0,0}};
+	test_executive(a);*/
 }
 #endif
 

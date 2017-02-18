@@ -700,7 +700,8 @@ cc_library(
 		"executive/auto_gearmid.cpp",
 		"executive/auto_baselineext.cpp",
 		"executive/auto_gearboilerext.cpp",
-		"executive/auto_guided_turn.cpp"
+		"executive/auto_guided_turn.cpp",
+		"executive/chain.cpp"
 	],
 	hdrs=[
 		"executive/delay.h",
@@ -715,9 +716,10 @@ cc_library(
 		"executive/auto_gearmid.h",
 		"executive/auto_baselineext.h",
 		"executive/auto_gearboilerext.h",
-		"executive/auto_guided_turn.h"
+		"executive/auto_guided_turn.h",
+		"executive/chain.h"
 	],
-	deps=[":executive",":posedge_trigger_debounce",":posedge_toggle",":motion_profile"]
+	deps=[":executive",":posedge_trigger_debounce",":posedge_toggle",":motion_profile",":step"]
 )
 
 cc_test(
@@ -879,7 +881,7 @@ cc_library(
 	name="step",
 	srcs=["executive/step.cpp"],
 	hdrs=["executive/step.h"],
-	deps=[":executive_impl"]
+	deps=[":executive"]
 )
 
 cc_test(
@@ -894,6 +896,6 @@ cc_test(
 	name="chain_test",
 	srcs=["executive/chain.cpp","executive/chain.h"],
 	copts=["-DCHAIN_TEST"],
-	deps=[":step"],
+	deps=[":step",":executive_impl"],
 	timeout="short"
 )

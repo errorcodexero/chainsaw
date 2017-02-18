@@ -2,7 +2,7 @@
 #include<queue>
 #include "executive.h"
 #include "../util/util.h"
-#include "teleop.h"
+//#include "teleop.h"
 
 using namespace std;
 
@@ -19,6 +19,18 @@ ostream& operator<<(ostream& o,Step const& a){
 }
 
 //This part stays in the CPP file.
+
+Turn::Turn(double)nyi
+
+Toplevel::Goal Turn::run(Run_info)nyi
+
+bool Turn::done(Next_mode_info)nyi
+
+std::unique_ptr<Step_impl> Turn::clone()const{
+	nyi
+}
+
+bool Turn::operator==(Turn const&)const nyi
 
 //Step::Step(Step_impl const& a):impl(a.clone().get()){}
 Step::Step(Step_impl const& a){
@@ -55,6 +67,8 @@ Step_impl::~Step_impl(){}
 	T const& b=dynamic_cast<T const&>(a.get());
 	return this->operator==(b);
 }*/
+
+Drive_straight::Drive_straight(Inch in):target_dist(in){}
 
 bool Drive_straight::done(Next_mode_info){
 	return 0;

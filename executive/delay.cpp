@@ -9,21 +9,62 @@
 #include "auto_gearloading.h"
 #include "auto_gearmid.h"
 #include "auto_baselineext.h"
+#include "chain.h"
+#include "step.h"
 
 using namespace std; 
 using Mode=Executive;
 
+double deg_to_rad(double deg){
+	return deg/180*PI;
+}
+
+//using Geardrop=Drive_straight{0}; //TODO: Fixme
+auto Geardrop(){ return Drive_straight{0}; }
+
 Executive auto_mode_convert(Next_mode_info info){
 	cout << "panel in use " << info.panel.in_use <<" auto panel value " <<info.panel.auto_select<<  "\n";
+
+	//for when just want to run across the field at the end of autonomous
+	Executive dash{Chain{
+		Step{Drive_straight{12*20}},
+		Executive{Teleop{}}
+	}};
+
+	Executive auto_null{Teleop{}};
+
+	Executive auto_baseline{Chain{
+		Step{Drive_straight{12*12}},
+		Executive{Teleop{}}
+	}};
+
 	if (info.panel.in_use) {
 		switch(info.panel.auto_select){ 
 			case 1: 
-				return Executive{Auto_null()};
+				return auto_null;
 			case 2:
-				return Executive{Auto_baseline({0,0,0})};
+				//just go across the baseline
+				return auto_baseline;
 			case 3:
-				return Executive{Auto_baseline({0,0,0})};
+				//go across the baseline, then do another striaght drive.
+				return Executive{Chain{
+					Step{Drive_straight{12*12}},
+					dash
+				}};
 			case 4:
+				return Executive{Chain{
+					Step{Drive_straight{5*12}},
+					Executive{Chain{
+						Step{Turn{deg_to_rad(40)}},
+						Executive{Chain{
+							Step{Drive_straight{12}}, //approach
+							Executive{Chain{
+								Step{Geardrop()},
+								Executive{Teleop{}}
+							}}
+						}}
+					}}
+				}};
 			//	return Executive{Auto_gearboiler_topeg()};
 			case 5:
 			//	return Executive{Auto_gearboiler_topeg()};
@@ -37,10 +78,10 @@ Executive auto_mode_convert(Next_mode_info info){
 				//return Executive{Auto_gearmid_topeg({0,0})};
 			case 0:
 			default:
-				return Executive{Auto_gearmid_topeg()};
+				return auto_null;
 		}
 	}
-	return Executive{Auto_baseline{{0,0,0}}};
+	return auto_baseline;
 }
 
 Mode Delay::next_mode(Next_mode_info info){

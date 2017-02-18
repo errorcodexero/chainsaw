@@ -31,21 +31,17 @@ int encoderconv(Maybe_inline<Encoder_output> encoder){
 	return 10000;
 }
 
+const unsigned int TICKS_PER_REVOLUTION=200;//for 2017
+const double WHEEL_DIAMETER=4.25;//inches for 2017
+const double WHEEL_CIRCUMFERENCE=WHEEL_DIAMETER*PI;//inches
+const double INCHES_PER_TICK=WHEEL_CIRCUMFERENCE/(double)TICKS_PER_REVOLUTION;
+const double ERROR_CORRECTION = 0.181952663;//2017, encoders are geared. Rough calculation.
+
 double ticks_to_inches(const int ticks){
-	const unsigned int TICKS_PER_REVOLUTION=200;//for 2017
-	const double WHEEL_DIAMETER=4.25;//inches for 2017
-	const double WHEEL_CIRCUMFERENCE=WHEEL_DIAMETER*PI;//inches
-	const double INCHES_PER_TICK=WHEEL_CIRCUMFERENCE/(double)TICKS_PER_REVOLUTION;
-	const double ERROR_CORRECTION = 0.181952663;//2017, encoders are geared. Rough calculation.
 	return ticks*INCHES_PER_TICK*ERROR_CORRECTION;
 }
 
 double inches_to_ticks(const float inches){
-	const unsigned int TICKS_PER_REVOLUTION=200;//for 2017
-	const double WHEEL_DIAMETER=4.25;//inches for 2017
-	const double WHEEL_CIRCUMFERENCE=WHEEL_DIAMETER*PI;//inches
-	const double INCHES_PER_TICK=WHEEL_CIRCUMFERENCE/(double)TICKS_PER_REVOLUTION;
-	const double ERROR_CORRECTION = 0.181952663;//2017, encoders are geared. Rough calculation.
 	return inches/(INCHES_PER_TICK*ERROR_CORRECTION);
 }
 
@@ -67,8 +63,8 @@ Robot_inputs Drivebase::Input_reader::operator()(Robot_inputs all,Input in)const
 	};
 	encoder(L_ENCODER_PORTS,in.left);
 	encoder(R_ENCODER_PORTS,in.right);
-	all.digital_io.encoder[L_ENCODER_LOC] = -in.ticks.l;
-	all.digital_io.encoder[R_ENCODER_LOC] = -in.ticks.r;
+	all.digital_io.encoder[L_ENCODER_LOC] = inches_to_ticks(in.distance.first);
+	all.digital_io.encoder[R_ENCODER_LOC] = -inches_to_ticks(in.distance.second);
 	return all;
 }
 
@@ -87,7 +83,7 @@ Drivebase::Input Drivebase::Input_reader::operator()(Robot_inputs const& in)cons
 		}(),
 		encoder_info(L_ENCODER_PORTS),
 		encoder_info(R_ENCODER_PORTS),
-		{-encoderconv(in.digital_io.encoder[L_ENCODER_LOC]),-encoderconv(in.digital_io.encoder[R_ENCODER_LOC])}
+		{encoderconv(in.digital_io.encoder[L_ENCODER_LOC]),-encoderconv(in.digital_io.encoder[R_ENCODER_LOC])}
 	};
 }
 
@@ -223,9 +219,9 @@ void Drivebase::Estimator::update(Time now,Drivebase::Input in,Drivebase::Output
 	timer.update(now,true);
 	static const double POLL_TIME = .05;//seconds
 	if(timer.done()){
-		last.speeds.l = ticks_to_inches((last.ticks.l-in.ticks.l)/POLL_TIME);
-		last.speeds.r = ticks_to_inches((last.ticks.r-in.ticks.r)/POLL_TIME);
-		last.ticks = in.ticks;
+		last.speeds.l = (last.distance.first-in.distance.first)/POLL_TIME;
+		last.speeds.r = (last.distance.second-in.distance.second)/POLL_TIME;
+		last.distance = in.distance;
 		timer.set(POLL_TIME);
 	}
 	

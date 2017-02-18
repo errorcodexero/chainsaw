@@ -58,17 +58,28 @@ struct Step_impl_inner:Step_impl{
 	}
 };
 
-struct Drive_straight:Step_impl_inner<Drive_straight>{
+using Inch=double;
+
+class Drive_straight:public Step_impl_inner<Drive_straight>{
+	Inch target_dist;
+
+	public:
+	explicit Drive_straight(Inch);
+
 	Toplevel::Goal run(Run_info);
 	bool done(Next_mode_info);
 	std::unique_ptr<Step_impl> clone()const;
 	bool operator==(Drive_straight const&)const;
 };
 
-struct Turn:Step_impl{
+struct Turn:Step_impl_inner<Turn>{
+	double radians;//clockwise=positive
+
+	explicit Turn(double);
 	Toplevel::Goal run(Run_info);
 	bool done(Next_mode_info);
-	//Step clone()const;
+	std::unique_ptr<Step_impl> clone()const;
+	bool operator==(Turn const&)const;
 };
 
 #endif
