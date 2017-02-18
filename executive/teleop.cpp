@@ -132,6 +132,10 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	if(info.panel.climb){
 		goals.climber = Climber::Goal::CLIMB;
 	}
+
+	if(info.in.ds_info.connected){
+		cout<<"\n"<<info.toplevel_status.gear_collector.gear_grabber<<"\n";
+	}
 	
 	return goals;
 }
