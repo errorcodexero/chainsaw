@@ -22,8 +22,14 @@ struct Gear_grabber{
 		Robot_inputs operator()(Robot_inputs,Input)const;
 	};
 
-	enum class Status_detail{OPEN,OPENING,CLOSING,CLOSED};
-
+	struct Status_detail{
+		enum class State{OPEN,OPENING,CLOSING,CLOSED};
+		State state;
+		bool has_gear;
+		Status_detail();
+		Status_detail(State,bool);
+	};
+	
 	typedef Status_detail Status;	
 	
 	struct Output_applicator{
@@ -60,6 +66,10 @@ std::ostream& operator<<(std::ostream&,const Gear_grabber::Status_detail);
 bool operator==(const Gear_grabber::Input,const Gear_grabber::Input);
 bool operator!=(const Gear_grabber::Input,const Gear_grabber::Input);
 bool operator<(const Gear_grabber::Input,const Gear_grabber::Input);
+
+bool operator<(Gear_grabber::Status_detail const&,Gear_grabber::Status_detail const&);
+bool operator==(Gear_grabber::Status_detail const&,Gear_grabber::Status_detail const&);
+bool operator!=(Gear_grabber::Status_detail const&,Gear_grabber::Status_detail const&);
 
 bool operator==(const Gear_grabber::Estimator,const Gear_grabber::Estimator);
 bool operator!=(const Gear_grabber::Estimator,const Gear_grabber::Estimator);

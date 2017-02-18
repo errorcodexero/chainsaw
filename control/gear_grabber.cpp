@@ -8,7 +8,7 @@ using namespace std;
 Gear_grabber::Input::Input():has_gear(false),enabled(false){}
 Gear_grabber::Input::Input(bool a,bool b):has_gear(a),enabled(b){}
 
-Gear_grabber::Estimator::Estimator():last(Gear_grabber::Status_detail::OPEN){
+Gear_grabber::Estimator::Estimator():last(){
 	const Time OPEN_TIME = .2, CLOSE_TIME = .2;
 	open_timer.set(OPEN_TIME);
 	close_timer.set(CLOSE_TIME);
@@ -53,7 +53,7 @@ ostream& operator<<(ostream& o,const Gear_grabber::Goal a){
 }
 
 ostream& operator<<(ostream& o,const Gear_grabber::Status_detail a){
-	#define X(STATUS) if(a==Gear_grabber::Status_detail::STATUS) return o<<""#STATUS;
+	#define X(STATUS) if(a.state==Gear_grabber::Status_detail::State::STATUS) return o<<"Status_detail(state:"#STATUS<<" has_gear:"<<a.has_gear<<")";
 	X(OPEN)
 	X(OPENING)
 	X(CLOSING)
@@ -61,6 +61,23 @@ ostream& operator<<(ostream& o,const Gear_grabber::Status_detail a){
 	#undef X
 	assert(0);
 }
+
+bool operator==(Gear_grabber::Status_detail const& a,Gear_grabber::Status_detail const& b){
+	return a.state == b.state && a.has_gear == b.has_gear;
+}
+
+bool operator!=(Gear_grabber::Status_detail const& a,Gear_grabber::Status_detail const& b){
+	return !(a==b);
+}
+
+bool operator<(Gear_grabber::Status_detail const& a,Gear_grabber::Status_detail const& b){
+	if(a.state < b.state) return true;
+	if(a.state > b.state) return false;
+	return !a.has_gear && b.has_gear;
+}
+
+Gear_grabber::Status_detail::Status_detail():state(Gear_grabber::Status_detail::State::OPEN),has_gear(false){}
+Gear_grabber::Status_detail::Status_detail(Gear_grabber::Status_detail::State s,bool g):state(s),has_gear(g){}
 
 set<Gear_grabber::Input> examples(Gear_grabber::Input*){
 	return {
@@ -76,11 +93,22 @@ set<Gear_grabber::Goal> examples(Gear_grabber::Goal*){
 }
 
 set<Gear_grabber::Status_detail> examples(Gear_grabber::Status_detail*){
-	return {Gear_grabber::Status_detail::OPEN,Gear_grabber::Status_detail::OPENING,Gear_grabber::Status_detail::CLOSING,Gear_grabber::Status_detail::CLOSED};
+	set<Gear_grabber::Status_detail::State> states = {
+		Gear_grabber::Status_detail::State::OPEN,
+		Gear_grabber::Status_detail::State::OPENING,
+		Gear_grabber::Status_detail::State::CLOSING,
+		Gear_grabber::Status_detail::State::CLOSED
+	};
+	set<Gear_grabber::Status_detail> statuses;
+	for(Gear_grabber::Status_detail::State a: states){
+		statuses.insert({a,true});
+		statuses.insert({a,false});
+	}
+	return statuses;
 }
 
-ostream& operator<<(ostream& o,Gear_grabber){
-	return o<<"Gear_grabber()";
+ostream& operator<<(ostream& o,Gear_grabber a){
+	return o<<"Gear_grabber("<<a.estimator.get()<<")";
 }
 
 Gear_grabber::Status_detail Gear_grabber::Estimator::get()const{
@@ -90,33 +118,33 @@ Gear_grabber::Status_detail Gear_grabber::Estimator::get()const{
 void Gear_grabber::Estimator::update(Time time,Input input,Output output){
 	switch(output){
 		case Gear_grabber::Output::OPEN:
-			if(last == Gear_grabber::Status_detail::OPENING){
+			if(last.state == Gear_grabber::Status_detail::State::OPENING){
 				open_timer.update(time,input.enabled);
-			} else if(last != Gear_grabber::Status_detail::OPEN){
+			} else if(last.state != Gear_grabber::Status_detail::State::OPEN){
 				const Time OPEN_TIME = .2;//seconds .tested 
 				open_timer.set(OPEN_TIME);
-				last = Status_detail::OPENING;
+				last.state = Status_detail::State::OPENING;
 			}
 			if(open_timer.done()){
-				 last = Gear_grabber::Status_detail::OPEN;
+				 last.state = Gear_grabber::Status_detail::State::OPEN;
 			}
 			break;
 		case Gear_grabber::Output::CLOSE:
-			if(last == Gear_grabber::Status_detail::CLOSING){
+			if(last.state == Gear_grabber::Status_detail::State::CLOSING){
 				close_timer.update(time,input.enabled);
-			} else if(last != Gear_grabber::Status_detail::CLOSED){
+			} else if(last.state != Gear_grabber::Status_detail::State::CLOSED){
 				const Time CLOSE_TIME = .2;//seconds tested
 				close_timer.set(CLOSE_TIME);
-				last = Status_detail::CLOSING;
+				last.state = Status_detail::State::CLOSING;
 			}
 			if(close_timer.done()){
-				last = Gear_grabber::Status_detail::CLOSED;
+				last.state = Gear_grabber::Status_detail::State::CLOSED;
 			}
 			break;
 		default:
 			assert(0);
 	}
-	
+	last.has_gear = input.has_gear;
 }
 
 Gear_grabber::Output control(Gear_grabber::Status /*status*/, Gear_grabber::Goal goal){
@@ -149,9 +177,9 @@ Gear_grabber::Status status(Gear_grabber::Status_detail status_detail){
 bool ready(Gear_grabber::Status status,Gear_grabber::Goal goal){
 	switch(goal){
 		case Gear_grabber::Goal::OPEN:
-			return status == Gear_grabber::Status::OPEN;
+			return status.state == Gear_grabber::Status::State::OPEN;
 		case Gear_grabber::Goal::CLOSE:
-			return status == Gear_grabber::Status::CLOSED;
+			return status.state == Gear_grabber::Status::State::CLOSED;
 		default:
 			assert(0);
 	}
@@ -171,9 +199,9 @@ int main(){
 		Gear_grabber g;
 		Gear_grabber::Goal goal = Gear_grabber::Goal::CLOSE;
 		const bool ENABLED = true;
-		const Time CLOSE_TIME = 5;//seconds - the amount of time before the simulated hall effect reads that it has a gear
+		bool has_gear = false;
 		for(Time t: range(1000)){
-			bool has_gear = t >= CLOSE_TIME;
+			has_gear = t >= 2;
 			Gear_grabber::Status_detail status = g.estimator.get();
 			Gear_grabber::Output out = control(status,goal);
 			
@@ -189,7 +217,6 @@ int main(){
 		goal = Gear_grabber::Goal::OPEN;
 
 		for(Time t: range(1000)){
-			bool has_gear = g.estimator.get() == Gear_grabber::Status_detail::CLOSED;
 			Gear_grabber::Status_detail status = g.estimator.get();
 			Gear_grabber::Output out = control(status,goal);
 			
