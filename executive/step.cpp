@@ -68,22 +68,28 @@ Step_impl::~Step_impl(){}
 	return this->operator==(b);
 }*/
 
-Drive_straight::Drive_straight(Inch in):target_dist(in){}
+Drive_straight::Drive_straight(Inch goal):target_dist(goal),initial_distances(Drivebase::Distances{0,0}),init(false),motion_profile(goal,0.2){}
 
-bool Drive_straight::done(Next_mode_info){
-	return 0;
+bool Drive_straight::done(Next_mode_info info){
+	static const Inch TOLERANCE = 3.0;//inches
+	Drivebase::Distances differences = initial_distances - info.status.drive.distances;
+	return differences < Drivebase::Distances{TOLERANCE,TOLERANCE};
 }
 
-Toplevel::Goal Drive_straight::run(Run_info){
-	nyi
+Toplevel::Goal Drive_straight::run(Run_info info){
+	if(!init) initial_distances = info.status.drive.distances;
+	Toplevel::Goal goals;
+	goals.drive.left = motion_profile.target_speed(info.status.drive.distances.l);
+	goals.drive.right = motion_profile.target_speed(info.status.drive.distances.r);
+	return goals;
 }
 
 unique_ptr<Step_impl> Drive_straight::clone()const{
 	return unique_ptr<Step_impl>(new Drive_straight(*this));
 }
 
-bool Drive_straight::operator==(Drive_straight const&)const{
-	nyi
+bool Drive_straight::operator==(Drive_straight const& b)const{
+	return target_dist == b.target_dist && initial_distances == b.initial_distances && init == b.init && motion_profile == b.motion_profile;
 }
 
 Step_impl const& Step::get()const{

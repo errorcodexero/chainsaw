@@ -72,8 +72,8 @@ Robot_inputs Drivebase::Input_reader::operator()(Robot_inputs all,Input in)const
 	};
 	encoder(L_ENCODER_PORTS,in.left);
 	encoder(R_ENCODER_PORTS,in.right);
-	all.digital_io.encoder[L_ENCODER_LOC] = inches_to_ticks(in.distance.l);
-	all.digital_io.encoder[R_ENCODER_LOC] = -inches_to_ticks(in.distance.r);
+	all.digital_io.encoder[L_ENCODER_LOC] = inches_to_ticks(in.distances.l);
+	all.digital_io.encoder[R_ENCODER_LOC] = -inches_to_ticks(in.distances.r);
 	return all;
 }
 
@@ -257,9 +257,9 @@ void Drivebase::Estimator::update(Time now,Drivebase::Input in,Drivebase::Output
 	timer.update(now,true);
 	static const double POLL_TIME = .05;//seconds
 	if(timer.done()){
-		last.speeds.l = (last.distance.l-in.distance.l)/POLL_TIME;
-		last.speeds.r = (last.distance.r-in.distance.r)/POLL_TIME;
-		last.distance = in.distance;
+		last.speeds.l = (last.distances.l-in.distances.l)/POLL_TIME;
+		last.speeds.r = (last.distances.r-in.distances.r)/POLL_TIME;
+		last.distances = in.distances;
 		timer.set(POLL_TIME);
 	}
 	

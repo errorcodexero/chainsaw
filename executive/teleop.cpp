@@ -146,7 +146,7 @@ Toplevel::Goal Teleop::run(Run_info info) {
 		}
 	}();
 
-	if((goals.gear_collector.gear_lifter==Gear_lifter::Goal::UP && info.toplevel_status.gear_collector.gear_lifter!=Gear_lifter::Status_detail::UP) || (goals.gear_collector.gear_lifter==Gear_lifter::Goal::DOWN && info.toplevel_status.gear_collector.gear_lifter!=Gear_lifter::Status_detail::DOWN)) goals.gear_collector.gear_grabber=Gear_grabber::Goal::CLOSE;
+	if((goals.gear_collector.gear_lifter==Gear_lifter::Goal::UP && info.status.gear_collector.gear_lifter!=Gear_lifter::Status_detail::UP) || (goals.gear_collector.gear_lifter==Gear_lifter::Goal::DOWN && info.status.gear_collector.gear_lifter!=Gear_lifter::Status_detail::DOWN)) goals.gear_collector.gear_grabber=Gear_grabber::Goal::CLOSE;
 
 	if(info.panel.gear_grasper==Panel::Gear_grasper::OPEN) goals.gear_collector.gear_grabber=Gear_grabber::Goal::OPEN;
 	if(info.panel.gear_grasper==Panel::Gear_grasper::CLOSED) goals.gear_collector.gear_grabber=Gear_grabber::Goal::CLOSE;
@@ -163,7 +163,7 @@ Toplevel::Goal Teleop::run(Run_info info) {
 			cout<<*it<<"\tarea: "<<(it->width * it->height)<<"\n";
 		}
 		cout<<"\n";
-		//cout<<"\n"<<info.toplevel_status.gear_collector.gear_grabber<<"\n";
+		//cout<<"\n"<<info.status.gear_collector.gear_grabber<<"\n";
 	}
 	print_num++;
 	

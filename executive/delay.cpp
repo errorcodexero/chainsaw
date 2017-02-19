@@ -23,7 +23,7 @@ double deg_to_rad(double deg){
 auto Geardrop(){ return Drive_straight{0}; }
 
 Executive auto_mode_convert(Next_mode_info info){
-	cout << "panel in use " << info.panel.in_use <<" auto panel value " <<info.panel.auto_select<<  "\n";
+	cout<<"panel in use "<<info.panel.in_use<<" auto panel value "<<info.panel.auto_select<<"\n";
 
 	//for when just want to run across the field at the end of autonomous
 	Executive dash{Chain{
@@ -81,7 +81,7 @@ Executive auto_mode_convert(Next_mode_info info){
 				return auto_null;
 		}
 	}
-	return auto_baseline;
+	return auto_baseline;//default executive is no panel exists. Noramlly Teleop
 }
 
 Mode Delay::next_mode(Next_mode_info info){

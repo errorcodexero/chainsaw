@@ -22,6 +22,10 @@ void Motion_profile::set_goal(double g){
 Motion_profile::Motion_profile():goal(0),vel_modifier(.02){}
 Motion_profile::Motion_profile(double g, double m):goal(g),vel_modifier(m){}
 
+bool operator==(Motion_profile const& a,Motion_profile const& b){
+	return a.goal == b.goal && a.vel_modifier == b.vel_modifier;
+}
+
 ostream& operator<<(ostream& o,Motion_profile const& a){
 	o<<"Motion_profile(";
 	o<<"goal:"<<a.goal;

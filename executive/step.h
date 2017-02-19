@@ -2,6 +2,7 @@
 #define STEP_H
 
 #include "executive.h"
+#include "../util/motion_profile.h"
 
 struct Step_impl;
 
@@ -62,6 +63,9 @@ using Inch=double;
 
 class Drive_straight:public Step_impl_inner<Drive_straight>{
 	Inch target_dist;
+	Drivebase::Distances initial_distances;
+	bool init;
+	Motion_profile motion_profile;
 
 	public:
 	explicit Drive_straight(Inch);
@@ -73,7 +77,7 @@ class Drive_straight:public Step_impl_inner<Drive_straight>{
 };
 
 struct Turn:Step_impl_inner<Turn>{
-	double radians;//clockwise=positive
+	Rad radians;//clockwise=positive
 
 	explicit Turn(double);
 	Toplevel::Goal run(Run_info);

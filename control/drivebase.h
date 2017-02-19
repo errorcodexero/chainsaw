@@ -27,7 +27,7 @@ struct Drivebase{
 		X(SINGLE_ARG(std::array<double,MOTORS>),current) \
 		X(Encoder_info,left) \
 		X(Encoder_info,right) \
-		X(Distances,distance)
+		X(Distances,distances)
 	DECLARE_STRUCT(Input,DRIVEBASE_INPUT)
 
 	struct Input_reader{
@@ -50,7 +50,7 @@ struct Drivebase{
 		X(SINGLE_ARG(std::array<Motor_check::Status,MOTORS>),motor)\
 		X(bool,stall) \
 		X(Speeds,speeds)\
-		X(Distances,distance)
+		X(Distances,distances)
 	DECLARE_STRUCT(Status,DRIVEBASE_STATUS)
 
 	typedef Status Status_detail;

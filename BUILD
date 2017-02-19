@@ -881,14 +881,14 @@ cc_library(
 	name="step",
 	srcs=["executive/step.cpp"],
 	hdrs=["executive/step.h"],
-	deps=[":executive"]
+	deps=[":executive",":motion_profile"]
 )
 
 cc_test(
 	name="step_test",
 	srcs=["executive/step.cpp","executive/step.h"],
 	copts=["-DSTEP_TEST"],
-	deps=[":executive_impl"],
+	deps=[":executive_impl",":motion_profile"],
 	timeout="short"
 )
 
