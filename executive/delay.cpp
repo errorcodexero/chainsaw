@@ -31,6 +31,11 @@ Executive auto_mode_convert(Next_mode_info info){
 		Executive{Teleop{}}
 	}};
 
+	Executive backoff{Chain{
+		Step{Drive_straight{-12}},
+		Executive{Teleop{}}
+	}};
+
 	Executive auto_null{Teleop{}};
 
 	Executive auto_baseline{Chain{
@@ -43,10 +48,8 @@ Executive auto_mode_convert(Next_mode_info info){
 			case 0: //Do Nothing
 				return auto_null;
 			case 1: //Baseline
-				//just go across the baseline
 				return auto_baseline;
 			case 2: //Baseline Extended
-				//go across the baseline, then do another striaght drive.
 				return Executive{Chain{
 					Step{Drive_straight{12*12}},
 					dash
@@ -60,15 +63,11 @@ Executive auto_mode_convert(Next_mode_info info){
 							Step{Drive_straight{12}}, //approach
 							Executive{Chain{
 								Step{Geardrop()},
-								Executive{Chain{
-									Step{Drive_straight{-12}},	
-									Executive{Teleop{}}
-								}}
+								backoff
 							}}
 						}}
 					}}
 				}};
-			//	return Executive{Auto_gearboiler_topeg()};
 			case 4: //Gear Boiler Extended
 				return Executive{Chain{
 					Step{Drive_straight{5*12}},
@@ -82,10 +81,7 @@ Executive auto_mode_convert(Next_mode_info info){
 									Step{Drive_straight{-12}},
 									Executive{Chain{
 										Step{Turn{deg_to_rad(-40)}},
-										Executive{Chain{
-											Step{Drive_straight{4*12}},
-											Executive{Teleop{}}
-										}}
+										dash
 									}}
 								}}
 							}}
@@ -101,10 +97,7 @@ Executive auto_mode_convert(Next_mode_info info){
 							Step{Drive_straight{12}}, //approach
 							Executive{Chain{
 								Step{Geardrop()},
-								Executive{Chain{
-									Step{Drive_straight{-12}},
-									Executive{Teleop{}}
-								}}
+								backoff
 							}}
 						}}
 					}}
@@ -122,10 +115,7 @@ Executive auto_mode_convert(Next_mode_info info){
 									Step{Drive_straight{-12}},
 									Executive{Chain{
 										Step{Turn{deg_to_rad(40)}},
-										Executive{Chain{
-											Step{Drive_straight{4*12}},
-											Executive{Teleop{}}
-										}}
+										dash
 									}}
 								}}
 							}}
@@ -137,10 +127,7 @@ Executive auto_mode_convert(Next_mode_info info){
 					Step{Drive_straight{10*12}},
 					Executive{Chain{
 						Step{Geardrop()},
-						Executive{Chain{
-							Step{Drive_straight{-12}},
-							Executive{Teleop{}}
-						}}
+						backoff
 					}}
 				}};
 			case 8: //Gear mid Extended right
@@ -156,10 +143,7 @@ Executive auto_mode_convert(Next_mode_info info){
 									Step{Drive_straight{3*12}},
 									Executive{Chain{
 										Step{Turn{deg_to_rad(45)}},
-										Executive{Chain{
-											Step{Drive_straight{4*12}},
-											Executive{Teleop{}}
-										}}
+										dash
 									}}
 								}}
 							}}
@@ -179,10 +163,7 @@ Executive auto_mode_convert(Next_mode_info info){
 									Step{Drive_straight{3*12}},
 									Executive{Chain{
 										Step{Turn{deg_to_rad(-45)}},
-										Executive{Chain{
-											Step{Drive_straight{4*12}},
-											Executive{Teleop{}}
-										}}
+										dash
 									}}
 								}}
 							}}
@@ -198,15 +179,11 @@ Executive auto_mode_convert(Next_mode_info info){
 							Step{Drive_straight{12}}, //approach
 							Executive{Chain{
 								Step{Geardrop()},
-								Executive{Chain{
-									Step{Drive_straight{-12}},
-									Executive{Teleop{}}
-								}}
+								backoff
 							}}
 						}}
 					}}
 				}};
-				//return Executive{Auto_gearmid_topeg({0,0})};
 			default:
 				return auto_null;
 		}
