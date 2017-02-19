@@ -36,7 +36,7 @@ ostream& operator<<(ostream& o,Motion_profile const& a){
 int main(){
 	{
 		const double TARGET = 100*12;//inches
-		Motion_profile mp(TARGET, .01);	
+		Motion_profile mp(TARGET, .01,1.0);	
 		
 		cout<<"\nSpeed List:\n";
 		for(int i=0;i<=TARGET;i+=10){//i is distance in inches
@@ -49,7 +49,7 @@ int main(){
 		
 		const double TARGET = 20*12; //inches
 		const double MAX_SPEED = 10*12; //inches per second, the maxium speed of the robot that will be slowed down by motion profiling
-		Motion_profile mp(TARGET, .01);
+		Motion_profile mp(TARGET, .01,1.0);
 	
 		const float INCREMENT=.5;//seconds
 		

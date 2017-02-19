@@ -87,6 +87,7 @@ std::ostream& operator<<(std::ostream&,Drivebase::Encoder_ticks const&);
 bool operator==(Drivebase::Distances const&,Drivebase::Distances const&);
 bool operator!=(Drivebase::Distances const&,Drivebase::Distances const&);
 bool operator<(Drivebase::Distances const&,Drivebase::Distances const&);
+std::ostream& operator<<(std::ostream&,Drivebase::Distances const&);
 Drivebase::Distances operator+(Drivebase::Distances const&,Drivebase::Distances const&);
 Drivebase::Distances operator-(Drivebase::Distances const&);
 Drivebase::Distances operator-(Drivebase::Distances const&,Drivebase::Distances const&);
