@@ -99,7 +99,6 @@ bool Drive_straight::done(Next_mode_info info){
 	Drivebase::Distances differences = fabs(Drivebase::Distances{target_dist,target_dist} - distance_travelled);
 	cout<<"\nCURR:"<<distance_travelled<<" DIFF: "<<differences<<"\n";
 	bool d = mean(differences.l,differences.r) < TOLERANCE;
-	if(d) exit(1);
 	return d;
 }
 

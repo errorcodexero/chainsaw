@@ -23,6 +23,7 @@ double deg_to_rad(double deg){
 auto Geardrop(){ return Drive_straight{0}; }
 
 Executive auto_mode_convert(Next_mode_info info){
+	if(!info.autonomous) return Executive{Teleop()};
 	cout<<"panel in use "<<info.panel.in_use<<" auto panel value "<<info.panel.auto_select<<"\n";
 
 	//for when just want to run across the field at the end of autonomous
@@ -39,7 +40,7 @@ Executive auto_mode_convert(Next_mode_info info){
 	Executive auto_null{Teleop{}};
 
 	Executive auto_baseline{Chain{
-		Step{Drive_straight{8*12}},//TODO change to 12*12
+		Step{Drive_straight{4*12}},//TODO change to 12*12
 		Executive{Teleop{}}
 	}};
 

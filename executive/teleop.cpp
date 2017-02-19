@@ -53,13 +53,13 @@ Executive Teleop::next_mode(Next_mode_info info) {
 			return Executive{Delay()};
 		}
 	}
-	Teleop t(CONSTRUCT_STRUCT_PARAMS(TELEOP_ITEMS));
-	return Executive{t};
+	//Teleop t(CONSTRUCT_STRUCT_PARAMS(TELEOP_ITEMS));
+	return Executive{*this};
 }
 
 IMPL_STRUCT(Teleop::Teleop,TELEOP_ITEMS)
 
-Teleop::Teleop():gear_collector_mode(Gear_collector_mode::PREP_COLLECT),gear_score_step(Gear_score_step::CLEAR_BALLS),print_num(0){}
+Teleop::Teleop():gear_collector_mode(Gear_collector_mode::PREP_COLLECT),gear_score_step(Gear_score_step::CLEAR_BALLS),print_number(0){}
 
 void Teleop::gear_score_protocol(Toplevel::Status_detail const& status,const bool enabled,const Time now,Toplevel::Goal& goals){
 	//TODO: set clear_ball_timer somewhere
@@ -157,7 +157,7 @@ Toplevel::Goal Teleop::run(Run_info info) {
 		goals.climber = Climber::Goal::CLIMB;
 	}
 
-	if(info.in.ds_info.connected && print_num%10==0){
+	if(info.in.ds_info.connected && (print_number%10)==0){
 		cout<<"size: "<<info.in.camera.blocks.size()<<" blocks:\n";
 		for (vector<Pixy::Block>::const_iterator it=info.in.camera.blocks.begin();it!=info.in.camera.blocks.end();it++){
 			cout<<*it<<"\tarea: "<<(it->width * it->height)<<"\n";
@@ -165,7 +165,7 @@ Toplevel::Goal Teleop::run(Run_info info) {
 		cout<<"\n";
 		//cout<<"\n"<<info.status.gear_collector.gear_grabber<<"\n";
 	}
-	print_num++;
+	print_number++;
 	
 	return goals;
 }
