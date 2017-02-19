@@ -21,4 +21,24 @@ struct Ball_lifter{
 };
 
 
+std::ostream& operator<<(std::ostream&,Ball_lifter::Goal);
+std::ostream& operator<<(std::ostream&,Ball_lifter);
+
+bool operator<(Ball_lifter::Status_detail,Ball_lifter::Status_detail);
+bool operator==(Ball_lifter::Status_detail,Ball_lifter::Status_detail);
+bool operator!=(Ball_lifter::Status_detail,Ball_lifter::Status_detail);
+
+bool operator==(Ball_lifter::Output_applicator,Ball_lifter::Output_applicator);
+
+bool operator==(Ball_lifter,Ball_lifter);
+bool operator!=(Ball_lifter,Ball_lifter);
+
+std::set<Ball_lifter::Goal> examples(Ball_lifter::Goal*);
+std::set<Ball_lifter::Status_detail> examples(Ball_lifter::Status_detail*);
+
+Ball_lifter::Output control(Ball_lifter::Status_detail, Ball_lifter::Goal);
+Ball_lifter::Status status(Ball_lifter::Status_detail);
+bool ready(Ball_lifter::Status, Ball_lifter::Goal);
+
+
 #endif

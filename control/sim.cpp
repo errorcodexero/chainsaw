@@ -39,6 +39,7 @@ using Climber_sim=Nop_sim<Climber::Input>;
 using Intake_sim=Nop_sim<Intake::Input>;
 using Gear_shifter_sim=Nop_sim<Gear_shifter::Input>;
 using Arm_sim=Nop_sim<Arm::Input>;
+using Ball_lifter_sim=Nop_sim<Ball_lifter::Input>;
 using Gear_grabber_sim=Nop_sim<Gear_grabber::Input>;
 using Gear_lifter_sim=Nop_sim<Gear_lifter::Input>;
 using Shooter_feed_sim = Nop_sim<Shooter_feed::Input>;
