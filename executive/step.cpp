@@ -20,17 +20,33 @@ ostream& operator<<(ostream& o,Step const& a){
 
 //This part stays in the CPP file.
 
-Turn::Turn(double)nyi
+Turn::Turn(double a):target_angle(a),initial_distances({0,0}),init(false){}
 
-Toplevel::Goal Turn::run(Run_info)nyi
-
-bool Turn::done(Next_mode_info)nyi
-
-std::unique_ptr<Step_impl> Turn::clone()const{
-	nyi
+Toplevel::Goal Turn::run(Run_info info){
+	if(!init) initial_distances = info.status.drive.distances;
+	Toplevel::Goal goals;
+	static const Inch WIDTH_OF_ROBOT = 36;//inches
+	double side_distance_goal = PI*WIDTH_OF_ROBOT;//inches
+	static const double VEL_MODIFIER = .2;
+	Motion_profile mp_left = {-side_distance_goal,VEL_MODIFIER}, mp_right = {side_distance_goal,VEL_MODIFIER};
+	goals.drive.left = mp_left.target_speed(info.status.drive.distances.l);
+	goals.drive.right = mp_right.target_speed(info.status.drive.distances.r);
+	return goals;
 }
 
-bool Turn::operator==(Turn const&)const nyi
+bool Turn::done(Next_mode_info info){
+	Drivebase::Distances differences = info.status.drive.distances - initial_distances;
+	static const Inch TOLERANCE = 3.0;//inches
+	return differences < Drivebase::Distances{TOLERANCE,TOLERANCE};
+}
+
+std::unique_ptr<Step_impl> Turn::clone()const{
+	return unique_ptr<Step_impl>(new Turn(*this));
+}
+
+bool Turn::operator==(Turn const& b)const{
+	return target_angle == b.target_angle;
+}
 
 //Step::Step(Step_impl const& a):impl(a.clone().get()){}
 Step::Step(Step_impl const& a){

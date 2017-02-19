@@ -77,7 +77,9 @@ class Drive_straight:public Step_impl_inner<Drive_straight>{
 };
 
 struct Turn:Step_impl_inner<Turn>{
-	Rad radians;//clockwise=positive
+	Rad target_angle;//radians,clockwise=positive
+	Drivebase::Distances initial_distances;
+	bool init;
 
 	explicit Turn(double);
 	Toplevel::Goal run(Run_info);
