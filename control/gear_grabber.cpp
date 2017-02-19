@@ -2,7 +2,7 @@
 
 using namespace std;
 
-#define GEAR_LIGHT_OUT 4 //TODO: get real value
+#define GEAR_LIGHT_OUT 1
 #define HALL_EFFECT_LOC 4 //TODO: get real value
 #define PISTON_LOC 1
 
@@ -196,13 +196,13 @@ Gear_grabber::Output Gear_grabber::Output_applicator::operator()(Robot_outputs r
 }
 
 Robot_inputs Gear_grabber::Input_reader::operator()(Robot_inputs r,Input in)const{
-	r.digital_io.in[HALL_EFFECT_LOC] = in.has_gear ? Digital_in::_1 : Digital_in::_0;
+	r.digital_io.in[HALL_EFFECT_LOC] = in.has_gear ? Digital_in::_0 : Digital_in::_1;
 	r.robot_mode.enabled = in.enabled;
 	return r;
 }
 
 Gear_grabber::Input Gear_grabber::Input_reader::operator()(Robot_inputs r)const{
-	return {(r.digital_io.in[HALL_EFFECT_LOC] == Digital_in::_1),r.robot_mode.enabled};
+	return {(r.digital_io.in[HALL_EFFECT_LOC] == Digital_in::_0),r.robot_mode.enabled};
 }
 
 Gear_grabber::Status status(Gear_grabber::Status_detail status_detail){
