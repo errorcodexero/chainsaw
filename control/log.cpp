@@ -236,6 +236,11 @@ void visit(Func f,Nop::Status const& a){
 }
 
 template<typename Func>
+void visit(Func f,Drivebase::Distances const& a){
+	f.terminal(a);
+}
+
+template<typename Func>
 void visit(Func f,Drivebase::Encoder_ticks const& a){
 	f.terminal(a);
 }

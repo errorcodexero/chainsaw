@@ -448,14 +448,14 @@ cc_library(
         name="collector",
         srcs=["control/collector.cpp"],
         hdrs=["control/collector.h"],
-        deps=[":intake",":arm"]
+        deps=[":intake",":arm",":ball_lifter"]
 )
 
 cc_test(
         name="collector_test",
         srcs=["control/collector.cpp","control/collector.h","control/formal.h"],
         copts=["-DCOLLECTOR_TEST"],
-        deps=[":intake",":arm"],
+        deps=[":intake",":arm",":ball_lifter"],
         timeout="short"
 )
 
@@ -881,14 +881,14 @@ cc_library(
 	name="step",
 	srcs=["executive/step.cpp"],
 	hdrs=["executive/step.h"],
-	deps=[":executive"]
+	deps=[":executive",":motion_profile"]
 )
 
 cc_test(
 	name="step_test",
 	srcs=["executive/step.cpp","executive/step.h"],
 	copts=["-DSTEP_TEST"],
-	deps=[":executive_impl"],
+	deps=[":executive_impl",":motion_profile"],
 	timeout="short"
 )
 

@@ -63,7 +63,7 @@ Robot_outputs Main::operator()(const Robot_inputs in,ostream&){
 	log(in,toplevel_status,r);
 
 	if(in.ds_info.connected && (print_count % 10 == 0)){
-		cout<<"mode: "<<mode<<"\n";
+		cout<<"mode: "<<mode<<"\n\n";
 		cout<<"panel:"<<panel<<"\n";
 	}
 

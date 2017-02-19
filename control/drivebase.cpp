@@ -41,8 +41,17 @@ double ticks_to_inches(const int ticks){
 	return ticks*INCHES_PER_TICK*ERROR_CORRECTION;
 }
 
-double inches_to_ticks(const float inches){
-	return inches/(INCHES_PER_TICK*ERROR_CORRECTION);
+
+Drivebase::Distances ticks_to_inches(const Drivebase::Encoder_ticks ticks){
+	Drivebase::Distances d = {0.0,0.0};
+	#define X(TYPE,SIDE) d.SIDE = ticks_to_inches(ticks.SIDE);
+	DISTANCES_ITEMS(X)
+	#undef X
+	return d;
+}
+
+int inches_to_ticks(const double inches){
+	return (int)(inches/(INCHES_PER_TICK*ERROR_CORRECTION));
 }
 
 #define R_ENCODER_PORTS 0,1
@@ -63,8 +72,8 @@ Robot_inputs Drivebase::Input_reader::operator()(Robot_inputs all,Input in)const
 	};
 	encoder(L_ENCODER_PORTS,in.left);
 	encoder(R_ENCODER_PORTS,in.right);
-	all.digital_io.encoder[L_ENCODER_LOC] = inches_to_ticks(in.distance.first);
-	all.digital_io.encoder[R_ENCODER_LOC] = -inches_to_ticks(in.distance.second);
+	all.digital_io.encoder[L_ENCODER_LOC] = inches_to_ticks(in.distances.l);
+	all.digital_io.encoder[R_ENCODER_LOC] = -inches_to_ticks(in.distances.r);
 	return all;
 }
 
@@ -83,7 +92,7 @@ Drivebase::Input Drivebase::Input_reader::operator()(Robot_inputs const& in)cons
 		}(),
 		encoder_info(L_ENCODER_PORTS),
 		encoder_info(R_ENCODER_PORTS),
-		{encoderconv(in.digital_io.encoder[L_ENCODER_LOC]),-encoderconv(in.digital_io.encoder[R_ENCODER_LOC])}
+		{ticks_to_inches(encoderconv(in.digital_io.encoder[L_ENCODER_LOC])),-ticks_to_inches(encoderconv(in.digital_io.encoder[R_ENCODER_LOC]))}
 	};
 }
 
@@ -106,6 +115,20 @@ Drivebase::Encoder_ticks operator+(Drivebase::Encoder_ticks const& a,Drivebase::
 	return sum;
 }
 
+
+
+Drivebase::Distances operator+(Drivebase::Distances const& a,Drivebase::Distances const& b){
+	Drivebase::Distances sum = {
+		#define X(TYPE,SIDE) 0,
+		DISTANCES_ITEMS(X)
+		#undef X
+	};
+	#define X(TYPE,SIDE) sum.SIDE = a.SIDE + b.SIDE;
+	DISTANCES_ITEMS(X)
+	#undef X
+	return sum;
+}
+
 Drivebase::Encoder_ticks operator-(Drivebase::Encoder_ticks const& a){
 	Drivebase::Encoder_ticks opposite = {
 		#define X(TYPE,SIDE) -a.SIDE,
@@ -119,8 +142,60 @@ Drivebase::Encoder_ticks operator-(Drivebase::Encoder_ticks const& a,Drivebase::
 	return a + (-b);
 }
 
+bool operator==(Drivebase::Distances const& a,Drivebase::Distances const& b){
+	#define X(TYPE,SIDE) if(a.SIDE != b.SIDE) return false;
+	DISTANCES_ITEMS(X)
+	#undef X
+	return true;
+}
+
+bool operator!=(Drivebase::Distances const& a,Drivebase::Distances const& b){
+	return !(a==b);
+}
+
+ostream& operator<<(ostream& o,Drivebase::Distances const& a){
+	o<<"Distances(";
+	#define X(TYPE,SIDE) o<<""#SIDE<<":"<<a.SIDE<<" ";
+	DISTANCES_ITEMS(X)
+	#undef X
+	return o<<")";
+}
+
+bool operator<(Drivebase::Distances const& a,Drivebase::Distances const& b){
+	#define X(TYPE,SIDE) if(a.SIDE >= b.SIDE) return false;
+	DISTANCES_ITEMS(X)
+	#undef X
+	return true;
+}
+
+Drivebase::Distances fabs(Drivebase::Distances const& a){
+	Drivebase::Distances pos = {
+		#define X(TYPE,SIDE) fabs(a.SIDE),
+		DISTANCES_ITEMS(X)
+		#undef X
+	};
+	return pos;
+}
+
+
+Drivebase::Distances operator-(Drivebase::Distances const& a){
+	Drivebase::Distances opposite = {
+		#define X(TYPE,SIDE) -a.SIDE,
+		DISTANCES_ITEMS(X)
+		#undef X
+	};
+	return opposite;
+}
+
+
+Drivebase::Distances operator-(Drivebase::Distances const& a,Drivebase::Distances const& b){
+	return a + (-b);
+}
+
+
 IMPL_STRUCT(Drivebase::Encoder_ticks::Encoder_ticks,ENCODER_TICKS)
 IMPL_STRUCT(Drivebase::Speeds::Speeds,SPEEDS_ITEMS)
+IMPL_STRUCT(Drivebase::Distances::Distances,DISTANCES_ITEMS)
 
 IMPL_STRUCT(Drivebase::Status::Status,DRIVEBASE_STATUS)
 IMPL_STRUCT(Drivebase::Input::Input,DRIVEBASE_INPUT)
@@ -219,9 +294,9 @@ void Drivebase::Estimator::update(Time now,Drivebase::Input in,Drivebase::Output
 	timer.update(now,true);
 	static const double POLL_TIME = .05;//seconds
 	if(timer.done()){
-		last.speeds.l = (last.distance.first-in.distance.first)/POLL_TIME;
-		last.speeds.r = (last.distance.second-in.distance.second)/POLL_TIME;
-		last.distance = in.distance;
+		last.speeds.l = (last.distances.l-in.distances.l)/POLL_TIME;
+		last.speeds.r = (last.distances.r-in.distances.r)/POLL_TIME;
+		last.distances = in.distances;
 		timer.set(POLL_TIME);
 	}
 	

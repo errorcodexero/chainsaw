@@ -18,12 +18,16 @@ struct Drivebase{
 		X(int,r)
 	DECLARE_STRUCT(Encoder_ticks,ENCODER_TICKS)
 
+	#define DISTANCES_ITEMS(X) \
+		X(double,l) \
+		X(double,r)
+	DECLARE_STRUCT(Distances,DISTANCES_ITEMS)
 
 	#define DRIVEBASE_INPUT(X) \
 		X(SINGLE_ARG(std::array<double,MOTORS>),current) \
 		X(Encoder_info,left) \
 		X(Encoder_info,right) \
-		X(SINGLE_ARG(std::pair<double,double>),distance)
+		X(Distances,distances)
 	DECLARE_STRUCT(Input,DRIVEBASE_INPUT)
 
 	struct Input_reader{
@@ -46,7 +50,7 @@ struct Drivebase{
 		X(SINGLE_ARG(std::array<Motor_check::Status,MOTORS>),motor)\
 		X(bool,stall) \
 		X(Speeds,speeds)\
-		X(SINGLE_ARG(std::pair<double,double>),distance)
+		X(Distances,distances)
 	DECLARE_STRUCT(Status,DRIVEBASE_STATUS)
 
 	typedef Status Status_detail;
@@ -72,7 +76,6 @@ struct Drivebase{
 		double left,right;
 	};
 };
-
 bool operator==(Drivebase::Encoder_ticks const&,Drivebase::Encoder_ticks const&);
 bool operator!=(Drivebase::Encoder_ticks const&,Drivebase::Encoder_ticks const&);
 bool operator<(Drivebase::Encoder_ticks const&,Drivebase::Encoder_ticks const&);
@@ -81,9 +84,18 @@ Drivebase::Encoder_ticks operator-(Drivebase::Encoder_ticks const&);
 Drivebase::Encoder_ticks operator-(Drivebase::Encoder_ticks const&,Drivebase::Encoder_ticks const&);
 std::ostream& operator<<(std::ostream&,Drivebase::Encoder_ticks const&);
 
-double ticks_to_inches(const int);
+bool operator==(Drivebase::Distances const&,Drivebase::Distances const&);
+bool operator!=(Drivebase::Distances const&,Drivebase::Distances const&);
+bool operator<(Drivebase::Distances const&,Drivebase::Distances const&);
+Drivebase::Distances operator+(Drivebase::Distances const&,Drivebase::Distances const&);
+Drivebase::Distances operator-(Drivebase::Distances const&);
+Drivebase::Distances operator-(Drivebase::Distances const&,Drivebase::Distances const&);
+Drivebase::Distances fabs(Drivebase::Distances const&);
 
-double inches_to_ticks(const float);
+double ticks_to_inches(const int);
+int inches_to_ticks(const double);
+Drivebase::Distances ticks_to_inches(const Drivebase::Encoder_ticks);
+Drivebase::Encoder_ticks inches_to_ticks(const Drivebase::Distances);
 
 int encoderconv(Maybe_inline<Encoder_output>);
 

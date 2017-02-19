@@ -67,18 +67,18 @@ void Teleop::gear_score_protocol(Toplevel::Status_detail const& status,const boo
 		case Gear_score_step::CLEAR_BALLS:
 			clear_ball_timer.update(now,enabled);
 			goals.collector.intake = Intake::Goal::OUT;
-			//goals.collector.lift = Lift::Goal::UP;//TODO
+			goals.collector.ball_lifter = Ball_lifter::Goal::UP;
 			goals.collector.arm = Arm::Goal::OUT;
 			if(clear_ball_timer.done()) gear_score_step = Gear_score_step::RAISE_ARM;
 			break;	
 		case Gear_score_step::RAISE_ARM:
 			goals.collector.intake = Intake::Goal::OFF;
-			//goals.collector.lift = Lift::Goal::OFF;//TODO
+			goals.collector.ball_lifter = Ball_lifter::Goal::OFF;
 			goals.collector.arm = Arm::Goal::IN;
 			if(ready(status.collector.arm,goals.collector.arm)) gear_score_step = Gear_score_step::LIFT_GEAR;
 			break;
 		case Gear_score_step::LIFT_GEAR:
-			goals.collector = {Intake::Goal::OFF,Arm::Goal::IN/*Lift::Goal::OFF*/};//TODO
+			goals.collector = {Intake::Goal::OFF,Arm::Goal::IN,Ball_lifter::Goal::OFF};
 			goals.gear_collector = {Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::UP};
 			break;	
 		default:
@@ -146,7 +146,7 @@ Toplevel::Goal Teleop::run(Run_info info) {
 		}
 	}();
 
-	if((goals.gear_collector.gear_lifter==Gear_lifter::Goal::UP && info.toplevel_status.gear_collector.gear_lifter!=Gear_lifter::Status_detail::UP) || (goals.gear_collector.gear_lifter==Gear_lifter::Goal::DOWN && info.toplevel_status.gear_collector.gear_lifter!=Gear_lifter::Status_detail::DOWN)) goals.gear_collector.gear_grabber=Gear_grabber::Goal::CLOSE;
+	if((goals.gear_collector.gear_lifter==Gear_lifter::Goal::UP && info.status.gear_collector.gear_lifter!=Gear_lifter::Status_detail::UP) || (goals.gear_collector.gear_lifter==Gear_lifter::Goal::DOWN && info.status.gear_collector.gear_lifter!=Gear_lifter::Status_detail::DOWN)) goals.gear_collector.gear_grabber=Gear_grabber::Goal::CLOSE;
 
 	if(info.panel.gear_grasper==Panel::Gear_grasper::OPEN) goals.gear_collector.gear_grabber=Gear_grabber::Goal::OPEN;
 	if(info.panel.gear_grasper==Panel::Gear_grasper::CLOSED) goals.gear_collector.gear_grabber=Gear_grabber::Goal::CLOSE;
@@ -163,7 +163,7 @@ Toplevel::Goal Teleop::run(Run_info info) {
 			cout<<*it<<"\tarea: "<<(it->width * it->height)<<"\n";
 		}
 		cout<<"\n";
-		//cout<<"\n"<<info.toplevel_status.gear_collector.gear_grabber<<"\n";
+		//cout<<"\n"<<info.status.gear_collector.gear_grabber<<"\n";
 	}
 	print_num++;
 	

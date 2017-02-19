@@ -8,24 +8,26 @@
 using namespace std;
 
 double Motion_profile::target_speed(const double current){
-	float error = goal-current;
-	float motorv = .2; //error*vel_modifier;//TODO: use vel_modifier
-	const float max=.2;//TODO: change to 1.0
-	//clamp(motorv,-max,max); //TODO fix so that it will return proper values.
-	return clamp((error/12)*motorv,-max,max);
+	double error = goal-current;
+	return clamp((error*vel_modifier),-max,max);
 }
 
 void Motion_profile::set_goal(double g){
 	goal=g;
 }
 
-Motion_profile::Motion_profile():goal(0),vel_modifier(.02){}
-Motion_profile::Motion_profile(double g, double m):goal(g),vel_modifier(m){}
+Motion_profile::Motion_profile():goal(0),vel_modifier(.02),max(1.0){}
+Motion_profile::Motion_profile(double g, double v,double m):goal(g),vel_modifier(v),max(m){}
+
+bool operator==(Motion_profile const& a,Motion_profile const& b){
+	return a.goal == b.goal && a.vel_modifier == b.vel_modifier && a.max == b.max;
+}
 
 ostream& operator<<(ostream& o,Motion_profile const& a){
 	o<<"Motion_profile(";
 	o<<"goal:"<<a.goal;
 	o<<" velocity modifier:"<<a.vel_modifier;
+	o<<" max:"<<a.max;
 	return o<<")";
 }
 

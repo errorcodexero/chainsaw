@@ -3,9 +3,10 @@
 
 #include "intake.h"
 #include "arm.h"
+#include "ball_lifter.h"
 
 struct Collector{
-	#define COLLECTOR_ITEMS(X) X(Intake,intake) X(Arm,arm)
+	#define COLLECTOR_ITEMS(X) X(Intake,intake) X(Arm,arm) X(Ball_lifter,ball_lifter)
 
 	struct Input{
 		#define X(A,B) A::Input B;
@@ -24,7 +25,7 @@ struct Collector{
 		COLLECTOR_ITEMS(X)
 		#undef X
 		Goal();
-		Goal(Intake::Goal,Arm::Goal);
+		Goal(Intake::Goal,Arm::Goal,Ball_lifter::Goal);
 	};
 
 	struct Input_reader{
