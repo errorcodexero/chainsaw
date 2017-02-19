@@ -20,15 +20,22 @@ ostream& operator<<(ostream& o,Step const& a){
 
 //This part stays in the CPP file.
 
+Toplevel::Goal Step::run(Run_info info){
+	return impl->run(info);
+}
+
 Turn::Turn(double a):target_angle(a),initial_distances({0,0}),init(false){}
 
 Toplevel::Goal Turn::run(Run_info info){
-	if(!init) initial_distances = info.status.drive.distances;
+	if(!init){
+		initial_distances = info.status.drive.distances;
+		init = true;
+	}
 	Toplevel::Goal goals;
 	static const Inch WIDTH_OF_ROBOT = 36;//inches
 	double side_distance_goal = PI*WIDTH_OF_ROBOT;//inches
 	static const double VEL_MODIFIER = .2;
-	Motion_profile mp_left = {-side_distance_goal,VEL_MODIFIER}, mp_right = {side_distance_goal,VEL_MODIFIER};
+	Motion_profile mp_left = {-side_distance_goal,VEL_MODIFIER,0.2}, mp_right = {side_distance_goal,VEL_MODIFIER,0.2};
 	goals.drive.left = mp_left.target_speed(info.status.drive.distances.l);
 	goals.drive.right = mp_right.target_speed(info.status.drive.distances.r);
 	return goals;
@@ -84,19 +91,30 @@ Step_impl::~Step_impl(){}
 	return this->operator==(b);
 }*/
 
-Drive_straight::Drive_straight(Inch goal):target_dist(goal),initial_distances(Drivebase::Distances{0,0}),init(false),motion_profile(goal,0.2){}
+Drive_straight::Drive_straight(Inch goal):target_dist(goal),initial_distances(Drivebase::Distances{0,0}),init(false),motion_profile(goal,0.2,.5){}
 
 bool Drive_straight::done(Next_mode_info info){
 	static const Inch TOLERANCE = 3.0;//inches
-	Drivebase::Distances differences = initial_distances - info.status.drive.distances;
-	return differences < Drivebase::Distances{TOLERANCE,TOLERANCE};
+	Drivebase::Distances distance_travelled = info.status.drive.distances - initial_distances;
+	Drivebase::Distances differences = fabs(Drivebase::Distances{target_dist,target_dist} - distance_travelled);
+	cout<<"\nCURR:"<<distance_travelled<<" DIFF: "<<differences<<"\n";
+	bool d = mean(differences.l,differences.r) < TOLERANCE;
+	if(d) exit(1);
+	return d;
 }
 
 Toplevel::Goal Drive_straight::run(Run_info info){
-	if(!init) initial_distances = info.status.drive.distances;
+	cout<<"\nRUNNING\n";
+	if(!init){
+		initial_distances = info.status.drive.distances;
+		init = true;
+	}
 	Toplevel::Goal goals;
-	goals.drive.left = motion_profile.target_speed(info.status.drive.distances.l);
-	goals.drive.right = motion_profile.target_speed(info.status.drive.distances.r);
+	
+	double power = mean(motion_profile.target_speed(info.status.drive.distances.l), goals.drive.right = motion_profile.target_speed(info.status.drive.distances.r));
+	goals.drive.left = power;
+	goals.drive.right = power;
+	goals.shifter = Gear_shifter::Goal::LOW;
 	return goals;
 }
 

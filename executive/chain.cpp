@@ -9,8 +9,8 @@ Chain::Chain(Step a,Executive next1):step(a),next(next1){}
 	if(a.next)nyi
 }*/
 
-Toplevel::Goal Chain::run(Run_info){
-	return Toplevel::Goal{};
+Toplevel::Goal Chain::run(Run_info info){
+	return step.run(info);
 }
 
 Executive Chain::next_mode(Next_mode_info a){

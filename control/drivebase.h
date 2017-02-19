@@ -76,7 +76,6 @@ struct Drivebase{
 		double left,right;
 	};
 };
-
 bool operator==(Drivebase::Encoder_ticks const&,Drivebase::Encoder_ticks const&);
 bool operator!=(Drivebase::Encoder_ticks const&,Drivebase::Encoder_ticks const&);
 bool operator<(Drivebase::Encoder_ticks const&,Drivebase::Encoder_ticks const&);
@@ -85,9 +84,13 @@ Drivebase::Encoder_ticks operator-(Drivebase::Encoder_ticks const&);
 Drivebase::Encoder_ticks operator-(Drivebase::Encoder_ticks const&,Drivebase::Encoder_ticks const&);
 std::ostream& operator<<(std::ostream&,Drivebase::Encoder_ticks const&);
 
+bool operator==(Drivebase::Distances const&,Drivebase::Distances const&);
+bool operator!=(Drivebase::Distances const&,Drivebase::Distances const&);
+bool operator<(Drivebase::Distances const&,Drivebase::Distances const&);
 Drivebase::Distances operator+(Drivebase::Distances const&,Drivebase::Distances const&);
 Drivebase::Distances operator-(Drivebase::Distances const&);
 Drivebase::Distances operator-(Drivebase::Distances const&,Drivebase::Distances const&);
+Drivebase::Distances fabs(Drivebase::Distances const&);
 
 double ticks_to_inches(const int);
 int inches_to_ticks(const double);
@@ -98,7 +101,6 @@ int encoderconv(Maybe_inline<Encoder_output>);
 
 CMP1(Drivebase::Encoder_ticks)
 CMP1(Drivebase::Speeds)
-CMP1(Drivebase::Distances)
 
 std::ostream& operator<<(std::ostream&,Drivebase::Input const&);
 bool operator<(Drivebase::Input const&,Drivebase::Input const&);

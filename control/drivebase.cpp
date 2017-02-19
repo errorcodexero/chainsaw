@@ -92,7 +92,7 @@ Drivebase::Input Drivebase::Input_reader::operator()(Robot_inputs const& in)cons
 		}(),
 		encoder_info(L_ENCODER_PORTS),
 		encoder_info(R_ENCODER_PORTS),
-		{(double)encoderconv(in.digital_io.encoder[L_ENCODER_LOC]),-(double)encoderconv(in.digital_io.encoder[R_ENCODER_LOC])}
+		{ticks_to_inches(encoderconv(in.digital_io.encoder[L_ENCODER_LOC])),-ticks_to_inches(encoderconv(in.digital_io.encoder[R_ENCODER_LOC]))}
 	};
 }
 
@@ -115,6 +115,20 @@ Drivebase::Encoder_ticks operator+(Drivebase::Encoder_ticks const& a,Drivebase::
 	return sum;
 }
 
+
+
+Drivebase::Distances operator+(Drivebase::Distances const& a,Drivebase::Distances const& b){
+	Drivebase::Distances sum = {
+		#define X(TYPE,SIDE) 0,
+		DISTANCES_ITEMS(X)
+		#undef X
+	};
+	#define X(TYPE,SIDE) sum.SIDE = a.SIDE + b.SIDE;
+	DISTANCES_ITEMS(X)
+	#undef X
+	return sum;
+}
+
 Drivebase::Encoder_ticks operator-(Drivebase::Encoder_ticks const& a){
 	Drivebase::Encoder_ticks opposite = {
 		#define X(TYPE,SIDE) -a.SIDE,
@@ -128,17 +142,41 @@ Drivebase::Encoder_ticks operator-(Drivebase::Encoder_ticks const& a,Drivebase::
 	return a + (-b);
 }
 
-Drivebase::Distances operator+(Drivebase::Distances const& a,Drivebase::Distances const& b){
-	Drivebase::Distances sum = {
-		#define X(TYPE,SIDE) 0,
+bool operator==(Drivebase::Distances const& a,Drivebase::Distances const& b){
+	#define X(TYPE,SIDE) if(a.SIDE != b.SIDE) return false;
+	DISTANCES_ITEMS(X)
+	#undef X
+	return true;
+}
+
+bool operator!=(Drivebase::Distances const& a,Drivebase::Distances const& b){
+	return !(a==b);
+}
+
+ostream& operator<<(ostream& o,Drivebase::Distances const& a){
+	o<<"Distances(";
+	#define X(TYPE,SIDE) o<<""#SIDE<<":"<<a.SIDE<<" ";
+	DISTANCES_ITEMS(X)
+	#undef X
+	return o<<")";
+}
+
+bool operator<(Drivebase::Distances const& a,Drivebase::Distances const& b){
+	#define X(TYPE,SIDE) if(a.SIDE >= b.SIDE) return false;
+	DISTANCES_ITEMS(X)
+	#undef X
+	return true;
+}
+
+Drivebase::Distances fabs(Drivebase::Distances const& a){
+	Drivebase::Distances pos = {
+		#define X(TYPE,SIDE) fabs(a.SIDE),
 		DISTANCES_ITEMS(X)
 		#undef X
 	};
-	#define X(TYPE,SIDE) sum.SIDE = a.SIDE + b.SIDE;
-	ENCODER_TICKS(X)
-	#undef X
-	return sum;
+	return pos;
 }
+
 
 Drivebase::Distances operator-(Drivebase::Distances const& a){
 	Drivebase::Distances opposite = {
@@ -165,7 +203,6 @@ IMPL_STRUCT(Drivebase::Output::Output,DRIVEBASE_OUTPUT)
 
 CMP_OPS(Drivebase::Encoder_ticks,ENCODER_TICKS)
 CMP_OPS(Drivebase::Speeds,SPEEDS_ITEMS)
-CMP_OPS(Drivebase::Distances,DISTANCES_ITEMS)
 
 CMP_OPS(Drivebase::Input,DRIVEBASE_INPUT)
 
