@@ -272,9 +272,9 @@ public:
 		return ds_info;
 	}
 
-	Camera read_camera(Robot_inputs r){
+	Camera read_camera(Robot_inputs){
 		Camera c;
-		c.enabled=r.robot_mode.enabled;
+		c.enabled=0;//r.robot_mode.enabled;
 		if(c.enabled){
 			camera.enable();
 			if(camera.isNewData()) c.blocks=camera.getBlocks();
