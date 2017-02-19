@@ -95,10 +95,66 @@ Executive auto_mode_convert(Next_mode_info info){
 
 			//	return Executive{Auto_gearboiler_topeg()};
 			case 6: //Gear Mid
+				return Executive{Chain{
+					Step{Drive_straight{10*12}},
+					Executive{Chain{
+						Step{Geardrop()},
+						Executive{Chain{
+							Step{Drive_straight{-12}},
+							Executive{Teleop{}}
+						}}
+					}}
+				}};
+							
 			//	return Executive{Auto_gearboiler_topeg()};
-			case 7:
+			case 7: //Gear mid Extention
+				return Executive{Chain{
+					Step{Drive_straight{10*12}},
+					Executive{Chain{
+						Step{Geardrop()},
+						Executive{Chain{
+							Step{Drive_straight{-12}},
+							Executive{Chain{
+								Step{Turn{deg_to_rad(-45)}},
+								Executive{Chain{
+									Step{Drive_straight{3*12}},
+									Executive{Chain{
+										Step{Turn{deg_to_rad(45)}},
+										Executive{Chain{
+											Step{Drive_straight{4*12}},
+											Executive{Teleop{}}
+										}}
+									}}
+								}}
+							}}
+						}}
+					}}
+				}};
 				//return Executive{Auto_gearloading_topeg({0,0})};
 			case 8:
+				return Executive{Chain{
+					Step{Drive_straight{10*12}},
+					Executive{Chain{
+						Step{Geardrop()},
+						Executive{Chain{
+							Step{Drive_straight{-12}},
+							Executive{Chain{
+								Step{Turn{deg_to_rad(45)}},
+								Executive{Chain{
+									Step{Drive_straight{3*12}},
+									Executive{Chain{
+										Step{Turn{deg_to_rad(-45)}},
+										Executive{Chain{
+											Step{Drive_straight{4*12}},
+											Executive{Teleop{}}
+										}}
+									}}
+								}}
+							}}
+						}}
+					}}
+				}};
+
 				//return Executive{Auto_gearmid_topeg({0,0})};
 			case 9: //Vision test (TEMP)
 				return Executive{Chain{
