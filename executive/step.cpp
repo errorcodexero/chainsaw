@@ -24,11 +24,12 @@ Toplevel::Goal Step::run(Run_info info){
 	return impl->run(info);
 }
 
-static const Inch WIDTH_OF_ROBOT = 30;//inches //TODO: make more accurate //TODO: finds some way of dealing with constants like this and wheel diameter
+static const Inch WIDTH_OF_ROBOT = 26.0;//inches, note: actual distance between centers of both wheels is 27.0 in, but 26 results in more precise turning  //TODO: finds some way of dealing with constants like this and wheel diameter
 
 Turn::Turn(Rad a):target_angle(a),initial_distances({0,0}),init(false),side_goals({0,0}){
-	Inch side = target_angle * 0.5 * WIDTH_OF_ROBOT;
-	side_goals = Drivebase::Distances{side,-side};	
+	Inch side_goal = target_angle * 0.5 * WIDTH_OF_ROBOT;
+	side_goals = Drivebase::Distances{side_goal,-side_goal};
+	motion_profile = {side_goal,0.1,0.25};
 }
 
 Toplevel::Goal Turn::run(Run_info info){
@@ -37,8 +38,7 @@ Toplevel::Goal Turn::run(Run_info info){
 		init = true;
 	}
 	Toplevel::Goal goals;
-	Motion_profile mp1 = {mean(side_goals.l,-side_goals.r),0.1,0.25};
-	double power = mp1.target_speed(mean(info.status.drive.distances.l,-info.status.drive.distances.r)); 
+	double power = motion_profile.target_speed(mean(info.status.drive.distances.l,-info.status.drive.distances.r)); 
 	goals.drive.left = power;
 	goals.drive.right = -power;
 	return goals;
@@ -63,7 +63,7 @@ std::unique_ptr<Step_impl> Turn::clone()const{
 }
 
 bool Turn::operator==(Turn const& b)const{
-	return target_angle == b.target_angle && initial_distances == b.initial_distances && in_range == b.in_range;
+	return target_angle == b.target_angle && initial_distances == b.initial_distances && side_goals == b.side_goals && motion_profile == b.motion_profile && in_range == b.in_range;
 }
 
 //Step::Step(Step_impl const& a):impl(a.clone().get()){}

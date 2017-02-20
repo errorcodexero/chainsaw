@@ -42,7 +42,7 @@ Executive auto_mode_convert(Next_mode_info info){
 	}};
 
 	Executive turn_test{Chain{
-		Step{Turn{PI/2}},
+		Step{Turn{PI*2}},
 		Executive{Teleop{}}
 	}};
 
