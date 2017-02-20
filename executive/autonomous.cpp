@@ -196,23 +196,24 @@ Executive auto_mode_convert(Next_mode_info info){
 	return auto_baseline;//default executive is no panel exists. Noramlly Teleop
 }
 
-Mode Delay::next_mode(Next_mode_info info){
+Mode Autonomous::next_mode(Next_mode_info info){
+	static const Time DELAY = 0.0;//seconds, TODO: base it off of the dial on the OI?
 	if(!info.autonomous) return Mode{Teleop()};
-	if(info.since_switch > .5) return auto_mode_convert(info);
-	return Mode{Delay()};
+	if(info.since_switch > DELAY) return auto_mode_convert(info);
+	return Mode{Autonomous()};
 }
 
-Toplevel::Goal Delay::run(Run_info){
+Toplevel::Goal Autonomous::run(Run_info){
 	
 	return {};
 }
 
-bool Delay::operator==(Delay const&)const{ return 1; }
+bool Autonomous::operator==(Autonomous const&)const{ return 1; }
 
 #ifdef AUTONOMOUS_TEST
 #include "test.h"
 int main(){
-	Delay a;
+	Autonomous a;
 	test_executive(a);
 }
 #endif 

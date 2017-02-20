@@ -50,7 +50,7 @@ ostream& operator<<(ostream& o,Teleop::Gear_score_step const& a){
 Executive Teleop::next_mode(Next_mode_info info) {
 	if (info.autonomous_start) {
 		if (info.panel.in_use) {
-			return Executive{Delay()};
+			return Executive{Autonomous()};
 		}
 	}
 	//Teleop t(CONSTRUCT_STRUCT_PARAMS(TELEOP_ITEMS));

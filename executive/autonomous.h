@@ -1,12 +1,12 @@
-#ifndef DELAY_H
-#define DELAY_H
+#ifndef AUTONOMOUS_H
+#define AUTONOMOUS_H
 
 #include "executive.h"
 
-struct Delay: public Executive_impl<Delay>{
+struct Autonomous: public Executive_impl<Autonomous>{
 	Executive next_mode(Next_mode_info);
 	Toplevel::Goal run(Run_info);
-	bool operator==(Delay const&)const;
+	bool operator==(Autonomous const&)const;
 };
 
 #endif
