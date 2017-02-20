@@ -553,9 +553,9 @@ set<Output> different(Robot_outputs const& a,Robot_outputs const& b){
 	X(SOLENOIDS,solenoid,solenoid)
 	X(DIGITAL_IOS,digital_io,digital_io)
 	X(TALON_SRX_OUTPUTS,talon_srx,talon_srx)
+	X(DRIVER_STATION_DIGITAL_OUTPUTS,driver_station.digital,driver_station)
 	#undef X
 	if(a.pump_auto!=b.pump_auto) r|=Output::pump();
-	if(a.driver_station != b.driver_station) r|=Output::driver_station();
 	return r;
 }
 
@@ -635,7 +635,7 @@ int main(){
 			case 0: return "UNUSED";
 			case 1: return *found.begin();
 			default:
-				return CONFLICT_MESSAGE + as_string(found) + " ------ Check IO's, assignming the same output from multiple parts - EXITING ------";
+				return CONFLICT_MESSAGE + as_string(found) + " ------ Check IO's, assigning the same output from multiple parts - EXITING ------";
 		}
 	};
 	for(auto a:outputs()){

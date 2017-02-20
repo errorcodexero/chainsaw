@@ -33,6 +33,7 @@ struct Teleop : Executive_impl<Teleop> {
 		X(Countdown_timer,clear_ball_timer) \
 		X(Gear_collector_mode,gear_collector_mode) \
 		X(Gear_score_step,gear_score_step) \
+		X(Posedge_toggle,collect) \
 		X(int,print_number)
 	STRUCT_MEMBERS(TELEOP_ITEMS)
 
