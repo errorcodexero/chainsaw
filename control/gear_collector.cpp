@@ -167,8 +167,11 @@ Gear_collector::Status status(Gear_collector::Status_detail const& a){
 }
 
 Gear_collector::Output control(Gear_collector::Status_detail const& st,Gear_collector::Goal const& goal){
+	Gear_collector::Goal g=goal;
+	if((goal.gear_lifter==Gear_lifter::Goal::UP && st.gear_lifter!=Gear_lifter::Status_detail::UP) || (goal.gear_lifter==Gear_lifter::Goal::DOWN && st.gear_lifter!=Gear_lifter::Status_detail::DOWN))
+		g.gear_grabber=Gear_grabber::Goal::CLOSE;
 	return {
-		#define X(A,B) control(st.B,goal.B),
+		#define X(A,B) control(st.B,g.B),
 		GEAR_COLLECTOR_ITEMS(X)
 		#undef X
 	};

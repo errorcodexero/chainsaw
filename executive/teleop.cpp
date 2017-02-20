@@ -150,8 +150,6 @@ Toplevel::Goal Teleop::run(Run_info info) {
 		}();
 	}
 
-	if((goals.gear_collector.gear_lifter==Gear_lifter::Goal::UP && info.status.gear_collector.gear_lifter!=Gear_lifter::Status_detail::UP) || (goals.gear_collector.gear_lifter==Gear_lifter::Goal::DOWN && info.status.gear_collector.gear_lifter!=Gear_lifter::Status_detail::DOWN)) goals.gear_collector.gear_grabber=Gear_grabber::Goal::CLOSE;
-
 	goals.climber = info.panel.climb ? Climber::Goal::CLIMB : Climber::Goal::STOP;
 
 	//Manual controls
