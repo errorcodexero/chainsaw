@@ -42,7 +42,7 @@ Executive auto_mode_convert(Next_mode_info info){
 	}};
 
 	Executive turn_test{Chain{
-		Step{Turn{PI*2}},
+		Step{Turn{PI/2}},
 		Executive{Teleop{}}
 	}};
 
@@ -50,10 +50,10 @@ Executive auto_mode_convert(Next_mode_info info){
 		switch(info.panel.auto_select){ 
 			case 0: //Do Nothing
 				return auto_null;
-			case 1: //Baseline
-				return turn_test;
 				//return drive_straight_test; 
-				//return auto_baseline;//TODO
+				//return turn_test;
+			case 1: //Baseline
+				return auto_baseline;
 			case 2: //Baseline Extended
 				return Executive{Chain{
 					Step{Drive_straight{12*12}},

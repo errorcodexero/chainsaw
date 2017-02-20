@@ -48,11 +48,10 @@ bool Turn::done(Next_mode_info info){
 	static const Inch TOLERANCE = 3.0;//inches
 	Drivebase::Distances distance_travelled = info.status.drive.distances - initial_distances;
 	Drivebase::Distances distance_left = fabs(side_goals - distance_travelled);
-	cout<<"\nSTART:"<<initial_distances<<"     NOW:"<<info.status.drive.distances<<"     TRAVELLED:"<<distance_travelled<<"    LEFT:"<<distance_left<<"    GOALS:"<<side_goals<<"    in_range:"<<in_range<<"\n";
 	if(mean(distance_left.l,distance_left.r) < TOLERANCE){
 		in_range.update(info.in.now,info.in.robot_mode.enabled);
 	} else {
-		static const Time FINISH_TIME = 1.0;
+		static const Time FINISH_TIME = 1.0;//seconds
 		in_range.set(FINISH_TIME);
 	}
 	return in_range.done();
