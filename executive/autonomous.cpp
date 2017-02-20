@@ -1,14 +1,6 @@
-#include "delay.h"
+#include "autonomous.h"
 
 #include "teleop.h" 
-#include "auto_null.h"
-#include "auto_distance.h"
-#include "auto_forward.h"
-#include "auto_baseline.h"
-#include "auto_gearboiler.h"
-#include "auto_gearloading.h"
-#include "auto_gearmid.h"
-#include "auto_baselineext.h"
 #include "chain.h"
 #include "step.h"
 
@@ -23,6 +15,7 @@ double deg_to_rad(double deg){
 auto Geardrop(){ return Drive_straight{0}; }
 
 Executive auto_mode_convert(Next_mode_info info){
+	if(!info.autonomous) return Executive{Teleop()};
 	cout<<"panel in use "<<info.panel.in_use<<" auto panel value "<<info.panel.auto_select<<"\n";
 
 	//for when just want to run across the field at the end of autonomous
@@ -39,7 +32,17 @@ Executive auto_mode_convert(Next_mode_info info){
 	Executive auto_null{Teleop{}};
 
 	Executive auto_baseline{Chain{
-		Step{Drive_straight{8*12}},//TODO change to 12*12
+		Step{Drive_straight{12*12}},
+		Executive{Teleop{}}
+	}};
+	
+	Executive drive_straight_test{Chain{
+		Step{Drive_straight{7*12}},
+		Executive{Teleop{}}
+	}};
+
+	Executive turn_test{Chain{
+		Step{Turn{PI/2}},
 		Executive{Teleop{}}
 	}};
 
@@ -48,7 +51,9 @@ Executive auto_mode_convert(Next_mode_info info){
 			case 0: //Do Nothing
 				return auto_null;
 			case 1: //Baseline
-				return auto_baseline;
+				//return turn_test;
+				return drive_straight_test; 
+				//return auto_baseline;//TODO
 			case 2: //Baseline Extended
 				return Executive{Chain{
 					Step{Drive_straight{12*12}},
@@ -191,23 +196,24 @@ Executive auto_mode_convert(Next_mode_info info){
 	return auto_baseline;//default executive is no panel exists. Noramlly Teleop
 }
 
-Mode Delay::next_mode(Next_mode_info info){
+Mode Autonomous::next_mode(Next_mode_info info){
+	static const Time DELAY = 0.0;//seconds, TODO: base it off of the dial on the OI?
 	if(!info.autonomous) return Mode{Teleop()};
-	if(info.since_switch > .5) return auto_mode_convert(info);
-	return Mode{Delay()};
+	if(info.since_switch > DELAY) return auto_mode_convert(info);
+	return Mode{Autonomous()};
 }
 
-Toplevel::Goal Delay::run(Run_info){
+Toplevel::Goal Autonomous::run(Run_info){
 	
 	return {};
 }
 
-bool Delay::operator==(Delay const&)const{ return 1; }
+bool Autonomous::operator==(Autonomous const&)const{ return 1; }
 
-#ifdef DELAY_TEST
+#ifdef AUTONOMOUS_TEST
 #include "test.h"
 int main(){
-	Delay a;
+	Autonomous a;
 	test_executive(a);
 }
 #endif 

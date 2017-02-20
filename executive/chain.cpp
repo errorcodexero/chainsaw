@@ -14,6 +14,7 @@ Toplevel::Goal Chain::run(Run_info info){
 }
 
 Executive Chain::next_mode(Next_mode_info a){
+	if(!a.autonomous) return Executive{Teleop()};
 	if(step.done(a)){
 		/*if(next) return next->clone();
 		return unique_ptr<Mode>();*/

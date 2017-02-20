@@ -688,35 +688,13 @@ cc_test(
 cc_library(
 	name="executive_impl",
 	srcs=[
-		"executive/delay.cpp",
-		"executive/auto_stop.cpp",
-		"executive/auto_null.cpp",
+		"executive/autonomous.cpp",
 		"executive/teleop.cpp",
-		"executive/auto_forward.cpp",
-		"executive/auto_distance.cpp",
-		"executive/auto_baseline.cpp",
-		"executive/auto_gearboiler.cpp",
-		"executive/auto_gearloading.cpp",
-		"executive/auto_gearmid.cpp",
-		"executive/auto_baselineext.cpp",
-		"executive/auto_gearboilerext.cpp",
-		"executive/auto_guided_turn.cpp",
 		"executive/chain.cpp"
 	],
 	hdrs=[
-		"executive/delay.h",
-		"executive/auto_stop.h",
-		"executive/auto_null.h",
+		"executive/autonomous.h",
 		"executive/teleop.h",
-		"executive/auto_forward.h",
-		"executive/auto_distance.h",
-		"executive/auto_baseline.h",
-		"executive/auto_gearboiler.h",
-		"executive/auto_gearloading.h",
-		"executive/auto_gearmid.h",
-		"executive/auto_baselineext.h",
-		"executive/auto_gearboilerext.h",
-		"executive/auto_guided_turn.h",
 		"executive/chain.h"
 	],
 	deps=[":executive",":posedge_trigger_debounce",":posedge_toggle",":motion_profile",":step"]
@@ -731,114 +709,15 @@ cc_test(
 )
 
 cc_test(
-	name="delay_test",
-	srcs=["executive/delay.cpp","executive/delay.h"],
-	copts=["-DDELAY_TEST"],
+	name="autonomous_test",
+	srcs=["executive/autonomous.cpp","executive/autonomous.h"],
+	copts=["-DAUTONOMOUS_TEST"],
 	deps=[
 		":executive",":executive_impl",
 		":test"
 	],
 	timeout="short"
 )
-
-cc_test(
-	name="auto_forward_test",
-	srcs=["executive/auto_forward.cpp","executive/auto_forward.h"],
-	copts=["-DAUTO_FORWARD_TEST"],
-	deps=[
-		":executive",":executive_impl",
-		":test"
-	],
-	timeout = "short"
-)
-
-cc_test(
-	name="auto_distance_test",
-	srcs=["executive/auto_distance.cpp","executive/auto_distance.h"],
-	copts=["-DAUTO_DISTANCE_TEST"],
-	deps=[
-		":executive",":executive_impl",
-		":test"
-        ],
-        timeout = "short"
-)
-cc_test(
-	name="auto_guided_turn_test",
-	srcs=["executive/auto_guided_turn.cpp","executive/auto_guided_turn.h"],
-	copts=["-DAUTO_GUIDED_TURN_TEST"],
-	deps=[
-		":executive",":executive_impl",
-		":test"
-	],
-	timeout = "short"
-)
-
-cc_test(
-	name="auto_baseline_test",
-	srcs=["executive/auto_baseline.cpp","executive/auto_baseline.h"],
-	copts=["-DAUTO_BASELINE_TEST"],
-	deps=[
-		":executive",":executive_impl",
-		":test"
-	],
-	timeout = "short"
-)
-
-cc_test(
-        name="auto_gearboiler_test",
-        srcs=["executive/auto_gearboiler.cpp","executive/auto_gearboiler.h"],
-        copts=["-DAUTO_GEARBOILER_TEST"],
-        deps=[
-                ":executive",":executive_impl",
-                ":test",":drivebase"
-        ],
-        timeout = "short"
-)
-
-cc_test(
-        name="auto_gearloading_test",
-        srcs=["executive/auto_gearloading.cpp","executive/auto_gearloading.h"],
-        copts=["-DAUTO_GEARLOADING_TEST"],
-        deps=[
-                ":executive",":executive_impl",
-                ":test",":drivebase"
-        ],
-        timeout = "short"
-)
-
-cc_test(
-        name="auto_gearmid_test",
-        srcs=["executive/auto_gearmid.cpp","executive/auto_gearmid.h", "control/drivebase.h"],
-        copts=["-DAUTO_GEARMID_TEST"],
-        deps=[
-                ":executive",":executive_impl",
-                ":test",":drivebase"
-        ],
-        timeout = "short"
-)
-
-cc_test(
-        name="auto_baselineext_test",
-        srcs=["executive/auto_baselineext.cpp","executive/auto_baselineext.h"],
-        copts=["-DAUTO_BASELINEEXT_TEST"],
-        deps=[
-                ":executive",":executive_impl",
-                ":test"
-        ],
-        timeout = "short"
-)
-
-cc_test(
-        name="auto_gearboilerext_test",
-        srcs=["executive/auto_gearboilerext.cpp","executive/auto_gearboilerext.h"],
-        copts=["-DAUTO_GEARBOILEREXT_TEST"],
-        deps=[
-                ":executive",":executive_impl",
-                ":test", ":drivebase"
-        ],
-        timeout = "short"
-)
-
 
 cc_library(
 	name="executive",
@@ -854,27 +733,11 @@ cc_test(
 	timeout="short"
 )
 
-cc_test(
-	name="auto_stop_test",
-	srcs=["executive/auto_stop.cpp","executive/auto_stop.h"],
-	copts=["-DAUTO_STOP_TEST"],
-	deps=[":test"],
-	timeout="short"
-)
-
 cc_library(
 	name="test",
 	srcs=["executive/test.cpp"],
 	hdrs=["executive/test.h"],
 	deps=[":executive",":executive_impl"]
-)
-
-cc_test(
-	name="auto_null_test",
-	srcs=["executive/auto_null.cpp","executive/auto_null.h"],
-	copts=["-DAUTO_NULL_TEST"],
-	deps=[":executive_impl",":test"],
-	timeout="short"
 )
 
 cc_library(

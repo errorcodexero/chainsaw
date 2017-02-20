@@ -8,6 +8,7 @@
 using namespace std;
 
 double Motion_profile::target_speed(const double current){
+	//TODO: add in ramping up too
 	double error = goal-current;
 	return clamp((error*vel_modifier),-max,max);
 }
@@ -42,7 +43,6 @@ int main(){
 		for(int i=0;i<=TARGET;i+=10){//i is distance in inches
 			 cout<<"\tRobot has moved "<<i<< " inches. Goal is "<<TARGET<<" inches. Target speed is "<<mp.target_speed(i)<<" using motion profile:"<<mp<<endl;
 		}
-	
 	}
 	{		
 		double dis=0; //inches, the current distance of the simulated robot

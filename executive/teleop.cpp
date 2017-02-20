@@ -1,6 +1,6 @@
 #include "teleop.h"
 #include <math.h>
-#include "delay.h"
+#include "autonomous.h"
 #include "../input/util.h"
 
 using namespace std;
@@ -50,16 +50,16 @@ ostream& operator<<(ostream& o,Teleop::Gear_score_step const& a){
 Executive Teleop::next_mode(Next_mode_info info) {
 	if (info.autonomous_start) {
 		if (info.panel.in_use) {
-			return Executive{Delay()};
+			return Executive{Autonomous()};
 		}
 	}
-	Teleop t(CONSTRUCT_STRUCT_PARAMS(TELEOP_ITEMS));
-	return Executive{t};
+	//Teleop t(CONSTRUCT_STRUCT_PARAMS(TELEOP_ITEMS));
+	return Executive{*this};
 }
 
 IMPL_STRUCT(Teleop::Teleop,TELEOP_ITEMS)
 
-Teleop::Teleop():gear_collector_mode(Gear_collector_mode::PREP_COLLECT),gear_score_step(Gear_score_step::CLEAR_BALLS),print_num(0){}
+Teleop::Teleop():gear_collector_mode(Gear_collector_mode::PREP_COLLECT),gear_score_step(Gear_score_step::CLEAR_BALLS),print_number(0){}
 
 void Teleop::gear_score_protocol(Toplevel::Status_detail const& status,const bool enabled,const Time now,Toplevel::Goal& goals){
 	//TODO: set clear_ball_timer somewhere
@@ -138,8 +138,8 @@ Toplevel::Goal Teleop::run(Run_info info) {
 
 	collect.update(info.panel.ball_collect);
 
-	goals.gear_collector=[&]{
-		if(!collect.get()){
+	if(!collect.get()){
+		goals.gear_collector=[&]{
 			switch(gear_collector_mode){
 				case Gear_collector_mode::PREP_COLLECT: return Gear_collector::Goal{Gear_grabber::Goal::OPEN,Gear_lifter::Goal::DOWN};
 				case Gear_collector_mode::COLLECT: return Gear_collector::Goal{Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::DOWN};
@@ -147,8 +147,8 @@ Toplevel::Goal Teleop::run(Run_info info) {
 				case Gear_collector_mode::SCORE: return Gear_collector::Goal{Gear_grabber::Goal::OPEN,Gear_lifter::Goal::UP};
 				default: assert(0);
 			}
-		} else return Gear_collector::Goal{Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::DOWN};
-	}();
+		}();
+	}
 
 	if((goals.gear_collector.gear_lifter==Gear_lifter::Goal::UP && info.status.gear_collector.gear_lifter!=Gear_lifter::Status_detail::UP) || (goals.gear_collector.gear_lifter==Gear_lifter::Goal::DOWN && info.status.gear_collector.gear_lifter!=Gear_lifter::Status_detail::DOWN)) goals.gear_collector.gear_grabber=Gear_grabber::Goal::CLOSE;
 
@@ -172,7 +172,7 @@ Toplevel::Goal Teleop::run(Run_info info) {
 		if(info.panel.ball_lift==Panel::Ball_lift::IN) goals.collector.ball_lifter=Ball_lifter::Goal::UP;
 	}
 	
-	if(info.in.ds_info.connected && print_num%10==0){
+	if(info.in.ds_info.connected && (print_number%10)==0){
 		cout<<"size: "<<info.in.camera.blocks.size()<<" blocks:\n";
 		for (vector<Pixy::Block>::const_iterator it=info.in.camera.blocks.begin();it!=info.in.camera.blocks.end();it++){
 			cout<<*it<<"\tarea: "<<(it->width * it->height)<<"\n";
@@ -180,7 +180,7 @@ Toplevel::Goal Teleop::run(Run_info info) {
 		cout<<"\n";
 		//cout<<"\n"<<info.status.gear_collector.gear_grabber<<"\n";
 	}
-	print_num+=1;
+	print_number++;
 	
 	return goals;
 }

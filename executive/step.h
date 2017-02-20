@@ -66,7 +66,8 @@ class Drive_straight:public Step_impl_inner<Drive_straight>{
 	Drivebase::Distances initial_distances;
 	bool init;
 	Motion_profile motion_profile;
-
+	Countdown_timer in_range;
+	
 	public:
 	explicit Drive_straight(Inch);
 
@@ -80,8 +81,9 @@ struct Turn:Step_impl_inner<Turn>{
 	Rad target_angle;//radians,clockwise=positive
 	Drivebase::Distances initial_distances;
 	bool init;
+	Countdown_timer in_range;
 
-	explicit Turn(double);
+	explicit Turn(Rad);
 	Toplevel::Goal run(Run_info);
 	bool done(Next_mode_info);
 	std::unique_ptr<Step_impl> clone()const;
