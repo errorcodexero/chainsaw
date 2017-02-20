@@ -1,14 +1,6 @@
-#include "delay.h"
+#include "autonomous.h"
 
 #include "teleop.h" 
-#include "auto_null.h"
-#include "auto_distance.h"
-#include "auto_forward.h"
-#include "auto_baseline.h"
-#include "auto_gearboiler.h"
-#include "auto_gearloading.h"
-#include "auto_gearmid.h"
-#include "auto_baselineext.h"
 #include "chain.h"
 #include "step.h"
 
@@ -40,7 +32,17 @@ Executive auto_mode_convert(Next_mode_info info){
 	Executive auto_null{Teleop{}};
 
 	Executive auto_baseline{Chain{
-		Step{Drive_straight{7*12}},//TODO change to 12*12
+		Step{Drive_straight{12*12}},
+		Executive{Teleop{}}
+	}};
+	
+	Executive drive_straight_test{Chain{
+		Step{Drive_straight{7*12}},
+		Executive{Teleop{}}
+	}};
+
+	Executive turn_test{Chain{
+		Step{Turn{PI/2}},
 		Executive{Teleop{}}
 	}};
 
@@ -49,7 +51,9 @@ Executive auto_mode_convert(Next_mode_info info){
 			case 0: //Do Nothing
 				return auto_null;
 			case 1: //Baseline
-				return auto_baseline;
+				//return turn_test;
+				return drive_straight_test; 
+				//return auto_baseline;//TODO
 			case 2: //Baseline Extended
 				return Executive{Chain{
 					Step{Drive_straight{12*12}},
@@ -205,7 +209,7 @@ Toplevel::Goal Delay::run(Run_info){
 
 bool Delay::operator==(Delay const&)const{ return 1; }
 
-#ifdef DELAY_TEST
+#ifdef AUTONOMOUS_TEST
 #include "test.h"
 int main(){
 	Delay a;
