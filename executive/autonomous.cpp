@@ -37,7 +37,7 @@ Executive auto_mode_convert(Next_mode_info info){
 	}};
 	
 	Executive drive_straight_test{Chain{
-		Step{Drive_straight{7*12}},
+		Step{Drive_straight{3*12}},
 		Executive{Teleop{}}
 	}};
 
@@ -51,8 +51,8 @@ Executive auto_mode_convert(Next_mode_info info){
 			case 0: //Do Nothing
 				return auto_null;
 			case 1: //Baseline
-				//return turn_test;
-				return drive_straight_test; 
+				return turn_test;
+				//return drive_straight_test; 
 				//return auto_baseline;//TODO
 			case 2: //Baseline Extended
 				return Executive{Chain{

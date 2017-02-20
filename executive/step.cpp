@@ -24,29 +24,38 @@ Toplevel::Goal Step::run(Run_info info){
 	return impl->run(info);
 }
 
-Turn::Turn(Rad a):target_angle(a),initial_distances({0,0}),init(false){}
+static const Inch WIDTH_OF_ROBOT = 30;//inches //TODO: make more accurate //TODO: finds some way of dealing with constants like this and wheel diameter
+
+Turn::Turn(Rad a):target_angle(a),initial_distances({0,0}),init(false),side_goals({0,0}){
+	Inch side = target_angle * 0.5 * WIDTH_OF_ROBOT;
+	side_goals = Drivebase::Distances{side,-side};	
+}
 
 Toplevel::Goal Turn::run(Run_info info){
 	if(!init){
 		initial_distances = info.status.drive.distances;
 		init = true;
 	}
-	static const Inch WIDTH_OF_ROBOT = 36;//inches
-	static const double VEL_MODIFIER = .5, MAX = 0.5;
-	
-	Inch side_distance_goal = target_angle*0.5*WIDTH_OF_ROBOT;//inches
-	Motion_profile mp_left = {-side_distance_goal,VEL_MODIFIER,MAX}, mp_right = {side_distance_goal,VEL_MODIFIER,MAX};
-	
 	Toplevel::Goal goals;
-	goals.drive.left = mp_left.target_speed(info.status.drive.distances.l);
-	goals.drive.right = mp_right.target_speed(info.status.drive.distances.r);
+	Motion_profile mp1 = {mean(side_goals.l,-side_goals.r),0.1,0.25};
+	double power = mp1.target_speed(mean(info.status.drive.distances.l,-info.status.drive.distances.r)); 
+	goals.drive.left = power;
+	goals.drive.right = -power;
 	return goals;
 }
 
 bool Turn::done(Next_mode_info info){
-	(void)info;
-	//Drivebase::Distances distance_travelled = info.status.drive.distances - initial_distances;
-	nyi
+	static const Inch TOLERANCE = 3.0;//inches
+	Drivebase::Distances distance_travelled = info.status.drive.distances - initial_distances;
+	Drivebase::Distances distance_left = fabs(side_goals - distance_travelled);
+	cout<<"\nSTART:"<<initial_distances<<"     NOW:"<<info.status.drive.distances<<"     TRAVELLED:"<<distance_travelled<<"    LEFT:"<<distance_left<<"    GOALS:"<<side_goals<<"    in_range:"<<in_range<<"\n";
+	if(mean(distance_left.l,distance_left.r) < TOLERANCE){
+		in_range.update(info.in.now,info.in.robot_mode.enabled);
+	} else {
+		static const Time FINISH_TIME = 1.0;
+		in_range.set(FINISH_TIME);
+	}
+	return in_range.done();
 }
 
 std::unique_ptr<Step_impl> Turn::clone()const{
@@ -95,11 +104,9 @@ Step_impl::~Step_impl(){}
 
 Drive_straight::Drive_straight(Inch goal):target_dist(goal),initial_distances(Drivebase::Distances{0,0}),init(false),motion_profile(goal,0.1,.5){}//Motion profiling values from testing
 
-bool Drive_straight::done(Next_mode_info info){
-	static const Inch TOLERANCE = 3.0;//inches
+bool Drive_straight::done(Next_mode_info info){	static const Inch TOLERANCE = 3.0;//inches
 	Drivebase::Distances distance_travelled = info.status.drive.distances - initial_distances;
 	Drivebase::Distances distance_left = fabs(Drivebase::Distances{target_dist,target_dist} - distance_travelled);
-	cout<<"\nCURR:"<<distance_travelled<<"    LEFT:"<<distance_left<<"    in_range:"<<in_range<<"\n";
 	if(mean(distance_left.l,distance_left.r) < TOLERANCE){
 		in_range.update(info.in.now,info.in.robot_mode.enabled);
 	} else {
@@ -119,7 +126,6 @@ Toplevel::Goal Drive_straight::run(Run_info info){
 	double power = mean(motion_profile.target_speed(info.status.drive.distances.l),motion_profile.target_speed(info.status.drive.distances.r));
 	goals.drive.left = power;
 	goals.drive.right = power;
-	cout<<"\npower: "<<goals.drive.left<<"\n";
 	goals.shifter = Gear_shifter::Goal::LOW;
 	return goals;
 }

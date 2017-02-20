@@ -54,8 +54,8 @@ int inches_to_ticks(const double inches){
 	return (int)(inches/(INCHES_PER_TICK*ERROR_CORRECTION));
 }
 
-#define R_ENCODER_PORTS 0,1
-#define L_ENCODER_PORTS 2,3
+#define L_ENCODER_PORTS 0,1
+#define R_ENCODER_PORTS 2,3
 #define L_ENCODER_LOC 0
 #define R_ENCODER_LOC 1
 
@@ -72,8 +72,8 @@ Robot_inputs Drivebase::Input_reader::operator()(Robot_inputs all,Input in)const
 	};
 	encoder(L_ENCODER_PORTS,in.left);
 	encoder(R_ENCODER_PORTS,in.right);
-	all.digital_io.encoder[L_ENCODER_LOC] = inches_to_ticks(in.distances.l);
-	all.digital_io.encoder[R_ENCODER_LOC] = -inches_to_ticks(in.distances.r);
+	all.digital_io.encoder[L_ENCODER_LOC] = -inches_to_ticks(in.distances.l);
+	all.digital_io.encoder[R_ENCODER_LOC] = inches_to_ticks(in.distances.r);
 	return all;
 }
 
@@ -92,7 +92,10 @@ Drivebase::Input Drivebase::Input_reader::operator()(Robot_inputs const& in)cons
 		}(),
 		encoder_info(L_ENCODER_PORTS),
 		encoder_info(R_ENCODER_PORTS),
-		{ticks_to_inches(encoderconv(in.digital_io.encoder[L_ENCODER_LOC])),-ticks_to_inches(encoderconv(in.digital_io.encoder[R_ENCODER_LOC]))}
+		{
+			-ticks_to_inches(encoderconv(in.digital_io.encoder[L_ENCODER_LOC])),
+			ticks_to_inches(encoderconv(in.digital_io.encoder[R_ENCODER_LOC]))
+		}
 	};
 }
 
@@ -296,6 +299,7 @@ void Drivebase::Estimator::update(Time now,Drivebase::Input in,Drivebase::Output
 	if(timer.done()){
 		last.speeds.l = (last.distances.l-in.distances.l)/POLL_TIME;
 		last.speeds.r = (last.distances.r-in.distances.r)/POLL_TIME;
+		cout<<"\nin: "<<in.distances<<"\n";
 		last.distances = in.distances;
 		timer.set(POLL_TIME);
 	}
