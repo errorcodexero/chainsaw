@@ -176,7 +176,6 @@ Toplevel::Goal Teleop::run(Run_info info) {
 			cout<<*it<<"\tarea: "<<(it->width * it->height)<<"\n";
 		}
 		cout<<"\n";
-		//cout<<"\n"<<info.status.gear_collector.gear_grabber<<"\n";
 	}
 	print_number++;
 	

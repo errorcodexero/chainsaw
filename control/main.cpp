@@ -14,9 +14,8 @@ using namespace std;
 
 static int print_count=0;
 
-//TODO: at some point, might want to make this whatever is right to start autonomous mode.
 Main::Main():
-	mode(Executive{Teleop()}),
+	mode(Executive{Teleop()}),//start in teleop because it is safer (it starts autonomous if it needs to anyway)
 	autonomous_start(0)
 {}
 
@@ -27,11 +26,22 @@ Robot_outputs Main::operator()(const Robot_inputs in,ostream&){
 	perf.update(in.now);
 
 	Joystick_data driver_joystick=in.joystick[MAIN_JOYSTICK_PORT];
-	Panel panel=interpret_oi(in.joystick[Panel::PORT]);
+	Panel panel = interpret_oi(in.joystick[Panel::PORT]);
 	if(!panel.in_use){
 		panel = interpret_gamepad(in.joystick[GUNNER_JOYSTICK_PORT]);
 	}
 
+	Toplevel::Status_detail status = toplevel.estimator.get();
+	
+	bool autonomous_start_now=autonomous_start(in.robot_mode.autonomous && in.robot_mode.enabled);
+	Executive next = mode.next_mode(Next_mode_info{in.robot_mode.autonomous,autonomous_start_now,status,since_switch.elapsed(),panel,in});
+	since_switch.update(in.now,mode != next);
+	mode=next;
+		
+	Toplevel::Goal goals = mode.run(Run_info{in,driver_joystick,panel,status});
+	Toplevel::Output r_out = control(status,goals); 
+	Robot_outputs r = toplevel.output_applicator(Robot_outputs{},r_out);
+	
 	force.update(
 		driver_joystick.button[Gamepad_button::A],
 		driver_joystick.button[Gamepad_button::LB],
@@ -41,26 +51,17 @@ Robot_outputs Main::operator()(const Robot_inputs in,ostream&){
 		driver_joystick.button[Gamepad_button::X]
 	);
 	
-	Toplevel::Status_detail toplevel_status=toplevel.estimator.get();
-	Toplevel::Goal goals = mode.run(Run_info{in,driver_joystick,panel,toplevel_status});
-	
-	bool autonomous_start_now=autonomous_start(in.robot_mode.autonomous && in.robot_mode.enabled);
-	Executive next = mode.next_mode(Next_mode_info{in.robot_mode.autonomous,autonomous_start_now,toplevel_status,since_switch.elapsed(),panel,in});
-	since_switch.update(in.now,mode != next);
-	mode=next;
-		
-	Toplevel::Output r_out = control(toplevel_status,goals); 
-	Robot_outputs r = toplevel.output_applicator(Robot_outputs{},r_out);
-	
+
 	r=force(r);
-	Toplevel::Input input=toplevel.input_reader(in);
+	Toplevel::Input input = toplevel.input_reader(in);
 
 	toplevel.estimator.update(
 		in.now,
 		input,
 		toplevel.output_applicator(r)
 	);
-	log(in,toplevel_status,r);
+	
+	log(in,status,r);
 
 	if(in.ds_info.connected && (print_count % 10 == 0)){
 		cout<<"mode: "<<mode<<"\n\n";
