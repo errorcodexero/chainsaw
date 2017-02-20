@@ -81,6 +81,8 @@ struct Turn:Step_impl_inner<Turn>{
 	Rad target_angle;//radians,clockwise=positive
 	Drivebase::Distances initial_distances;
 	bool init;
+	Drivebase::Distances side_goals;
+	Motion_profile motion_profile;
 	Countdown_timer in_range;
 
 	explicit Turn(Rad);

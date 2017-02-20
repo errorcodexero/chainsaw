@@ -136,34 +136,46 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	if(info.panel.gear_prep_score) gear_collector_mode=Gear_collector_mode::PREP_SCORE;
 	if(info.panel.gear_score) gear_collector_mode=Gear_collector_mode::SCORE;
 
-	goals.gear_collector=[&]{
-		switch(gear_collector_mode){
-			case Gear_collector_mode::PREP_COLLECT: return Gear_collector::Goal{Gear_grabber::Goal::OPEN,Gear_lifter::Goal::DOWN};
-			case Gear_collector_mode::COLLECT: return Gear_collector::Goal{Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::DOWN};
-			case Gear_collector_mode::PREP_SCORE: return Gear_collector::Goal{Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::UP};
-			case Gear_collector_mode::SCORE: return Gear_collector::Goal{Gear_grabber::Goal::OPEN,Gear_lifter::Goal::UP};
-			default: assert(0);
-		}
-	}();
+	collect.update(info.panel.ball_collect);
 
-	if((goals.gear_collector.gear_lifter==Gear_lifter::Goal::UP && info.status.gear_collector.gear_lifter!=Gear_lifter::Status_detail::UP) || (goals.gear_collector.gear_lifter==Gear_lifter::Goal::DOWN && info.status.gear_collector.gear_lifter!=Gear_lifter::Status_detail::DOWN)) goals.gear_collector.gear_grabber=Gear_grabber::Goal::CLOSE;
+	if(!collect.get()){
+		goals.gear_collector=[&]{
+			switch(gear_collector_mode){
+				case Gear_collector_mode::PREP_COLLECT: return Gear_collector::Goal{Gear_grabber::Goal::OPEN,Gear_lifter::Goal::DOWN};
+				case Gear_collector_mode::COLLECT: return Gear_collector::Goal{Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::DOWN};
+				case Gear_collector_mode::PREP_SCORE: return Gear_collector::Goal{Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::UP};
+				case Gear_collector_mode::SCORE: return Gear_collector::Goal{Gear_grabber::Goal::OPEN,Gear_lifter::Goal::UP};
+				default: assert(0);
+			}
+		}();
+	}
 
+	goals.climber = info.panel.climb ? Climber::Goal::CLIMB : Climber::Goal::STOP;
+
+	//Manual controls
 	if(info.panel.gear_grasper==Panel::Gear_grasper::OPEN) goals.gear_collector.gear_grabber=Gear_grabber::Goal::OPEN;
 	if(info.panel.gear_grasper==Panel::Gear_grasper::CLOSED) goals.gear_collector.gear_grabber=Gear_grabber::Goal::CLOSE;
 	if(info.panel.gear_collector==Panel::Gear_collector::UP) goals.gear_collector.gear_lifter=Gear_lifter::Goal::UP;
 	if(info.panel.gear_collector==Panel::Gear_collector::DOWN) goals.gear_collector.gear_lifter=Gear_lifter::Goal::DOWN;	
 
-	if(info.panel.climb){
-		goals.climber = Climber::Goal::CLIMB;
+	if(info.panel.ball_arm==Panel::Ball_arm::UP) goals.collector.arm=Arm::Goal::IN;
+	if(info.panel.ball_arm==Panel::Ball_arm::DOWN) goals.collector.arm=Arm::Goal::OUT;
+	if(false){//info.panel.ball_collector==Panel::Ball_collector::DISABLED){
+		if(info.panel.ball_intake!=Panel::Ball_intake::AUTO) goals.collector.intake=Intake::Goal::OFF;
+		if(info.panel.ball_lift!=Panel::Ball_lift::AUTO) goals.collector.ball_lifter=Ball_lifter::Goal::OFF;
+	}else{
+		if(info.panel.ball_intake==Panel::Ball_intake::OUT) goals.collector.intake=Intake::Goal::OUT;
+		if(info.panel.ball_intake==Panel::Ball_intake::IN) goals.collector.intake=Intake::Goal::IN;
+		if(info.panel.ball_lift==Panel::Ball_lift::OUT) goals.collector.ball_lifter=Ball_lifter::Goal::DOWN;
+		if(info.panel.ball_lift==Panel::Ball_lift::IN) goals.collector.ball_lifter=Ball_lifter::Goal::UP;
 	}
-
+	
 	if(info.in.ds_info.connected && (print_number%10)==0){
 		cout<<"size: "<<info.in.camera.blocks.size()<<" blocks:\n";
 		for (vector<Pixy::Block>::const_iterator it=info.in.camera.blocks.begin();it!=info.in.camera.blocks.end();it++){
 			cout<<*it<<"\tarea: "<<(it->width * it->height)<<"\n";
 		}
 		cout<<"\n";
-		//cout<<"\n"<<info.status.gear_collector.gear_grabber<<"\n";
 	}
 	print_number++;
 	

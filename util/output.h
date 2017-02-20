@@ -35,7 +35,6 @@ class Output{
 	NUMBERED_TYPES
 	#undef X
 	static Output pump();
-	static Output driver_station();
 };
 
 bool operator<(Output const&,Output const&);

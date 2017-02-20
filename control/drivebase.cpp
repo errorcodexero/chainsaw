@@ -54,8 +54,8 @@ int inches_to_ticks(const double inches){
 	return (int)(inches/(INCHES_PER_TICK*ERROR_CORRECTION));
 }
 
-#define R_ENCODER_PORTS 0,1
-#define L_ENCODER_PORTS 2,3
+#define L_ENCODER_PORTS 0,1
+#define R_ENCODER_PORTS 2,3
 #define L_ENCODER_LOC 0
 #define R_ENCODER_LOC 1
 
@@ -72,8 +72,8 @@ Robot_inputs Drivebase::Input_reader::operator()(Robot_inputs all,Input in)const
 	};
 	encoder(L_ENCODER_PORTS,in.left);
 	encoder(R_ENCODER_PORTS,in.right);
-	all.digital_io.encoder[L_ENCODER_LOC] = inches_to_ticks(in.distances.l);
-	all.digital_io.encoder[R_ENCODER_LOC] = -inches_to_ticks(in.distances.r);
+	all.digital_io.encoder[L_ENCODER_LOC] = -inches_to_ticks(in.distances.l);
+	all.digital_io.encoder[R_ENCODER_LOC] = inches_to_ticks(in.distances.r);
 	return all;
 }
 
@@ -92,7 +92,10 @@ Drivebase::Input Drivebase::Input_reader::operator()(Robot_inputs const& in)cons
 		}(),
 		encoder_info(L_ENCODER_PORTS),
 		encoder_info(R_ENCODER_PORTS),
-		{ticks_to_inches(encoderconv(in.digital_io.encoder[L_ENCODER_LOC])),-ticks_to_inches(encoderconv(in.digital_io.encoder[R_ENCODER_LOC]))}
+		{
+			-ticks_to_inches(encoderconv(in.digital_io.encoder[L_ENCODER_LOC])),
+			ticks_to_inches(encoderconv(in.digital_io.encoder[R_ENCODER_LOC]))
+		}
 	};
 }
 
@@ -300,7 +303,6 @@ void Drivebase::Estimator::update(Time now,Drivebase::Input in,Drivebase::Output
 		timer.set(POLL_TIME);
 	}
 	
-	//cout << "Encoder in: " << in << endl;
 	for(unsigned i=0;i<MOTORS;i++){
 		Drivebase::Motor m=(Drivebase::Motor)i;
 		auto current=in.current[i];
@@ -312,19 +314,12 @@ void Drivebase::Estimator::update(Time now,Drivebase::Input in,Drivebase::Output
 }
 
 Robot_outputs Drivebase::Output_applicator::operator()(Robot_outputs robot,Drivebase::Output b)const{
-	//cout<<"\nOutputs: "<<b<<"\n";
 	robot.pwm[L_MOTOR_LOC_1] = -b.l; // positive values go forward
 	robot.pwm[L_MOTOR_LOC_2] = -b.l;
 	robot.pwm[L_MOTOR_LOC_3] = -b.l;
 	robot.pwm[R_MOTOR_LOC_1] = b.r;
 	robot.pwm[R_MOTOR_LOC_2] = b.r;
 	robot.pwm[R_MOTOR_LOC_3] = b.r;
-
-	/*
-	cout<<"b.l: "<<b.l<<'\n';
-	cout<<"b.r: "<<b.r<<'\n';
-	cout<<"pwms: "<<robot.pwm<<'\n';
-	*/
 
 	auto set_encoder=[&](unsigned int a, unsigned int b,unsigned int loc){
 		robot.digital_io[a] = Digital_out::encoder(loc,1);

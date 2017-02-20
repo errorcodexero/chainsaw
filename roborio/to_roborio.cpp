@@ -89,10 +89,7 @@ Joystick_data read_joystick(DriverStation& ds,int port){
 		assert(lim>=0);
 		unsigned axes=std::min((unsigned)JOY_AXES,(unsigned)lim);
 		for(unsigned i=0;i<axes;i++){
-			//r.axis[i]=ds.GetStickAxis(port+1,i+1);
-			//cerr<<"Reading Port "<<port<<" Axis "<<i<<endl<<flush;
 			r.axis[i]=ds.GetStickAxis(port,i);
-			//cerr<<r.axis[i]<<endl<<flush;
 		}
 	}
 	auto lim=ds.GetStickButtonCount(port);
@@ -175,7 +172,6 @@ class To_roborio
 	AnalogInput *analog_in[Robot_inputs::ANALOG_INPUTS];
 	int error_code;
 	USER_CODE main;
-	int skipped;
 	//Talon_srx_controls talon_srx_controls;
 	//DriverStationLCD *lcd;
 	//NetworkTable *table;
@@ -186,7 +182,7 @@ class To_roborio
 	Pixy::PixyUART uart;
 	Pixy::PixyCam camera;
 public:
-	To_roborio():error_code(0),skipped(0),driver_station(DriverStation::GetInstance()),uart("/dev/ttyS1"),camera(uart)//,gyro(NULL)
+	To_roborio():error_code(0),driver_station(DriverStation::GetInstance()),uart("/dev/ttyS1"),camera(uart)//,gyro(NULL)
 	{
 		power = new PowerDistributionPanel();
 		// Wake the NUC by sending a Wake-on-LAN magic UDP packet:
@@ -272,7 +268,7 @@ public:
 		return ds_info;
 	}
 
-	Camera read_camera(Robot_inputs){
+	Camera read_camera(Robot_inputs){//TODO: check to see if camera exists
 		Camera c;
 		c.enabled=0;//r.robot_mode.enabled;
 		if(c.enabled){
@@ -341,24 +337,6 @@ public:
 			if(r) error_code|=2;
 		}
 
-		/*cout<<"cout1\n";
-		cout.flush();
-		cerr<<"cerr1\n";
-		cerr.flush();
-		usleep(1000*5);*/
-
-		/*if(0){
-			//The first column is numbered 1.
-			lcd->Printf(DriverStationLCD::kUser_Line1,1,"%s",space_out(out.driver_station.lcd.line[0]).c_str());
-			lcd->Printf(DriverStationLCD::kUser_Line2,1,"%s",space_out(out.driver_station.lcd.line[1]).c_str());
-			lcd->Printf(DriverStationLCD::kUser_Line3,1,"%s",space_out(out.driver_station.lcd.line[2]).c_str());
-			lcd->Printf(DriverStationLCD::kUser_Line4,1,"%s",space_out(out.driver_station.lcd.line[3]).c_str());
-			lcd->Printf(DriverStationLCD::kUser_Line5,1,"%s",space_out(out.driver_station.lcd.line[4]).c_str());
-			lcd->Printf(DriverStationLCD::kUser_Line6,1,"%s",space_out(out.driver_station.lcd.line[5]).c_str());
-			lcd->UpdateLCD();
-		}else{
-			cerr<<"lcd is null\r\n";
-		}*/
 		for(unsigned i=0;i<Robot_outputs::SOLENOIDS;i++){
 			int r=set_solenoid(i,out.solenoid[i]);
 			if(r) error_code|=16;
@@ -373,7 +351,7 @@ public:
 		{	
 			Joystick panel(Panel::PORT);
 			for(unsigned i=0;i<Driver_station_output::DIGITAL_OUTPUTS;i++){
-				panel.SetOutput(i, out.driver_station.digital[i]);
+				panel.SetOutput(i+1, out.driver_station.digital[i]);
 			}
 		}
 		{
@@ -383,22 +361,6 @@ public:
 			}
 			//talon_srx_controls.set(out.talon_srx,enable_all); 
 		}
-		//rate limiting the output  
-		if(skipped==0){
-			//cerr<<"Ran "<<mode<<"\r\n";
-			/*cerr<<in<<"\r\n";
-			cerr<<main<<"\r\n";*/
-			//cerr<<"errorcode="<<error_code<<"\n";
-			//cerr.flush();
-			//cerr<<out<<"\r\n";
-			/*cerr<<"Going to start task\r\n";
-			int priority=Task::kDefaultPriority;
-			int stack_size=64000;//copied from Task
-			INT32 task_id=taskSpawn("tDemo",priority,VX_FP_TASK,stack_size,demo,0,1,2,3,4,5,6,7,8,9);
-			cerr<<"Task id="<<task_id<<" error="<<ERROR<<"\r\n";*/
-		}
-		
-		skipped=(skipped+1)%100;
 		return error_code;
 	}
 	
@@ -411,7 +373,6 @@ public:
 			cout<<"in: "<<in<<"\n";
 			cout<<"main: "<<main<<"\n";
 			cout<<"out: "<<out<<"\n";
-			//cout<<"talon_srx_controls: "<<talon_srx_controls<<"\n";//Do not add back in. crashes
 			cout<<"CLEAR_SCREEN\n";
 		}
 		int x=set_outputs(out,in.robot_mode.enabled);
@@ -420,35 +381,11 @@ public:
 	}
 	
 	void run(Robot_mode mode){
-		/*cerr<<"Going to set LCD\n";
-		cerr.flush();
-		
-		ALON//string s="hell owrld\n";
-		static const unsigned SIZE=USER_DS_LCD_DATA_SIZE;
-		char s[SIZE];
-		memset(s,' ',SIZE);
-		s[0]='a';
-		s[1]='b';
-		//setUserDsLcdData(s,SIZE,0);
-		DriverStationLCD *a=DriverStationLCD::GetInstance();
-		if(!a){
-			cerr<<"LCD null\n";
-		}else{
-			a->PrintfLine(DriverStationLCD::kUser_Line1,"d");
-			a->UpdateLCD();
-			//a->PrintLine("hello");
-		}
-		cerr<<"Done with LCD\n";
-		cerr.flush();*/
-		
-
 		pair<Robot_inputs,int> in1=read(mode);
 		Robot_inputs in=in1.first;
 		error_code|=in1.second;
 		in.digital_io=digital_io.get();
 		//in.talon_srx=talon_srx_controls.get();
-		//cout<<"in:"<<in<<"\n";
-		//}
 		/*if(gyro){
 			in.orientation=gyro->GetAngle();
 		}*/
