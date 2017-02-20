@@ -2,7 +2,7 @@
 
 using namespace std;
 
-#define GEAR_LIGHT_OUT 1
+#define GEAR_LIGHT_OUT 0 //-1
 #define HALL_EFFECT_LOC 4 //TODO: get real value
 #define PISTON_LOC 1
 
