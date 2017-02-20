@@ -155,7 +155,7 @@ bool operator!=(Drivebase::Distances const& a,Drivebase::Distances const& b){
 
 ostream& operator<<(ostream& o,Drivebase::Distances const& a){
 	o<<"Distances(";
-	#define X(TYPE,SIDE) o<<""#SIDE<<":"<<a.SIDE<<" ";
+	#define X(TYPE,SIDE) o<</*""#SIDE<<":"<<*/a.SIDE<<" ";
 	DISTANCES_ITEMS(X)
 	#undef X
 	return o<<")";

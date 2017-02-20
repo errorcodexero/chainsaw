@@ -91,28 +91,33 @@ Step_impl::~Step_impl(){}
 	return this->operator==(b);
 }*/
 
-Drive_straight::Drive_straight(Inch goal):target_dist(goal),initial_distances(Drivebase::Distances{0,0}),init(false),motion_profile(goal,0.2,.5){}
+Drive_straight::Drive_straight(Inch goal):target_dist(goal),initial_distances(Drivebase::Distances{0,0}),init(false),motion_profile(goal,0.1,.5){}
 
 bool Drive_straight::done(Next_mode_info info){
 	static const Inch TOLERANCE = 3.0;//inches
 	Drivebase::Distances distance_travelled = info.status.drive.distances - initial_distances;
-	Drivebase::Distances differences = fabs(Drivebase::Distances{target_dist,target_dist} - distance_travelled);
-	cout<<"\nCURR:"<<distance_travelled<<" DIFF: "<<differences<<"\n";
-	bool d = mean(differences.l,differences.r) < TOLERANCE;
-	return d;
+	Drivebase::Distances distance_left = fabs(Drivebase::Distances{target_dist,target_dist} - distance_travelled);
+	cout<<"\nCURR:"<<distance_travelled<<"    LEFT:"<<distance_left<<"    in_range:"<<in_range<<"\n";
+	if(mean(distance_left.l,distance_left.r) < TOLERANCE){
+		in_range.update(info.in.now,info.in.robot_mode.enabled);
+	} else {
+		static const Time FINISH_TIME = 1.0;
+		in_range.set(FINISH_TIME);
+	}
+	return in_range.done();
 }
 
 Toplevel::Goal Drive_straight::run(Run_info info){
-	cout<<"\nRUNNING\n";
 	if(!init){
 		initial_distances = info.status.drive.distances;
 		init = true;
 	}
 	Toplevel::Goal goals;
-	
-	double power = mean(motion_profile.target_speed(info.status.drive.distances.l), goals.drive.right = motion_profile.target_speed(info.status.drive.distances.r));
+
+	double power = mean(motion_profile.target_speed(info.status.drive.distances.l),motion_profile.target_speed(info.status.drive.distances.r));
 	goals.drive.left = power;
 	goals.drive.right = power;
+	cout<<"\npower: "<<goals.drive.left<<"\n";
 	goals.shifter = Gear_shifter::Goal::LOW;
 	return goals;
 }
@@ -122,7 +127,7 @@ unique_ptr<Step_impl> Drive_straight::clone()const{
 }
 
 bool Drive_straight::operator==(Drive_straight const& b)const{
-	return target_dist == b.target_dist && initial_distances == b.initial_distances && init == b.init && motion_profile == b.motion_profile;
+	return target_dist == b.target_dist && initial_distances == b.initial_distances && init == b.init && motion_profile == b.motion_profile && in_range == b.in_range;
 }
 
 Step_impl const& Step::get()const{

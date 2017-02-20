@@ -66,7 +66,8 @@ class Drive_straight:public Step_impl_inner<Drive_straight>{
 	Drivebase::Distances initial_distances;
 	bool init;
 	Motion_profile motion_profile;
-
+	Countdown_timer in_range;
+	
 	public:
 	explicit Drive_straight(Inch);
 

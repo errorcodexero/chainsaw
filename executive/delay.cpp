@@ -40,7 +40,7 @@ Executive auto_mode_convert(Next_mode_info info){
 	Executive auto_null{Teleop{}};
 
 	Executive auto_baseline{Chain{
-		Step{Drive_straight{4*12}},//TODO change to 12*12
+		Step{Drive_straight{7*12}},//TODO change to 12*12
 		Executive{Teleop{}}
 	}};
 
