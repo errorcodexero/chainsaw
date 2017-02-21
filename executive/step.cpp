@@ -133,10 +133,16 @@ Toplevel::Goal Drive_straight::run(Run_info info,Toplevel::Goal goals){
 	}
 
 	Drivebase::Distances distance_travelled = info.status.drive.distances - initial_distances;	
+	
+	/*
+	static const double ERROR_SCALAR = 1.0;
+	double error_correction_left = 0.5 * ERROR_SCALAR * (distance_travelled.r - distance_travelled.l);
+	double error_correction_right = 0.5 * ERROR_SCALAR * (distance_travelled.l - distance_travelled.r);
+	*/
 
 	double power = mean(motion_profile.target_speed(distance_travelled.l),motion_profile.target_speed(distance_travelled.r));
-	goals.drive.left = power;
-	goals.drive.right = power;
+	goals.drive.left = power /* + error_correction_left * power */;
+	goals.drive.right = power /* + error_correction_right * power */;
 	goals.shifter = Gear_shifter::Goal::LOW;
 	return goals;
 }
