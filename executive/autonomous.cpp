@@ -12,6 +12,8 @@ double deg_to_rad(double deg){
 
 const Inch SCORE_GEAR_APPROACH_DIST = 18.0;//inches
 
+const Inch ROBOT_LENGTH = 29.0; //inches from front to back
+
 Executive insert_score_gear(Executive last){
 	Executive score_gear{Chain{
 		Step{Lift_gear()},//lift gear from floor
@@ -60,7 +62,7 @@ Executive get_auto_mode(Next_mode_info info){
 	// Tests for different steps
 	//
 		
-	Executive drive_straight_test = make_test(Drive_straight{3*12});//used to test the Step Drive_straight
+	Executive drive_straight_test = make_test(Drive_straight{7*12});//used to test the Step Drive_straight
 	Executive turn_test = make_test(Turn{PI/2});//used to test the Step Turn
 
 	////////////////////////////
@@ -93,15 +95,18 @@ Executive get_auto_mode(Next_mode_info info){
 
 	//Scores a gear on the middle peg and then stops
 	Executive gear_drop_mid{Chain{
-		Step{Drive_straight{114.3 - SCORE_GEAR_APPROACH_DIST}},//TODO: find out correct distance
+		Step{Combo{
+			Step{Drive_straight{114.3 - SCORE_GEAR_APPROACH_DIST - ROBOT_LENGTH}},//TODO: find out correct distance
+			Step{Lift_gear()}
+		}},
 		score_gear
 	}};
 
 	if (info.panel.in_use) {
 		switch(info.panel.auto_select){ 
 			case 0: //Do Nothing
-				//return auto_null;
-				return score_gear;				
+				return auto_null;
+				//return score_gear;				
 				//tests for different steps
 				//return make_test(Lift_gear());
 				//return drive_straight_test; 
