@@ -34,6 +34,7 @@ struct Block {
 };
 
 std::ostream& operator << ( std::ostream& stm, const Pixy::Block& block );
+bool operator==(Block const&,Block const&);
 
 ////////////////////////////////////////////////////////////////////////
 //

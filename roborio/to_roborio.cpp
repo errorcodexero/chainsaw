@@ -181,8 +181,9 @@ class To_roborio
 	DriverStation& driver_station;
 	Pixy::PixyUART uart;
 	Pixy::PixyCam camera;
+	bool cam_data_recieved;
 public:
-	To_roborio():error_code(0),driver_station(DriverStation::GetInstance()),uart("/dev/ttyS1"),camera(uart)//,gyro(NULL)
+	To_roborio():error_code(0),driver_station(DriverStation::GetInstance()),uart("/dev/ttyS1"),camera(uart),cam_data_recieved(false)//,gyro(NULL)
 	{
 		power = new PowerDistributionPanel();
 		// Wake the NUC by sending a Wake-on-LAN magic UDP packet:
@@ -268,14 +269,17 @@ public:
 		return ds_info;
 	}
 
-	Camera read_camera(Robot_inputs){//TODO: check to see if camera exists
+	Camera read_camera(Robot_inputs r){
 		Camera c;
-		c.enabled=0;//r.robot_mode.enabled;
-		if(c.enabled){
+		if(r.now<.05&&!cam_data_recieved) {
+			c.enabled=false;
 			camera.enable();
-			if(camera.isNewData()) c.blocks=camera.getBlocks();
+			if(camera.isNewData()) cam_data_recieved=true;
+		} else {
+			c.enabled=cam_data_recieved&&camera.enable()&&r.robot_mode.enabled;
+			if(c.enabled && camera.isNewData()) c.blocks=camera.getBlocks();
+			else camera.disable();
 		}
-		else camera.disable();
 		return c;
 	}
 
