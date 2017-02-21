@@ -3,7 +3,7 @@
 
 using namespace std;
 
-#define SHOOTER_FEED_RELAY 0 
+#define SHOOTER_FEED_RELAY 1 //This is going to be deleted anyway 
 
 ostream& operator<<(ostream& o, Shooter_feed::Goal a){
 	#define X(name) if(a==Shooter_feed::Goal::name)return o<<""#name;

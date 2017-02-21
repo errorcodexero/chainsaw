@@ -579,6 +579,20 @@ cc_test(
 	timeout="short"
 )
 
+cc_library(
+	name="lights",
+	srcs=["control/lights.cpp"],
+	hdrs=["control/lights.h"],
+	deps=[":interface",":nop"]
+)
+
+cc_test(
+	name="lights_test",
+	srcs=["control/lights.cpp","control/lights.h","control/formal.h"],
+	copts=["-DLIGHTS_TEST"],
+	deps=[":interface",":nop"],
+	timeout="short"
+)
 
 cc_library(
 	name="force",
