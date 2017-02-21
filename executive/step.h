@@ -157,6 +157,9 @@ struct Turn: Step_impl_inner<Turn>{
 	bool operator==(Turn const&)const;
 };
 struct Align: public Step_impl_inner<Align>{
+	std::vector<Pixy::Block> blocks;
+	int current;
+	int center;
 	Countdown_timer in_range; 
 	public:
 	explicit Align();

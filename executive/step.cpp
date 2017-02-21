@@ -144,7 +144,11 @@ Toplevel::Goal Drive_straight::run(Run_info info,Toplevel::Goal goals){
 Align::Align(){}
 
 bool Align::done(Next_mode_info info){
-	if(true/*pixy cam condition*/){
+	blocks=info.in.camera.blocks;
+	current=mean(blocks[0].x,blocks[1].x);
+	center=mean(blocks[0].min_x,blocks[0].max_x);
+	int TOLLERENCE= 2;
+	if(current<= center-TOLLERENCE && current >=center-TOLLERENCE){
 		in_range.update(info.in.now,info.in.robot_mode.enabled);
 	} else {
 		static const Time FINISH_TIME = 1.0;
@@ -152,12 +156,15 @@ bool Align::done(Next_mode_info info){
 	}
 	return in_range.done();
 }
+
 Toplevel::Goal Align::run(Run_info info){
 	return run(info,{});
 }
 
 Toplevel::Goal Align::run(Run_info info,Toplevel::Goal goals){
-	
+	blocks=info.in.camera.blocks;
+	current=mean(blocks[0].x,blocks[1].x);
+	center=mean(blocks[0].min_x,blocks[0].max_x);
 	double power = 0;
 	goals.drive.left = power;
 	goals.drive.right = power;
