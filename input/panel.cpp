@@ -6,7 +6,7 @@
 #include <cmath>
 
 using namespace std;
-static const unsigned int BALL_ARM_AXIS=0,GEAR_GRASPER_AXIS=1,GEAR_COLLECTOR_AXIS=2,SHOOTER_AXIS=3,BALL_INTAKE_AXIS=4,BALL_LIFT_AXIS=5,AUTO_SELECTOR_AXIS=6,SPEED_DIAL_AXIS=7;//TODO: rename constants
+static const unsigned int BALL_ARM_AXIS=0,BALL_LIFT_AXIS=1,BALL_INTAKE_AXIS=2,SHOOTER_AXIS=3,GEAR_COLLECTOR_AXIS=4,GEAR_GRASPER_AXIS=5,AUTO_SELECTOR_AXIS=6,SPEED_DIAL_AXIS=7;//TODO: rename constants
 static const unsigned int BALL_COLLECT_LOC=0,LOADING_INDICATOR_LOC=1,SHOOT_LOC=2,PREP_COLLECT_GEAR_LOC=3,PREP_SCORE_GEAR_LOC=4,COLLECT_GEAR_LOC=5,SCORE_GEAR_LOC=6,CLIMB_LOC=7,LEARN_LOC=8;//TODO: rename constants
 static const unsigned int SHOOTER_BELT_AUTO_LOC=9,SHOOTER_BELT_ENABLED_LOC=10,BALL_COLLECTOR_DISABLED_LOC=11,BALL_COLLECTOR_AUTO_LOC=12;
 
@@ -272,8 +272,6 @@ Panel interpret_gamepad(Joystick_data d){
 	p.in_use = get_in_use(d);
 	if(!p.in_use) return p;
 	
-	//TODO: Redo this with new controls
-	
 	bool alternative_op = d.button[Gamepad_button::LB];
 	p.auto_select=0;
 	p.speed_dial = (d.axis[Gamepad_axis::LTRIGGER]-.5)*2;
@@ -285,6 +283,7 @@ Panel interpret_gamepad(Joystick_data d){
 		p.gear_score = d.button[Gamepad_button::B];
 		p.gear_collect = d.button[Gamepad_button::X];
 		p.gear_prep_collect = d.button[Gamepad_button::A];
+
 		switch(pov_section(d.axis[Gamepad_axis::DPAD])){
 			case POV_section::CENTER:
 				break;
@@ -310,6 +309,7 @@ Panel interpret_gamepad(Joystick_data d){
 			default:
 				assert(0);
 		}
+
 		p.ball_arm=Panel::Ball_arm::AUTO;
 		p.gear_grasper=Panel::Gear_grasper::AUTO;
 		p.gear_collector=Panel::Gear_collector::AUTO;
@@ -318,14 +318,19 @@ Panel interpret_gamepad(Joystick_data d){
 		p.ball_lift=Panel::Ball_lift::AUTO;
 		p.shooter_belt=Panel::Shooter_belt::AUTO;
 		p.ball_collector=Panel::Ball_collector::AUTO;
-	} else{
+	} else {
 		p.ball_collector = d.button[Gamepad_button::RB] ? Panel::Ball_collector::DISABLED:Panel::Ball_collector::AUTO;
-		if(d.button[Gamepad_button::B]) p.gear_grasper= Panel::Gear_grasper::CLOSED;
+
+		if(d.button[Gamepad_button::B]) p.gear_grasper=Panel::Gear_grasper::CLOSED;
 		else if(!d.button[Gamepad_button::X]) p.gear_grasper= Panel::Gear_grasper::OPEN;
 		else p.gear_grasper=Panel::Gear_grasper::AUTO;
-		if(d.button[Gamepad_button::Y]) p.gear_collector= Panel::Gear_collector::UP;
+
+		if(d.button[Gamepad_button::Y]) p.gear_collector=Panel::Gear_collector::UP;
 		else if(!d.button[Gamepad_button::A]) p.gear_collector=Panel::Gear_collector::DOWN;
 		else p.gear_collector=Panel::Gear_collector::AUTO;
+
+		p.ball_lift=Panel::Ball_lift::AUTO;
+		p.ball_intake=Panel::Ball_intake::AUTO;
 		switch(pov_section(d.axis[Gamepad_axis::DPAD])){
 			case POV_section::CENTER:
 				break;
@@ -352,6 +357,7 @@ Panel interpret_gamepad(Joystick_data d){
 			default:
 				assert(0);
 		}
+
 		switch(joystick_section(d.axis[Gamepad_axis::LEFTX],d.axis[Gamepad_axis::LEFTY])){
 			case Joystick_section::UP:
 				p.shooter=Panel::Shooter::ENABLED;
@@ -370,10 +376,13 @@ Panel interpret_gamepad(Joystick_data d){
 				p.shooter_belt=Panel::Shooter_belt::ENABLED;
 				break;
 			case Joystick_section::CENTER:
+				p.shooter=Panel::Shooter::AUTO;
+				p.shooter_belt=Panel::Shooter_belt::AUTO;
 				break;
 			default:
 				assert(0);
 		}
+
 		switch(joystick_section(d.axis[Gamepad_axis::RIGHTX],d.axis[Gamepad_axis::RIGHTY])){
 			case Joystick_section::UP:
 				p.ball_arm=Panel::Ball_arm::UP;
@@ -386,6 +395,7 @@ Panel interpret_gamepad(Joystick_data d){
 			case Joystick_section::RIGHT:
 				break;
 			case Joystick_section::CENTER:
+				p.ball_arm=Panel::Ball_arm::AUTO;
 				break;
 			default:
 				assert(0);
