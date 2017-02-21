@@ -13,6 +13,7 @@ class Step{
 	explicit Step(Step_impl const&);
 	Step(Step const&);
 
+	Toplevel::Goal run(Run_info,Toplevel::Goal);
 	Toplevel::Goal run(Run_info);
 	bool done(Next_mode_info);
 	Step_impl const& get()const;
@@ -26,6 +27,7 @@ std::ostream& operator<<(std::ostream&,Step const&);
 struct Step_impl{
 	virtual ~Step_impl();
 
+	virtual Toplevel::Goal run(Run_info,Toplevel::Goal)=0;
 	virtual Toplevel::Goal run(Run_info)=0;
 	virtual bool done(Next_mode_info)=0;//could try to make this const.
 	virtual std::unique_ptr<Step_impl> clone()const=0;
@@ -71,13 +73,75 @@ class Drive_straight:public Step_impl_inner<Drive_straight>{
 	public:
 	explicit Drive_straight(Inch);
 
+	Toplevel::Goal run(Run_info,Toplevel::Goal);//TODO
 	Toplevel::Goal run(Run_info);
 	bool done(Next_mode_info);
 	std::unique_ptr<Step_impl> clone()const;
 	bool operator==(Drive_straight const&)const;
 };
 
-struct Turn:Step_impl_inner<Turn>{
+class Wait: public Step_impl_inner<Wait>{
+	Countdown_timer wait_timer;//seconds
+	public:
+	explicit Wait(Time);
+
+	Toplevel::Goal run(Run_info,Toplevel::Goal);
+	Toplevel::Goal run(Run_info);
+	bool done(Next_mode_info);
+	std::unique_ptr<Step_impl> clone()const;
+	bool operator==(Wait const&)const;
+};
+
+class Lift_gear: public Step_impl_inner<Lift_gear>{
+	Gear_collector::Goal goal;//is the same in every one
+	public:
+	explicit Lift_gear();
+
+	Toplevel::Goal run(Run_info,Toplevel::Goal);
+	Toplevel::Goal run(Run_info);
+	bool done(Next_mode_info);
+	std::unique_ptr<Step_impl> clone()const;
+	bool operator==(Lift_gear const&)const;
+};
+
+class Drop_gear: public Step_impl_inner<Drop_gear>{
+	Gear_collector::Goal goal;
+	public:
+	explicit Drop_gear();
+
+	Toplevel::Goal run(Run_info,Toplevel::Goal);
+	Toplevel::Goal run(Run_info);
+	bool done(Next_mode_info);
+	std::unique_ptr<Step_impl> clone()const;
+	bool operator==(Drop_gear const&)const;
+};
+
+class Drop_collector: public Step_impl_inner<Drop_collector>{
+	Gear_collector::Goal goal;
+	public:
+	explicit Drop_collector();
+
+	Toplevel::Goal run(Run_info,Toplevel::Goal);
+	Toplevel::Goal run(Run_info);
+	bool done(Next_mode_info);
+	std::unique_ptr<Step_impl> clone()const;
+	bool operator==(Drop_collector const&)const;
+};
+
+class Combo: public Step_impl_inner<Combo>{
+	Step step_a;
+	Step step_b;
+	public:
+	explicit Combo(Step,Step);
+
+	Toplevel::Goal run(Run_info,Toplevel::Goal);
+	Toplevel::Goal run(Run_info);
+	bool done(Next_mode_info);
+	std::unique_ptr<Step_impl> clone()const;
+	bool operator==(Combo const&)const;
+};
+
+struct Turn: Step_impl_inner<Turn>{
 	Rad target_angle;//radians,clockwise=positive
 	Drivebase::Distances initial_distances;
 	bool init;
@@ -86,6 +150,7 @@ struct Turn:Step_impl_inner<Turn>{
 	Countdown_timer in_range;
 
 	explicit Turn(Rad);
+	Toplevel::Goal run(Run_info,Toplevel::Goal);
 	Toplevel::Goal run(Run_info);
 	bool done(Next_mode_info);
 	std::unique_ptr<Step_impl> clone()const;

@@ -9,11 +9,16 @@ using namespace std;
 double deg_to_rad(double deg){
 	return deg/180*PI;
 }
+auto Geardrop(){ return Drive_straight{0}; }//TODO: remove
 
-//using Geardrop=Drive_straight{0}; //TODO: Fixme
-auto Geardrop(){ return Drive_straight{0}; }
+Executive make_test(auto a){
+	return Executive{Chain{
+		Step{a},
+		Executive{Teleop{}}
+	}};
+}
 
-Executive auto_mode_convert(Next_mode_info info){
+Executive get_auto_mode(Next_mode_info info){
 	if(!info.autonomous) return Executive{Teleop()};
 
 	//for when just want to run across the field at the end of autonomous
@@ -34,20 +39,55 @@ Executive auto_mode_convert(Next_mode_info info){
 		Executive{Teleop{}}
 	}};
 	
-	Executive drive_straight_test{Chain{//used to test the Step Drive_straight
-		Step{Drive_straight{3*12}},
-		Executive{Teleop{}}
+	Executive drive_straight_test = make_test(Drive_straight{3*12});//used to test the Step Drive_straight
+	Executive turn_test = make_test(Turn{PI/2});//used to test the Step Turn
+
+	//for scoring a gear after the robot is lined up in front of any of the pegs
+	Executive score_gear{Chain{
+		Step{Lift_gear()},//lift gear from floor
+		Executive{Chain{
+			Step{Combo{
+				Step{Lift_gear()},
+				Step{Drive_straight{3*12}}
+			}},//slide gear onto peg
+			Executive{Chain{
+				Step{Drop_gear()},//let go of gear
+				Executive{Chain{
+					Step{Combo{
+						Step{Wait{1.0}},
+						Step{Drop_gear()}
+					}},//make sure we're not attached to the gear
+					Executive{Chain{
+						Step{Combo{
+							Step{Drop_gear()},
+							Step{Drive_straight{-3*12}}
+						}},//drive back from the peg
+						Executive{Chain{
+							Step{Drop_collector()},//lower the collector to the floor
+							Executive{Teleop()}
+						}}
+					}}
+				}}
+			}}		
+		}}
 	}};
 
-	Executive turn_test{Chain{//used to test the Step Turn
-		Step{Turn{PI/2}},
-		Executive{Teleop{}}
+
+	Executive gear_drop_mid{Chain{
+		Step{Drive_straight{10*12}},
+		Executive{Chain{
+			Step{Geardrop()},
+			backoff
+		}}
 	}};
 
 	if (info.panel.in_use) {
 		switch(info.panel.auto_select){ 
 			case 0: //Do Nothing
 				return auto_null;
+				//tests for different steps
+				//return score_gear;
+				//return make_test(Lift_gear());
 				//return drive_straight_test; 
 				//return turn_test;
 			case 1: //Baseline
@@ -126,13 +166,7 @@ Executive auto_mode_convert(Next_mode_info info){
 					}}
 				}};	
 			case 7: //Gear Mid
-				return Executive{Chain{
-					Step{Drive_straight{10*12}},
-					Executive{Chain{
-						Step{Geardrop()},
-						backoff
-					}}
-				}};
+				return gear_drop_mid;
 			case 8: //Gear mid Extended right
 				return Executive{Chain{
 					Step{Drive_straight{10*12}},
@@ -204,9 +238,9 @@ Executive auto_mode_convert(Next_mode_info info){
 }
 
 Executive Autonomous::next_mode(Next_mode_info info){
-	static const Time DELAY = 0.0;//seconds, TODO: base it off of the dial on the OI?
+	static const Time DELAY = 0.0;//seconds, TODO: base it off of the dial on the OI? Or maybe during autonomous wait until we reach a certain air pressure?
 	if(!info.autonomous) return Executive{Teleop()};
-	if(info.since_switch > DELAY) return auto_mode_convert(info);
+	if(info.since_switch > DELAY) return get_auto_mode(info);
 	return Executive{Autonomous()};
 }
 
