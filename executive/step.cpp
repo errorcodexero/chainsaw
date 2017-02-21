@@ -141,6 +141,39 @@ Toplevel::Goal Drive_straight::run(Run_info info,Toplevel::Goal goals){
 	return goals;
 }
 
+Align::Align(){}
+
+bool Align::done(Next_mode_info info){
+	if(true/*pixy cam condition*/){
+		in_range.update(info.in.now,info.in.robot_mode.enabled);
+	} else {
+		static const Time FINISH_TIME = 1.0;
+		in_range.set(FINISH_TIME);
+	}
+	return in_range.done();
+}
+Toplevel::Goal Align::run(Run_info info){
+	return run(info,{});
+}
+
+Toplevel::Goal Align::run(Run_info info,Toplevel::Goal goals){
+	
+	double power = 0;
+	goals.drive.left = power;
+	goals.drive.right = power;
+	goals.shifter = Gear_shifter::Goal::LOW;
+	return goals;
+}
+
+unique_ptr<Step_impl> Align::clone()const{
+	return unique_ptr<Step_impl>(new Align());
+}
+
+bool Align::operator==(Align const& b)const{
+	return in_range == b.in_range;
+}
+
+
 unique_ptr<Step_impl> Drive_straight::clone()const{
 	return unique_ptr<Step_impl>(new Drive_straight(*this));
 }

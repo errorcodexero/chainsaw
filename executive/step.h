@@ -156,5 +156,20 @@ struct Turn: Step_impl_inner<Turn>{
 	std::unique_ptr<Step_impl> clone()const;
 	bool operator==(Turn const&)const;
 };
+struct Align: public Step_impl_inner<Align>{
+	Countdown_timer in_range; 
+	public:
+	explicit Align();
+
+	Toplevel::Goal run(Run_info,Toplevel::Goal);//TODO
+	Toplevel::Goal run(Run_info);
+	bool done(Next_mode_info);
+	std::unique_ptr<Step_impl> clone()const;
+	bool operator==(Align const&)const;
+	
+
+
+
+};
 
 #endif
