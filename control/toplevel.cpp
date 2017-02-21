@@ -387,7 +387,7 @@ set<Toplevel::Output> examples(Toplevel::Output*){
 #include "../util/output.h"
 
 bool approx_equal(float a, float b){
-	return a==b;
+	return a==b;//TODO: why?
 }
 
 bool approx_equal(Toplevel::Status /*a*/,Toplevel::Status /*b*/){
