@@ -9,7 +9,43 @@ using namespace std;
 double deg_to_rad(double deg){
 	return deg/180*PI;
 }
-auto Geardrop(){ return Drive_straight{0}; }//TODO: remove
+
+const Inch SCORE_GEAR_APPROACH_DIST = 18.0;//inches
+
+const Inch ROBOT_LENGTH = 29.0; //inches from front to back
+
+Executive insert_score_gear(Executive last){
+	Executive score_gear{Chain{
+		Step{Lift_gear()},//lift gear from floor
+		Executive{Chain{
+			Step{Combo{
+				Step{Lift_gear()},
+				Step{Drive_straight{SCORE_GEAR_APPROACH_DIST}}
+			}},//slide gear onto peg
+			Executive{Chain{
+				Step{Drop_gear()},//let go of gear
+				Executive{Chain{
+					Step{Combo{
+						Step{Wait{.5}},
+						Step{Drop_gear()}
+					}},//make sure we're not attached to the gear
+					Executive{Chain{
+						Step{Combo{
+							Step{Drop_gear()},
+							Step{Drive_straight{-SCORE_GEAR_APPROACH_DIST}}
+						}},//drive back from the peg
+						Executive{Chain{
+							Step{Drop_collector()},//lower the collector to the floor
+							last //what to do after scoring the gear
+						}}
+					}}
+				}}
+			}}		
+		}}
+	}};
+	return score_gear;
+}
+
 
 Executive make_test(auto a){
 	return Executive{Chain{
@@ -26,7 +62,7 @@ Executive get_auto_mode(Next_mode_info info){
 	// Tests for different steps
 	//
 		
-	Executive drive_straight_test = make_test(Drive_straight{3*12});//used to test the Step Drive_straight
+	Executive drive_straight_test = make_test(Drive_straight{7*12});//used to test the Step Drive_straight
 	Executive turn_test = make_test(Turn{PI/2});//used to test the Step Turn
 
 	////////////////////////////
@@ -35,34 +71,7 @@ Executive get_auto_mode(Next_mode_info info){
 	// 
 
 	//for scoring a gear after the robot is lined up in front of any of the pegs
-	Executive score_gear{Chain{
-		Step{Lift_gear()},//lift gear from floor
-		Executive{Chain{
-			Step{Combo{
-				Step{Lift_gear()},
-				Step{Drive_straight{12}}
-			}},//slide gear onto peg
-			Executive{Chain{
-				Step{Drop_gear()},//let go of gear
-				Executive{Chain{
-					Step{Combo{
-						Step{Wait{.5}},
-						Step{Drop_gear()}
-					}},//make sure we're not attached to the gear
-					Executive{Chain{
-						Step{Combo{
-							Step{Drop_gear()},
-							Step{Drive_straight{-12}}
-						}},//drive back from the peg
-						Executive{Chain{
-							Step{Drop_collector()},//lower the collector to the floor
-							Executive{Teleop()}
-						}}
-					}}
-				}}
-			}}		
-		}}
-	}};
+	Executive score_gear = insert_score_gear(Executive{Teleop()});
 
 	//for when just want to run across the field at the end of autonomous
 	Executive dash{Chain{
@@ -86,7 +95,10 @@ Executive get_auto_mode(Next_mode_info info){
 
 	//Scores a gear on the middle peg and then stops
 	Executive gear_drop_mid{Chain{
-		Step{Drive_straight{114.3 - 12}},//TODO: find out correct distance (-12 is for score_gear)
+		Step{Combo{
+			Step{Drive_straight{114.3 - SCORE_GEAR_APPROACH_DIST - ROBOT_LENGTH}},//TODO: find out correct distance
+			Step{Lift_gear()}
+		}},
 		score_gear
 	}};
 
@@ -94,6 +106,7 @@ Executive get_auto_mode(Next_mode_info info){
 		switch(info.panel.auto_select){ 
 			case 0: //Do Nothing
 				return auto_null;
+				//return score_gear;				
 				//tests for different steps
 				//return make_test(Lift_gear());
 				//return drive_straight_test; 
@@ -123,8 +136,7 @@ Executive get_auto_mode(Next_mode_info info){
 						Step{Turn{deg_to_rad(40)}},
 						Executive{Chain{
 							Step{Drive_straight{12}}, //approach
-							Executive{Chain{
-								Step{Geardrop()},
+							insert_score_gear(
 								Executive{Chain{
 									Step{Drive_straight{-12}},
 									Executive{Chain{
@@ -132,7 +144,7 @@ Executive get_auto_mode(Next_mode_info info){
 										dash
 									}}
 								}}
-							}}
+							)
 						}}
 					}}
 				}};
@@ -143,7 +155,7 @@ Executive get_auto_mode(Next_mode_info info){
 						Step{Turn{deg_to_rad(-40)}},
 						Executive{Chain{
 							Step{Drive_straight{12}}, //approach
-							score_gear
+							insert_score_gear(Executive{Teleop()})
 						}}
 					}}
 				}};
@@ -154,8 +166,7 @@ Executive get_auto_mode(Next_mode_info info){
 						Step{Turn{deg_to_rad(-40)}},
 						Executive{Chain{
 							Step{Drive_straight{12}}, //approach
-							Executive{Chain{
-								Step{Geardrop()},
+							insert_score_gear(
 								Executive{Chain{
 									Step{Drive_straight{-12}},
 									Executive{Chain{
@@ -163,7 +174,7 @@ Executive get_auto_mode(Next_mode_info info){
 										dash
 									}}
 								}}
-							}}
+							)
 						}}
 					}}
 				}};	
@@ -172,8 +183,7 @@ Executive get_auto_mode(Next_mode_info info){
 			case 8: //Gear mid Extended right
 				return Executive{Chain{
 					Step{Drive_straight{10*12}},
-					Executive{Chain{
-						Step{Geardrop()},
+					insert_score_gear(
 						Executive{Chain{
 							Step{Drive_straight{-12}},
 							Executive{Chain{
@@ -187,13 +197,12 @@ Executive get_auto_mode(Next_mode_info info){
 								}}
 							}}
 						}}
-					}}
+					)
 				}};
 			case 9: //Gear mid Extended left
 				return Executive{Chain{
 					Step{Drive_straight{10*12}},
-					Executive{Chain{
-						Step{Geardrop()},
+					insert_score_gear(
 						Executive{Chain{
 							Step{Drive_straight{-12}},
 							Executive{Chain{
@@ -207,7 +216,7 @@ Executive get_auto_mode(Next_mode_info info){
 								}}
 							}}
 						}}
-					}}
+					)
 				}};
 			case 10: //Vision test (TEMP)
 				return Executive{Chain{

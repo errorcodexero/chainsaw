@@ -51,7 +51,7 @@ void print_diff(ostream& o,Driver_station_output &a,Driver_station_output const&
 void print_diff(ostream& o,Robot_outputs &a,Robot_outputs const& b){
 	for(unsigned i=0;i<Robot_outputs::PWMS;i++){
 		if(a.pwm[i]!=b.pwm[i]){
-			o<<"pwm"<<i<<" "<<(int)a.pwm[i]<<"->"<<(int)b.pwm[i]<<"\n";
+			o<<"pwm"<<i<<" "<<a.pwm[i]<<"->"<<b.pwm[i]<<"\n";
 			a.pwm[i]=b.pwm[i];
 		}
 	}
