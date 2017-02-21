@@ -25,5 +25,11 @@ std::ostream& operator<< ( std::ostream& stm, const Block& block )
 	return stm;
 }
 
+bool operator==(Block const& a,Block const& b){
+	#define X(name) a.name==b.name &&
+	return X(signature) X(x) X(y) X(width) X(height) true;
+	#undef X
+}
+
 }; // namespace Pixy
 

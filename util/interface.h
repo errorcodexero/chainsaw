@@ -158,6 +158,10 @@ struct DS_info{
 	int location;
 	DS_info();
 };
+bool operator<(DS_info const&,DS_info const&);
+bool operator==(DS_info const&,DS_info const&);
+bool operator!=(DS_info const&,DS_info const&);
+std::ostream& operator<<(std::ostream&,DS_info const&);
 
 enum class Digital_in{OUTPUT,_0,_1,ENCODER};
 std::ostream& operator<<(std::ostream&,Digital_in);
@@ -180,7 +184,13 @@ std::ostream& operator<<(std::ostream&,Digital_inputs const&);
 struct Camera{
 	bool enabled;
 	std::vector<Pixy::Block> blocks;
+	
+	Camera();
 };
+bool operator<(Camera const&,Camera const&);
+bool operator==(Camera const&,Camera const&);
+bool operator!=(Camera const&,Camera const&);
+std::ostream& operator<<(std::ostream&,Camera const&);
 
 typedef float Volt;
 typedef double Rad; //radians, clockwise

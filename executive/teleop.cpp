@@ -131,7 +131,7 @@ Toplevel::Goal Teleop::run(Run_info info) {
 
 		POV_section driver_pov=pov_section(info.driver_joystick.pov);
 		
-		const array<POV_section,NUDGES> nudge_povs={POV_section::UP,POV_section::DOWN,POV_section::LEFT,POV_section::RIGHT};
+		const array<POV_section,NUDGES> nudge_povs={POV_section::UP,POV_section::DOWN,POV_section::RIGHT,POV_section::LEFT};
 		//Forward, backward, clockwise, counter-clockwise
 		for(unsigned i=0;i<NUDGES;i++){
 			if(nudges[i].trigger(boost<.25 && driver_pov==nudge_povs[i])) nudges[i].timer.set(.1);
@@ -202,10 +202,10 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	if(info.status.collector.arm==Arm::Status::OUT) goals.gear_collector.gear_lifter=Gear_lifter::Goal::DOWN;
 	if(info.status.gear_collector.gear_lifter==Gear_lifter::Status::UP) goals.collector.arm=Arm::Goal::IN;	
 	
-	if(info.in.ds_info.connected && (print_number%10)==0){
+	if(info.in.ds_info.connected && (print_number%10)==0 && info.in.camera.enabled){
 		cout<<"size: "<<info.in.camera.blocks.size()<<" blocks:\n";
 		for (vector<Pixy::Block>::const_iterator it=info.in.camera.blocks.begin();it!=info.in.camera.blocks.end();it++){
-			cout<<*it<<"\tarea: "<<(it->width * it->height)<<"\n";
+			cout<<"\tarea: "<<(it->width * it->height)<<"\n";
 		}
 		cout<<"\n";
 	}

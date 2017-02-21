@@ -21,26 +21,18 @@ Executive make_test(auto a){
 Executive get_auto_mode(Next_mode_info info){
 	if(!info.autonomous) return Executive{Teleop()};
 
-	//for when just want to run across the field at the end of autonomous
-	Executive dash{Chain{
-		Step{Drive_straight{12*20}},
-		Executive{Teleop{}}
-	}};
-
-	Executive backoff{Chain{
-		Step{Drive_straight{-1*12}},
-		Executive{Teleop{}}
-	}};
-
-	Executive auto_null{Teleop{}};
-
-	Executive auto_baseline{Chain{
-		Step{Drive_straight{12*12}},
-		Executive{Teleop{}}
-	}};
-	
+	////////////////////////////
+	//
+	// Tests for different steps
+	//
+		
 	Executive drive_straight_test = make_test(Drive_straight{3*12});//used to test the Step Drive_straight
 	Executive turn_test = make_test(Turn{PI/2});//used to test the Step Turn
+
+	////////////////////////////
+	//
+	// Parts of other autonomous modes
+	// 
 
 	//for scoring a gear after the robot is lined up in front of any of the pegs
 	Executive score_gear{Chain{
@@ -48,19 +40,19 @@ Executive get_auto_mode(Next_mode_info info){
 		Executive{Chain{
 			Step{Combo{
 				Step{Lift_gear()},
-				Step{Drive_straight{3*12}}
+				Step{Drive_straight{12}}
 			}},//slide gear onto peg
 			Executive{Chain{
 				Step{Drop_gear()},//let go of gear
 				Executive{Chain{
 					Step{Combo{
-						Step{Wait{1.0}},
+						Step{Wait{.5}},
 						Step{Drop_gear()}
 					}},//make sure we're not attached to the gear
 					Executive{Chain{
 						Step{Combo{
 							Step{Drop_gear()},
-							Step{Drive_straight{-3*12}}
+							Step{Drive_straight{-12}}
 						}},//drive back from the peg
 						Executive{Chain{
 							Step{Drop_collector()},//lower the collector to the floor
@@ -72,13 +64,30 @@ Executive get_auto_mode(Next_mode_info info){
 		}}
 	}};
 
+	//for when just want to run across the field at the end of autonomous
+	Executive dash{Chain{
+		Step{Drive_straight{12*20}},
+		Executive{Teleop{}}
+	}};
 
+	//////////////////////////
+	//
+	// Full autonomous modes
+	//
+	
+	//Auto mode which does nothing
+	Executive auto_null{Teleop{}};
+
+	//Auto mode for crossing the mode
+	Executive auto_baseline{Chain{
+		Step{Drive_straight{12*12}},
+		Executive{Teleop{}}
+	}};
+
+	//Scores a gear on the middle peg and then stops
 	Executive gear_drop_mid{Chain{
-		Step{Drive_straight{10*12}},
-		Executive{Chain{
-			Step{Geardrop()},
-			backoff
-		}}
+		Step{Drive_straight{114.3 - 12}},//TODO: find out correct distance (-12 is for score_gear)
+		score_gear
 	}};
 
 	if (info.panel.in_use) {
@@ -86,7 +95,6 @@ Executive get_auto_mode(Next_mode_info info){
 			case 0: //Do Nothing
 				return auto_null;
 				//tests for different steps
-				//return score_gear;
 				//return make_test(Lift_gear());
 				//return drive_straight_test; 
 				//return turn_test;
@@ -104,10 +112,7 @@ Executive get_auto_mode(Next_mode_info info){
 						Step{Turn{deg_to_rad(40)}},
 						Executive{Chain{
 							Step{Drive_straight{12}}, //approach
-							Executive{Chain{
-								Step{Geardrop()},
-								backoff
-							}}
+							score_gear
 						}}
 					}}
 				}};
@@ -138,10 +143,7 @@ Executive get_auto_mode(Next_mode_info info){
 						Step{Turn{deg_to_rad(-40)}},
 						Executive{Chain{
 							Step{Drive_straight{12}}, //approach
-							Executive{Chain{
-								Step{Geardrop()},
-								backoff
-							}}
+							score_gear
 						}}
 					}}
 				}};
@@ -214,10 +216,7 @@ Executive get_auto_mode(Next_mode_info info){
 						Step{Turn{deg_to_rad(40)}},
 						Executive{Chain{
 							Step{Drive_straight{12}}, //approach
-							Executive{Chain{
-								Step{Geardrop()},
-								backoff
-							}}
+							score_gear
 						}}
 					}}
 				}};
