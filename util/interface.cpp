@@ -481,14 +481,6 @@ ostream& operator<<(ostream& o,Alliance a){
 	return o<<")";
 }
 
-ostream& operator<<(ostream& o,DS_info d){
-	o<<"DS_info(";
-	o<<"connected:"<<d.connected;
-	o<<" alliance:"<<d.alliance;
-	o<<" location:"<<d.location;
-	return o<<")";
-}
-
 Digital_in random(Digital_in* d){
 	return choose_random(examples(d));
 }
@@ -564,10 +556,56 @@ ostream& operator<<(ostream& o,Digital_inputs const& a){
 	o<<a.encoder;
 	return o<<")";
 }
-DS_info::DS_info():
-connected(0),alliance(Alliance::INVALID),location(0)
-{
+
+DS_info::DS_info():connected(0),alliance(Alliance::INVALID),location(0){}
+
+ostream& operator<<(ostream& o,DS_info const& d){
+	o<<"DS_info(";
+	o<<"connected:"<<d.connected;
+	o<<" alliance:"<<d.alliance;
+	o<<" location:"<<d.location;
+	return o<<")";
 }
+
+bool operator<(DS_info const& a,DS_info const& b){
+	if(!a.connected && b.connected) return 1;
+	if(a.connected && !b.connected) return 0;
+	if(a.alliance<b.alliance) return 1;
+	if(b.alliance<a.alliance) return 0;
+	if(a.location<b.location) return 1;
+	if(b.location<a.location) return 0;
+	return 0;
+}
+
+bool operator==(DS_info const& a,DS_info const& b){
+	return a.connected==b.connected && a.alliance==b.alliance && a.location==b.location;
+}
+
+bool operator!=(DS_info const& a,DS_info const& b){ return !(a==b); }
+
+Camera::Camera():enabled(0){}
+
+ostream& operator<<(ostream& o,Camera const& a){
+	o<<"Camera(";
+	o<<"enabled:"<<a.enabled;
+	o<<" blocks:";
+	for(vector<Pixy::Block>::const_iterator it=a.blocks.begin();it!=a.blocks.end();it++) cout<<*it<<",";
+	return o<<")";
+}
+
+bool operator<(Camera const& a,Camera const& b){
+	if(!a.enabled && b.enabled) return 1;
+	if(a.enabled && !b.enabled) return 0;
+	if(a.blocks.size()<b.blocks.size()) return 1;
+	if(b.blocks.size()<a.blocks.size()) return 0;
+	return 0;
+}
+
+bool operator==(Camera const& a,Camera const& b){
+	return a.enabled==b.enabled && a.blocks==b.blocks;
+}
+
+bool operator!=(Camera const& a,Camera const& b){ return !(a==b); }
 
 Robot_inputs::Robot_inputs():
 	now(0),orientation(0),pump(0)
@@ -594,6 +632,7 @@ Robot_inputs rand(Robot_inputs*){
 bool operator==(Robot_inputs a,Robot_inputs b){
 	if(a.robot_mode!=b.robot_mode) return 0;
 	if(a.now!=b.now) return 0;
+	if(a.ds_info!=b.ds_info) return 0;
 	for(unsigned i=0;i<Robot_inputs::JOYSTICKS;i++){
 		if(a.joystick[i]!=b.joystick[i]) return 0;
 	}
@@ -614,6 +653,7 @@ bool operator==(Robot_inputs a,Robot_inputs b){
 		}
 	}
 	if(a.driver_station!=b.driver_station) return 0;
+	if(a.camera!=b.camera) return 0;
 	return a.orientation==b.orientation;
 }
 
@@ -625,6 +665,7 @@ bool operator<(Robot_inputs a,Robot_inputs b){
 	#define X(NAME) if(a.NAME<b.NAME) return 1; if(b.NAME<a.NAME) return 0;
 	X(robot_mode)
 	X(now)
+	X(ds_info)
 	X(joystick)
 	X(digital_io)
 	X(analog)
@@ -633,6 +674,7 @@ bool operator<(Robot_inputs a,Robot_inputs b){
 	X(orientation)
 	X(current)
 	X(pump)
+	X(camera)
 	#undef X
 	return 0;
 }
@@ -660,6 +702,7 @@ ostream& operator<<(ostream& o,Robot_inputs a){
 	}
 	o<<" currents:"<<a.current;	
 	o<<" driver_station_inputs:"<<a.driver_station;
+	o<<" camera:"<<a.camera;
 	o<<" orientation:"<<a.orientation;
 	return o<<")";
 }
