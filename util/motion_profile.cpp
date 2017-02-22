@@ -7,6 +7,13 @@
 
 using namespace std;
 
+double target_to_out_power(double target_power){//tries to account for the fact that small out powers to the motors will not move them
+	if(target_power == 0) return 0.0;
+	static const double K = 0.05;
+	double slope = 1.0 - K;
+	return target_power * slope + copysign(K,target_power);//copysign returns magnitude of the first and the sign of second
+}
+
 double Motion_profile::target_speed(const double current){
 	//TODO: add in ramping up too
 	double error = goal-current;

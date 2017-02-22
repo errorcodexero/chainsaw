@@ -105,11 +105,11 @@ Executive get_auto_mode(Next_mode_info info){
 	if (info.panel.in_use) {
 		switch(info.panel.auto_select){ 
 			case 0: //Do Nothing
-				return auto_null;
+				//return auto_null;
 				//return score_gear;				
 				//tests for different steps
 				//return make_test(Lift_gear());
-				//return drive_straight_test; 
+				return drive_straight_test; 
 				//return turn_test;
 			case 1: //Baseline
 				return auto_baseline;

@@ -2,6 +2,7 @@
 #include<queue>
 #include "executive.h"
 #include "../util/util.h"
+#include <cmath>
 //#include "teleop.h"
 
 using namespace std;
@@ -108,13 +109,13 @@ Step_impl::~Step_impl(){}
 	return this->operator==(b);
 }*/
 
-Drive_straight::Drive_straight(Inch goal):target_dist(goal),initial_distances(Drivebase::Distances{0,0}),init(false),motion_profile(goal,0.1,.5){}//Motion profiling values from testing
+Drive_straight::Drive_straight(Inch goal):target_dist(goal),initial_distances(Drivebase::Distances{0,0}),init(false),motion_profile(goal,0.02,.5){}//Motion profiling values from testing
 
 bool Drive_straight::done(Next_mode_info info){
 	static const Inch TOLERANCE = 3.0;//inches
 	Drivebase::Distances distance_travelled = info.status.drive.distances - initial_distances;
-	Drivebase::Distances distance_left = fabs(Drivebase::Distances{target_dist,target_dist} - distance_travelled);
-	if(mean(distance_left.l,distance_left.r) < TOLERANCE){
+	Drivebase::Distances distance_left = (Drivebase::Distances{target_dist,target_dist} - distance_travelled);
+	if(fabs(mean(distance_left.l,distance_left.r)) < TOLERANCE){
 		in_range.update(info.in.now,info.in.robot_mode.enabled);
 	} else {
 		static const Time FINISH_TIME = 1.0;
@@ -132,17 +133,20 @@ Toplevel::Goal Drive_straight::run(Run_info info,Toplevel::Goal goals){
 		init = true;
 	}
 
-	Drivebase::Distances distance_travelled = info.status.drive.distances - initial_distances;	
-	
+	Drivebase::Distances distance_travelled = info.status.drive.distances - initial_distances;
+
 	/*
-	static const double ERROR_SCALAR = 1.0;
+	static const double ERROR_SCALAR = 0;//.0001;
 	double error_correction_left = 0.5 * ERROR_SCALAR * (distance_travelled.r - distance_travelled.l);
 	double error_correction_right = 0.5 * ERROR_SCALAR * (distance_travelled.l - distance_travelled.r);
 	*/
 
-	double power = mean(motion_profile.target_speed(distance_travelled.l),motion_profile.target_speed(distance_travelled.r));
-	goals.drive.left = power /* + error_correction_left * power */;
-	goals.drive.right = power /* + error_correction_right * power */;
+	double power = target_to_out_power(motion_profile.target_speed(mean(distance_travelled.l,distance_travelled.r)));
+	
+	cout<<"\ndistance_travelled:"<<distance_travelled<<"  mean:"<<mean(distance_travelled.l,distance_travelled.r)<<"   goal:"<<target_dist<<"     power:"<<power<<"    in_range:"<<in_range<<"\n";
+	
+	goals.drive.left = clip(power + power * 0.05);
+	goals.drive.right = clip(power);
 	goals.shifter = Gear_shifter::Goal::LOW;
 	return goals;
 }
