@@ -31,9 +31,9 @@ struct Lights{
 	};
 
 	struct Estimator{
-		Status time;
+		Status_detail time;
 		void update(Time,Input,Output);
-		Status_detail get();
+		Status_detail get()const;
 
 		Estimator();
 	};
@@ -45,19 +45,25 @@ struct Lights{
 
 std::ostream& operator<<(std::ostream&,Lights::Loading_indicator);
 std::ostream& operator<<(std::ostream&,Lights::Goal);
+std::ostream& operator<<(std::ostream&,Lights::Output);
 std::ostream& operator<<(std::ostream&,Lights);
 
-bool operator<(Lights::Status_detail,Lights::Status_detail);
-bool operator==(Lights::Status_detail,Lights::Status_detail);
-bool operator!=(Lights::Status_detail,Lights::Status_detail);
+bool operator<(Lights::Goal,Lights::Goal);
+
+bool operator<(Lights::Output,Lights::Output);
+bool operator==(Lights::Output,Lights::Output);
+bool operator!=(Lights::Output,Lights::Output);
 
 bool operator==(Lights::Output_applicator,Lights::Output_applicator);
+
+bool operator==(Lights::Estimator,Lights::Estimator);
 
 bool operator==(Lights,Lights);
 bool operator!=(Lights,Lights);
 
 std::set<Lights::Goal> examples(Lights::Goal*);
 std::set<Lights::Status_detail> examples(Lights::Status_detail*);
+std::set<Lights::Output> examples(Lights::Output*);
 
 Lights::Output control(Lights::Status_detail, Lights::Goal);
 Lights::Status status(Lights::Status_detail);
