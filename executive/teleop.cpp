@@ -181,6 +181,10 @@ Toplevel::Goal Teleop::run(Run_info info) {
 
 	goals.climber = info.panel.climb ? Climber::Goal::CLIMB : Climber::Goal::STOP;
 
+	indicator_toggle.update(info.panel.loading_indicator);
+	if(indicator_toggle.get()) goals.lights.loading_indicator=Lights::Loading_indicator::GEARS;
+	else goals.lights.loading_indicator=Lights::Loading_indicator::BALLS;
+
 	//Manual controls
 	if(info.panel.gear_grasper==Panel::Gear_grasper::OPEN) goals.gear_collector.gear_grabber=Gear_grabber::Goal::OPEN;
 	if(info.panel.gear_grasper==Panel::Gear_grasper::CLOSED) goals.gear_collector.gear_grabber=Gear_grabber::Goal::CLOSE;
