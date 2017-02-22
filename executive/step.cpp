@@ -153,8 +153,8 @@ bool Align::done(Next_mode_info info){
 	blocks=info.in.camera.blocks;
 	current=mean(blocks[0].x,blocks[1].x);
 	center=mean(blocks[0].min_x,blocks[0].max_x);
-	int TOLLERENCE= 2;
-	if(current<= center-TOLLERENCE && current >=center-TOLLERENCE){
+	int const  TOLERANCE= 2;
+	if(current<= center-TOLERANCE && current >=center+TOLERANCE){
 		in_range.update(info.in.now,info.in.robot_mode.enabled);
 	} else {
 		static const Time FINISH_TIME = 1.0;
@@ -171,10 +171,22 @@ Toplevel::Goal Align::run(Run_info info,Toplevel::Goal goals){
 	blocks=info.in.camera.blocks;
 	current=mean(blocks[0].x,blocks[1].x);
 	center=mean(blocks[0].min_x,blocks[0].max_x);
-	double power = 0;
-	goals.drive.left = power;
+	cout << "Align:    " << blocks[0] << "," << blocks[1] << "   " << current << "   " << center << "\n";
+	const int TOLERANCE = 2;
+	double power = .2;
+	if(current<=center-TOLERANCE){
+		goals.drive.left = -power;
+		goals.drive.right = power;
+		goals.shifter = Gear_shifter::Goal::LOW;
+	} else if(current>=center+TOLERANCE) {
+		goals.drive.left = power;
+		goals.drive.right = -power;
+		goals.shifter = Gear_shifter::Goal::LOW;
+	}
+	goals.drive.left = -power;
 	goals.drive.right = power;
 	goals.shifter = Gear_shifter::Goal::LOW;
+	
 	return goals;
 }
 
