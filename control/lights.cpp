@@ -29,6 +29,9 @@ ostream& operator<<(ostream& o, Lights::Output a){
 
 ostream& operator<<(ostream& o, Lights){ return o<<"Lights()";}
 
+Lights::Output::Output():loading_indicator(0),camera_light(0){}
+Lights::Output::Output(bool li,bool cl):loading_indicator(li),camera_light(cl){}
+
 bool operator<(Lights::Goal a,Lights::Goal b){
 	if(a.loading_indicator<b.loading_indicator) return 1;
 	if(b.loading_indicator<a.loading_indicator) return 0;
@@ -50,16 +53,17 @@ bool operator!=(Lights::Output a, Lights::Output b){ return !(a==b); }
 bool operator==(Lights::Output_applicator, Lights::Output_applicator){ return 1; }
 
 bool operator==(Lights::Estimator a, Lights::Estimator b){ return a.time==b.time; }
+bool operator!=(Lights::Estimator a, Lights::Estimator b){ return !(a==b); }
 
 bool operator==(Lights a, Lights b){ return (a.input_reader==b.input_reader && a.estimator==b.estimator && a.output_applicator==b.output_applicator);}
 bool operator!=(Lights a, Lights b){ return !(a==b);}
 
 Lights::Output Lights::Output_applicator::operator()(Robot_outputs r)const{
 	switch(r.relay[LIGHTS_ADDRESS]){
-		case Relay_output::_00: return Output{0, 0};
-		case Relay_output::_01: return Output{0, 1};
-		case Relay_output::_10: return Output{1, 0};
-		case Relay_output::_11: return Output{1, 1};
+		case Relay_output::_00: return Output(0, 0);
+		case Relay_output::_01: return Output(0, 1);
+		case Relay_output::_10: return Output(1, 0);
+		case Relay_output::_11: return Output(1, 1);
 		default: assert(0);
 	}
 }

@@ -621,14 +621,14 @@ cc_library(
 	name="toplevel",
 	srcs=["control/toplevel.cpp"],
 	hdrs=["control/toplevel.h"],
-	deps=[":pump",":drivebase",":climber",":gear_shifter",":collector",":gear_collector",":shooter_feed",":shooter",":input"]
+	deps=[":pump",":drivebase",":climber",":gear_shifter",":collector",":gear_collector",":shooter_feed",":shooter",":input",":lights"]
 )
 
 cc_test(
 	name="toplevel_test",
 	srcs=["control/toplevel.cpp","control/toplevel.h","control/formal.h"],
 	copts=["-DTOPLEVEL_TEST"],
-	deps=[":pump",":drivebase",":climber",":gear_shifter",":collector",":input",":gear_collector",":shooter_feed",":output",":shooter"],
+	deps=[":pump",":drivebase",":climber",":gear_shifter",":collector",":input",":gear_collector",":shooter_feed",":output",":shooter",":lights"],
 	timeout="short"
 )
 

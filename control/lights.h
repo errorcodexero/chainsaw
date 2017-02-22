@@ -23,6 +23,9 @@ struct Lights{
 
 	struct Output{
 		bool loading_indicator,camera_light;
+
+		Output();
+		Output(bool,bool);
 	};
 	
 	struct Output_applicator{
@@ -57,6 +60,7 @@ bool operator!=(Lights::Output,Lights::Output);
 bool operator==(Lights::Output_applicator,Lights::Output_applicator);
 
 bool operator==(Lights::Estimator,Lights::Estimator);
+bool operator!=(Lights::Estimator,Lights::Estimator);
 
 bool operator==(Lights,Lights);
 bool operator!=(Lights,Lights);

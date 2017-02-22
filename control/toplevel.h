@@ -10,6 +10,7 @@
 #include "gear_collector.h"
 #include "shooter_feed.h"
 #include "shooter.h"
+#include "lights.h"
 
 #define TOPLEVEL_ITEMS \
 	X(Pump,pump,Pump::Goal::AUTO)\
@@ -19,7 +20,8 @@
 	X(Collector,collector,)\
 	X(Gear_collector,gear_collector,) \
 	X(Shooter_feed,shooter_feed,Shooter_feed::Goal::OFF) \
-	X(Shooter,shooter,)
+	X(Shooter,shooter,) \
+	X(Lights,lights,)
 	
 class Toplevel{
 	public:
