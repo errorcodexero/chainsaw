@@ -19,7 +19,7 @@ Main::Main():
 	autonomous_start(0)
 {}
 
-Robot_outputs Main::operator()(const Robot_inputs in,ostream& print_stream){
+Robot_outputs Main::operator()(const Robot_inputs in,ostream& /*print_stream*/){
 	print_count++;
 	static const unsigned MAIN_JOYSTICK_PORT = 0, GUNNER_JOYSTICK_PORT = 1;
 
@@ -63,8 +63,8 @@ Robot_outputs Main::operator()(const Robot_inputs in,ostream& print_stream){
 	
 	log(in,status,r);
 
-	print_stream<<"mode: "<<mode<<"\n\n";
-	print_stream<<"panel:"<<panel<<"\n";
+	cout<<"mode: "<<mode<<"\n\n";
+	cout<<"panel:"<<panel<<"\n";
 
 	return r;
 }

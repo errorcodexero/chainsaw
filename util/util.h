@@ -14,7 +14,7 @@
 #define PI 3.14159265
 #endif
 
-#define PRINT(x) print_stream<<""#x<<":"<<(x)<<"\n";
+#define PRINT(x) std::cout<<""#x<<":"<<(x)<<"\n";
 #define nyi { std::cout<<"nyi "<<__FILE__<<":"<<__LINE__<<"\n"; exit(44); }
 
 int write_file(std::string const& filename,std::string const& contents);
