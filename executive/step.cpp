@@ -49,6 +49,7 @@ Toplevel::Goal Turn::run(Run_info info,Toplevel::Goal goals){
 	double power = motion_profile.target_speed(mean(distance_travelled.l,-distance_travelled.r)); 
 	goals.drive.left = power;
 	goals.drive.right = -power;
+	goals.shifter = Gear_shifter::Goal::LOW;
 	return goals;
 }
 
@@ -126,6 +127,7 @@ bool Drive_straight::done(Next_mode_info info){
 	}
 	return in_range.done();
 }
+
 Toplevel::Goal Drive_straight::run(Run_info info){
 	return run(info,{});
 }
@@ -291,7 +293,7 @@ bool Drop_gear::operator==(Drop_gear const& b)const{
 	return true;
 }
 
-Drop_collector::Drop_collector():goal({Gear_grabber::Goal::OPEN,Gear_lifter::Goal::DOWN}){}
+Drop_collector::Drop_collector():goal({Gear_grabber::Goal::OPEN,Gear_lifter::Goal::DOWN}){}//TODO: close it?
 
 bool Drop_collector::done(Next_mode_info info){
 	return ready(status(info.status.gear_collector),goal);
