@@ -72,6 +72,7 @@ class Drive_straight:public Step_impl_inner<Drive_straight>{
 	
 	public:
 	explicit Drive_straight(Inch);
+	explicit Drive_straight(Inch,double,double);
 
 	Toplevel::Goal run(Run_info,Toplevel::Goal);//TODO
 	Toplevel::Goal run(Run_info);

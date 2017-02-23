@@ -110,6 +110,9 @@ Step_impl::~Step_impl(){}
 }*/
 
 Drive_straight::Drive_straight(Inch goal):target_dist(goal),initial_distances(Drivebase::Distances{0,0}),init(false),motion_profile(goal,0.02,.5){}//Motion profiling values from testing
+Drive_straight::Drive_straight(Inch goal,double vel_modifier,double max):Drive_straight(goal){
+	motion_profile = {goal,vel_modifier,max};
+}
 
 bool Drive_straight::done(Next_mode_info info){
 	static const Inch TOLERANCE = 3.0;//inches
