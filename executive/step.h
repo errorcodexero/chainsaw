@@ -5,7 +5,7 @@
 #include "../util/motion_profile.h"
 
 struct Step_impl;
-
+enum class Camera_con{ENABLE,DISABLED,NONVISION};
 class Step{
 	std::unique_ptr<Step_impl> impl;
 
@@ -160,6 +160,9 @@ struct Align: public Step_impl_inner<Align>{
 	std::vector<Pixy::Block> blocks;
 	int current;
 	int center;
+	bool manualflag;
+	bool firsttime;
+	Camera_con camera_con;
 	Countdown_timer in_range; 
 	public:
 	explicit Align();
