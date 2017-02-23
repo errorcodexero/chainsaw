@@ -158,7 +158,8 @@ Toplevel::Status::Status():
 		{Motor_check::Status::OK_,Motor_check::Status::OK_},
 		false,
 		{0.0,0.0},
-		{0.0,0.0}
+		{0.0,0.0},
+		0.0
 	),
 	collector(),
 	gear_collector(),

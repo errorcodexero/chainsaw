@@ -147,8 +147,10 @@ Toplevel::Goal Drive_straight::run(Run_info info,Toplevel::Goal goals){
 	double power = target_to_out_power(motion_profile.target_speed(mean(distance_travelled.l,distance_travelled.r)));
 	
 	cout<<"\ndistance_travelled:"<<distance_travelled<<"  mean:"<<mean(distance_travelled.l,distance_travelled.r)<<"   goal:"<<target_dist<<"     power:"<<power<<"    in_range:"<<in_range<<"\n";
+
+	static const double ERROR_CORRECTION = 0.05;//left and right encoders count up at different rates
 	
-	goals.drive.left = clip(power + power * 0.05);
+	goals.drive.left = clip(power + power * ERROR_CORRECTION);
 	goals.drive.right = clip(power);
 	goals.shifter = Gear_shifter::Goal::LOW;
 	return goals;
