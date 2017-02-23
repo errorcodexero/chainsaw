@@ -202,10 +202,13 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	if(info.status.collector.arm==Arm::Status::OUT) goals.gear_collector.gear_lifter=Gear_lifter::Goal::DOWN;
 	if(info.status.gear_collector.gear_lifter==Gear_lifter::Status::UP) goals.collector.arm=Arm::Goal::IN;	
 	
-	if(info.in.ds_info.connected && (print_number%10)==0 && info.in.camera.enabled){
-		cout<<"size: "<<info.in.camera.blocks.size()<<" blocks:\n";
-		for (vector<Pixy::Block>::const_iterator it=info.in.camera.blocks.begin();it!=info.in.camera.blocks.end();it++){
-			cout<<"\tarea: "<<(it->width * it->height)<<"\n";
+	if(info.in.ds_info.connected && (print_number%10)==0){
+		cout<<"\nUltrasonic sensor:"<<info.status.drive.ultrasonic<<"\n";
+		if(info.in.camera.enabled){
+			cout<<"size: "<<info.in.camera.blocks.size()<<" blocks:\n";
+			for (vector<Pixy::Block>::const_iterator it=info.in.camera.blocks.begin();it!=info.in.camera.blocks.end();it++){
+				cout<<"\tarea: "<<(it->width * it->height)<<"\n";
+			}
 		}
 		cout<<"\n";
 	}

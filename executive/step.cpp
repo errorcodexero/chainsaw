@@ -110,6 +110,9 @@ Step_impl::~Step_impl(){}
 }*/
 
 Drive_straight::Drive_straight(Inch goal):target_dist(goal),initial_distances(Drivebase::Distances{0,0}),init(false),motion_profile(goal,0.02,.5){}//Motion profiling values from testing
+Drive_straight::Drive_straight(Inch goal,double vel_modifier,double max):Drive_straight(goal){
+	motion_profile = {goal,vel_modifier,max};
+}
 
 bool Drive_straight::done(Next_mode_info info){
 	static const Inch TOLERANCE = 3.0;//inches
@@ -144,8 +147,10 @@ Toplevel::Goal Drive_straight::run(Run_info info,Toplevel::Goal goals){
 	double power = target_to_out_power(motion_profile.target_speed(mean(distance_travelled.l,distance_travelled.r)));
 	
 	cout<<"\ndistance_travelled:"<<distance_travelled<<"  mean:"<<mean(distance_travelled.l,distance_travelled.r)<<"   goal:"<<target_dist<<"     power:"<<power<<"    in_range:"<<in_range<<"\n";
+
+	static const double ERROR_CORRECTION = 0.05;//left and right encoders count up at different rates
 	
-	goals.drive.left = clip(power + power * 0.05);
+	goals.drive.left = clip(power + power * ERROR_CORRECTION);
 	goals.drive.right = clip(power);
 	goals.shifter = Gear_shifter::Goal::LOW;
 	return goals;
