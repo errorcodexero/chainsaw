@@ -115,9 +115,17 @@ Drive_straight::Drive_straight(Inch goal,double vel_modifier,double max):Drive_s
 	motion_profile = {goal,vel_modifier,max};
 }
 
+Drivebase::Distances Drive_straight::get_distance_travelled(Drivebase::Distances current){
+	Drivebase::Distances distance_travelled = current - initial_distances;
+	cout<<"\nbefore:"<<distance_travelled;
+	distance_travelled.r += distance_travelled.r * RIGHT_DISTANCE_CORRECTION;//right encoder would read that it's moved less than it has without error correction
+	cout<<"    after:"<<distance_travelled<<"\n";
+	return distance_travelled;
+}
+
 bool Drive_straight::done(Next_mode_info info){
 	static const Inch TOLERANCE = 3.0;//inches
-	Drivebase::Distances distance_travelled = info.status.drive.distances - initial_distances;
+	Drivebase::Distances distance_travelled = get_distance_travelled(info.status.drive.distances);
 	Drivebase::Distances distance_left = (Drivebase::Distances{target_dist,target_dist} - distance_travelled);
 	if(fabs(mean(distance_left.l,distance_left.r)) < TOLERANCE){
 		in_range.update(info.in.now,info.in.robot_mode.enabled);
@@ -125,6 +133,7 @@ bool Drive_straight::done(Next_mode_info info){
 		static const Time FINISH_TIME = 1.0;
 		in_range.set(FINISH_TIME);
 	}
+	cout<<"\ndistance_travelled:"<<distance_travelled<<"  mean:"<<mean(distance_travelled.l,distance_travelled.r)<<"   goal:"<<target_dist<<"   in_range:"<<in_range<<"\n";
 	return in_range.done();
 }
 
@@ -138,22 +147,14 @@ Toplevel::Goal Drive_straight::run(Run_info info,Toplevel::Goal goals){
 		init = true;
 	}
 
-	Drivebase::Distances distance_travelled = info.status.drive.distances - initial_distances;
-
-	/*
-	static const double ERROR_SCALAR = 0;//.0001;
-	double error_correction_left = 0.5 * ERROR_SCALAR * (distance_travelled.r - distance_travelled.l);
-	double error_correction_right = 0.5 * ERROR_SCALAR * (distance_travelled.l - distance_travelled.r);
-	*/
+	Drivebase::Distances distance_travelled = get_distance_travelled(info.status.drive.distances);
 
 	double power = target_to_out_power(motion_profile.target_speed(mean(distance_travelled.l,distance_travelled.r)));
 	
-	cout<<"\ndistance_travelled:"<<distance_travelled<<"  mean:"<<mean(distance_travelled.l,distance_travelled.r)<<"   goal:"<<target_dist<<"     power:"<<power<<"    in_range:"<<in_range<<"\n";
-
-	static const double ERROR_CORRECTION = 0.05;//left and right encoders count up at different rates
+	//cout<<"\ndistance_travelled:"<<distance_travelled<<"  mean:"<<mean(distance_travelled.l,distance_travelled.r)<<"   goal:"<<target_dist<<"     power:"<<power<<"    in_range:"<<in_range<<"\n";
 	
-	goals.drive.left = clip(power + power * ERROR_CORRECTION);
-	goals.drive.right = clip(power);
+	goals.drive.left = clip(power);
+	goals.drive.right = clip(power - power * RIGHT_SPEED_CORRECTION);//right side would go faster than the left without error correction
 	goals.shifter = Gear_shifter::Goal::LOW;
 	return goals;
 }

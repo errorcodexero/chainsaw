@@ -10,9 +10,9 @@ double deg_to_rad(double deg){
 	return deg/180*PI;
 }
 
-const Inch SCORE_GEAR_APPROACH_DIST = 18.0;//inches
+const Inch SCORE_GEAR_APPROACH_DIST = 12.0;//inches
 
-const Inch ROBOT_LENGTH = 29.0; //inches from front to back
+const Inch ROBOT_LENGTH = 28.0; //inches from front to back
 
 Executive insert_score_gear(Executive last){
 	Executive score_gear{Chain{
@@ -95,7 +95,7 @@ Executive get_auto_mode(Next_mode_info info){
 	//Scores a gear on the middle peg and then stops
 	Executive auto_score_gear_middle{Chain{
 		Step{Combo{
-			Step{Drive_straight{114.3 - SCORE_GEAR_APPROACH_DIST - ROBOT_LENGTH}},//TODO: find out correct distance
+			Step{Drive_straight{114 - SCORE_GEAR_APPROACH_DIST - ROBOT_LENGTH}},//TODO: find out correct distance
 			Step{Lift_gear()}
 		}},
 		score_gear
