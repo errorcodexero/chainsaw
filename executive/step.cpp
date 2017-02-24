@@ -234,13 +234,24 @@ Toplevel::Goal Align::run(Run_info info,Toplevel::Goal goals){
 		goals.drive.right = power;
 		goals.shifter = Gear_shifter::Goal::LOW;
 	}
-	if(camera_con==Camera_con::DISABLED){
-		goals.drive.left = power;
-		goals.drive.right = power;
-		goals.shifter = Gear_shifter::Goal::LOW;
+	else if(camera_con==Camera_con::DISABLED){
+		if(info.panel.auto_select == 3 || info.panel.auto_select == 4){
+			goals.drive.left = power;
+			goals.drive.right = -power;
+			goals.shifter = Gear_shifter::Goal::LOW;
+		}
+		else if(info.panel.auto_select == 5 || info.panel.auto_select == 6){
+			goals.drive.left = -power;
+			goals.drive.right = power;	
+			goals.shifter = Gear_shifter::Goal::LOW;
+		}else{
+			goals.drive.left =0;
+			goals.drive.right=0;
+			goals.shifter = Gear_shifter::Goal::LOW;
+		}
 	}
-	if(camera_con==Camera_con::NONVISION){
-		goals.drive.left = power;
+	else if(camera_con==Camera_con::NONVISION){
+		goals.drive.left = -power;
 		goals.drive.right = power;
 		goals.shifter = Gear_shifter::Goal::LOW;
 	}
