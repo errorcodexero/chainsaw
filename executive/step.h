@@ -69,6 +69,7 @@ class Drive_straight:public Step_impl_inner<Drive_straight>{//Drives straight a 
 	bool init;
 	Motion_profile motion_profile;
 	Countdown_timer in_range;
+	Gear_shifter::Goal gear;
 	const double RIGHT_SPEED_CORRECTION = 0.05;//left and right sides of the robot drive at different speeds given the same power, left encoder gives us the actual distance, right is ~6% behind
 	const double RIGHT_DISTANCE_CORRECTION = 0.07;//these values are from testing
 	

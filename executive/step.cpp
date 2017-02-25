@@ -110,7 +110,7 @@ Step_impl::~Step_impl(){}
 	return this->operator==(b);
 }*/
 
-Drive_straight::Drive_straight(Inch goal):target_dist(goal),initial_distances(Drivebase::Distances{0,0}),init(false),motion_profile(goal,0.02,.5){}//Motion profiling values from testing
+Drive_straight::Drive_straight(Inch goal):target_dist(goal),initial_distances(Drivebase::Distances{0,0}),init(false),motion_profile(goal,0.02,.5),gear(Gear_shifter::Goal::LOW){}//Motion profiling values from testing
 Drive_straight::Drive_straight(Inch goal,double vel_modifier,double max):Drive_straight(goal){
 	motion_profile = {goal,vel_modifier,max};
 }
@@ -155,7 +155,7 @@ Toplevel::Goal Drive_straight::run(Run_info info,Toplevel::Goal goals){
 	
 	goals.drive.left = clip(power);
 	goals.drive.right = clip(power - power * RIGHT_SPEED_CORRECTION);//right side would go faster than the left without error correction
-	goals.shifter = Gear_shifter::Goal::LOW;
+	goals.shifter = gear;
 	return goals;
 }
 
@@ -164,7 +164,7 @@ unique_ptr<Step_impl> Drive_straight::clone()const{
 }
 
 bool Drive_straight::operator==(Drive_straight const& b)const{
-	return target_dist == b.target_dist && initial_distances == b.initial_distances && init == b.init && motion_profile == b.motion_profile && in_range == b.in_range;
+	return target_dist == b.target_dist && initial_distances == b.initial_distances && init == b.init && motion_profile == b.motion_profile && in_range == b.in_range && gear == b.gear;
 }
 
 
