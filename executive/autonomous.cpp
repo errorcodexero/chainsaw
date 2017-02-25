@@ -26,7 +26,7 @@ Executive insert_score_gear(Executive last){
 				Step{Drop_gear()},//let go of gear
 				Executive{Chain{
 					Step{Combo{
-						Step{Wait{.5}},
+						Step{Wait{.5}},//TODO: is this necessary?
 						Step{Drop_gear()}
 					}},//make sure we're not attached to the gear
 					Executive{Chain{
@@ -204,6 +204,7 @@ Executive get_auto_mode(Next_mode_info info){
 		switch(info.panel.auto_select){ 
 			case 0: 
 				//return auto_null;//TODO
+				
 				//tests for different steps
 				//return score_gear;				
 				//return make_test_test(Lift_gear());
