@@ -2,7 +2,7 @@
 
 using namespace std;
 
-Gear_collector::Goal::Goal():gear_grabber(Gear_grabber::Goal::OPEN),gear_lifter(Gear_lifter::Goal::DOWN){}
+Gear_collector::Goal::Goal():gear_grabber(Gear_grabber::Goal::CLOSE),gear_lifter(Gear_lifter::Goal::DOWN){}
 
 Gear_collector::Goal::Goal(Gear_grabber::Goal g,Gear_lifter::Goal l):gear_grabber(g),gear_lifter(l){}
 
