@@ -1,7 +1,7 @@
 #include "motion_profile.h"
 #include <iostream>
 #include <assert.h>
-#include <algorithm>
+#include <cmath>
 #include "interface.h"
 #include "util.h"
 
