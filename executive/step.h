@@ -5,7 +5,7 @@
 #include "../util/motion_profile.h"
 
 struct Step_impl;
-
+enum class Camera_con{ENABLE,DISABLED,NONVISION};
 class Step{
 	std::unique_ptr<Step_impl> impl;
 
@@ -63,24 +63,29 @@ struct Step_impl_inner:Step_impl{
 
 using Inch=double;
 
-class Drive_straight:public Step_impl_inner<Drive_straight>{
+class Drive_straight:public Step_impl_inner<Drive_straight>{//Drives straight a certain distance
 	Inch target_dist;
 	Drivebase::Distances initial_distances;
 	bool init;
 	Motion_profile motion_profile;
 	Countdown_timer in_range;
+	const double RIGHT_SPEED_CORRECTION = 0.05;//left and right sides of the robot drive at different speeds given the same power, left encoder gives us the actual distance, right is ~6% behind
+	const double RIGHT_DISTANCE_CORRECTION = 0.07;//these values are from testing
 	
+	Drivebase::Distances get_distance_travelled(Drivebase::Distances);
+
 	public:
 	explicit Drive_straight(Inch);
+	explicit Drive_straight(Inch,double,double);
 
-	Toplevel::Goal run(Run_info,Toplevel::Goal);//TODO
+	Toplevel::Goal run(Run_info,Toplevel::Goal);
 	Toplevel::Goal run(Run_info);
 	bool done(Next_mode_info);
 	std::unique_ptr<Step_impl> clone()const;
 	bool operator==(Drive_straight const&)const;
 };
 
-class Wait: public Step_impl_inner<Wait>{
+class Wait: public Step_impl_inner<Wait>{//Either stops all operation for a given period of time or continues to run the same goals for that time
 	Countdown_timer wait_timer;//seconds
 	public:
 	explicit Wait(Time);
@@ -92,7 +97,7 @@ class Wait: public Step_impl_inner<Wait>{
 	bool operator==(Wait const&)const;
 };
 
-class Lift_gear: public Step_impl_inner<Lift_gear>{
+class Lift_gear: public Step_impl_inner<Lift_gear>{//Closes the gear grabber and raises the gear collector to peg height
 	Gear_collector::Goal goal;//is the same in every one
 	public:
 	explicit Lift_gear();
@@ -104,7 +109,7 @@ class Lift_gear: public Step_impl_inner<Lift_gear>{
 	bool operator==(Lift_gear const&)const;
 };
 
-class Drop_gear: public Step_impl_inner<Drop_gear>{
+class Drop_gear: public Step_impl_inner<Drop_gear>{//Opens the gear grabber but keeps the manipulator at peg height
 	Gear_collector::Goal goal;
 	public:
 	explicit Drop_gear();
@@ -116,7 +121,7 @@ class Drop_gear: public Step_impl_inner<Drop_gear>{
 	bool operator==(Drop_gear const&)const;
 };
 
-class Drop_collector: public Step_impl_inner<Drop_collector>{
+class Drop_collector: public Step_impl_inner<Drop_collector>{//Lowers the gear manipulator to the floor
 	Gear_collector::Goal goal;
 	public:
 	explicit Drop_collector();
@@ -128,11 +133,11 @@ class Drop_collector: public Step_impl_inner<Drop_collector>{
 	bool operator==(Drop_collector const&)const;
 };
 
-class Combo: public Step_impl_inner<Combo>{
+class Combo: public Step_impl_inner<Combo>{//Runs two steps at the same time
 	Step step_a;
 	Step step_b;
 	public:
-	explicit Combo(Step,Step);
+	explicit Combo(Step,Step);//the second step will overwrite goals from the first one if they both modify the same parts of the robot
 
 	Toplevel::Goal run(Run_info,Toplevel::Goal);
 	Toplevel::Goal run(Run_info);
@@ -141,7 +146,7 @@ class Combo: public Step_impl_inner<Combo>{
 	bool operator==(Combo const&)const;
 };
 
-struct Turn: Step_impl_inner<Turn>{
+struct Turn: Step_impl_inner<Turn>{//orients the robot to a certain angle relative to its starting orientation
 	Rad target_angle;//radians,clockwise=positive
 	Drivebase::Distances initial_distances;
 	bool init;
@@ -155,6 +160,27 @@ struct Turn: Step_impl_inner<Turn>{
 	bool done(Next_mode_info);
 	std::unique_ptr<Step_impl> clone()const;
 	bool operator==(Turn const&)const;
+};
+struct Align: public Step_impl_inner<Align>{
+	std::vector<Pixy::Block> blocks;
+	int current;
+	int center;
+	bool manualflag;
+	bool firsttime;
+	Camera_con camera_con;
+	Countdown_timer in_range; 
+	public:
+	explicit Align();
+
+	Toplevel::Goal run(Run_info,Toplevel::Goal);//TODO
+	Toplevel::Goal run(Run_info);
+	bool done(Next_mode_info);
+	std::unique_ptr<Step_impl> clone()const;
+	bool operator==(Align const&)const;
+	
+
+
+
 };
 
 #endif

@@ -41,7 +41,6 @@ double ticks_to_inches(const int ticks){
 	return ticks*INCHES_PER_TICK*ERROR_CORRECTION;
 }
 
-
 Drivebase::Distances ticks_to_inches(const Drivebase::Encoder_ticks ticks){
 	Drivebase::Distances d = {0.0,0.0};
 	#define X(TYPE,SIDE) d.SIDE = ticks_to_inches(ticks.SIDE);
@@ -58,6 +57,7 @@ int inches_to_ticks(const double inches){
 #define R_ENCODER_PORTS 2,3
 #define L_ENCODER_LOC 0
 #define R_ENCODER_LOC 1
+#define ULTRA_SONIC_LOC 0
 
 Robot_inputs Drivebase::Input_reader::operator()(Robot_inputs all,Input in)const{
 	for(unsigned i=0;i<MOTORS;i++){
@@ -74,6 +74,7 @@ Robot_inputs Drivebase::Input_reader::operator()(Robot_inputs all,Input in)const
 	encoder(R_ENCODER_PORTS,in.right);
 	all.digital_io.encoder[L_ENCODER_LOC] = -inches_to_ticks(in.distances.l);
 	all.digital_io.encoder[R_ENCODER_LOC] = inches_to_ticks(in.distances.r);
+	all.analog[ULTRA_SONIC_LOC] = in.ultrasonic;
 	return all;
 }
 
@@ -95,7 +96,8 @@ Drivebase::Input Drivebase::Input_reader::operator()(Robot_inputs const& in)cons
 		{
 			-ticks_to_inches(encoderconv(in.digital_io.encoder[L_ENCODER_LOC])),
 			ticks_to_inches(encoderconv(in.digital_io.encoder[R_ENCODER_LOC]))
-		}
+		},
+		in.analog[ULTRA_SONIC_LOC]
 	};
 }
 
@@ -220,7 +222,8 @@ set<Drivebase::Status> examples(Drivebase::Status*){
 		,
 		false,
 		{0.0,0.0},
-		{0,0}
+		{0,0},
+		0.0
 	}};
 }
 
@@ -256,11 +259,11 @@ set<Drivebase::Input> examples(Drivebase::Input*){
 	auto d=Digital_in::_0;
 	auto p=make_pair(d,d);
 	return {Drivebase::Input{
-		{0,0,0,0,0,0},p,p,{0,0}
+		{0,0,0,0,0,0},p,p,{0,0},0.0
 	}};
 }
 
-Drivebase::Estimator::Estimator():motor_check(),last({{{}},false,{0,0},{0,0}}){
+Drivebase::Estimator::Estimator():motor_check(),last({{{}},false,{0,0},{0,0},0.0}){
 	timer.set(.05);
 }
 
@@ -293,15 +296,19 @@ double get_output(Drivebase::Output out,Drivebase::Motor m){
 	assert(0);
 }
 
-void Drivebase::Estimator::update(Time now,Drivebase::Input in,Drivebase::Output out){\
+void Drivebase::Estimator::update(Time now,Drivebase::Input in,Drivebase::Output out){
 	timer.update(now,true);
 	static const double POLL_TIME = .05;//seconds
 	if(timer.done()){
 		last.speeds.l = (last.distances.l-in.distances.l)/POLL_TIME;
 		last.speeds.r = (last.distances.r-in.distances.r)/POLL_TIME;
-		last.distances = in.distances;
 		timer.set(POLL_TIME);
 	}
+	
+	last.distances = in.distances;
+	last.ultrasonic = in.ultrasonic;
+	
+	//cout<<"\ndistances:"<<last.distances<<"\n";
 	
 	for(unsigned i=0;i<MOTORS;i++){
 		Drivebase::Motor m=(Drivebase::Motor)i;

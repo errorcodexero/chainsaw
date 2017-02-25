@@ -9,9 +9,44 @@ using namespace std;
 double deg_to_rad(double deg){
 	return deg/180*PI;
 }
-auto Geardrop(){ return Drive_straight{0}; }//TODO: remove
 
-Executive make_test(auto a){
+const Inch SCORE_GEAR_APPROACH_DIST = 12.0;//inches
+
+const Inch ROBOT_LENGTH = 28.0; //inches from front to back
+
+Executive insert_score_gear(Executive last){
+	Executive score_gear{Chain{
+		Step{Lift_gear()},//lift gear from floor
+		Executive{Chain{
+			Step{Combo{
+				Step{Lift_gear()},
+				Step{Drive_straight{SCORE_GEAR_APPROACH_DIST}}
+			}},//slide gear onto peg
+			Executive{Chain{
+				Step{Drop_gear()},//let go of gear
+				Executive{Chain{
+					Step{Combo{
+						Step{Wait{.5}},
+						Step{Drop_gear()}
+					}},//make sure we're not attached to the gear
+					Executive{Chain{
+						Step{Combo{
+							Step{Drop_gear()},
+							Step{Drive_straight{-SCORE_GEAR_APPROACH_DIST}}
+						}},//drive back from the peg
+						Executive{Chain{
+							Step{Drop_collector()},//lower the collector to the floor
+							last //what to do after scoring the gear
+						}}
+					}}
+				}}
+			}}		
+		}}
+	}};
+	return score_gear;
+}
+
+Executive make_test_step(auto a){
 	return Executive{Chain{
 		Step{a},
 		Executive{Teleop{}}
@@ -21,204 +56,184 @@ Executive make_test(auto a){
 Executive get_auto_mode(Next_mode_info info){
 	if(!info.autonomous) return Executive{Teleop()};
 
+	////////////////////////////
+	//
+	// Tests for different steps
+	//
+		
+	Executive drive_straight_test = make_test_step(Drive_straight{7*12});//used to test the Step Drive_straight
+	Executive turn_test = make_test_step(Turn{PI/2});//used to test the Step Turn
+
+	////////////////////////////
+	//
+	// Parts of other autonomous modes
+	// 
+
+	//for scoring a gear after the robot is lined up in front of any of the pegs
+	Executive score_gear = insert_score_gear(Executive{Teleop()});
+
 	//for when just want to run across the field at the end of autonomous
 	Executive dash{Chain{
 		Step{Drive_straight{12*20}},
 		Executive{Teleop{}}
 	}};
 
-	Executive backoff{Chain{
-		Step{Drive_straight{-1*12}},
-		Executive{Teleop{}}
-	}};
-
+	//////////////////////////
+	//
+	// Full autonomous modes
+	//
+	
+	//Auto mode which does nothing
 	Executive auto_null{Teleop{}};
 
+	//Auto mode for crossing the baseline
 	Executive auto_baseline{Chain{
 		Step{Drive_straight{12*12}},
 		Executive{Teleop{}}
 	}};
-	
-	Executive drive_straight_test = make_test(Drive_straight{3*12});//used to test the Step Drive_straight
-	Executive turn_test = make_test(Turn{PI/2});//used to test the Step Turn
 
-	//for scoring a gear after the robot is lined up in front of any of the pegs
-	Executive score_gear{Chain{
-		Step{Lift_gear()},//lift gear from floor
+	//Scores a gear on the middle peg and then stops
+	Executive auto_score_gear_middle{Chain{
+		Step{Combo{
+			Step{Drive_straight{114 - SCORE_GEAR_APPROACH_DIST - ROBOT_LENGTH}},//TODO: find out correct distance
+			Step{Lift_gear()}
+		}},
+		score_gear
+	}};
+
+	//Score a gear on the boiler-side peg
+	Executive auto_score_gear_boiler_side{Chain{
+		Step{Drive_straight{5*12}},
 		Executive{Chain{
-			Step{Combo{
-				Step{Lift_gear()},
-				Step{Drive_straight{3*12}}
-			}},//slide gear onto peg
-			Executive{Chain{
-				Step{Drop_gear()},//let go of gear
+			Step{Turn{deg_to_rad(40)}},
+			score_gear
+		}}
+	}};
+
+	//Crosses the baseline and continues driving to the other side of the field
+	Executive auto_baseline_extended{Chain{
+		Step{Drive_straight{12*12}},
+		dash
+	}};
+	
+	//scores gear on the boilder-side of the field and then drives towards the other side of the field
+	Executive auto_score_gear_boiler_side_extended{Chain{
+		Step{Drive_straight{5*12}},
+		Executive{Chain{
+			Step{Turn{deg_to_rad(40)}},
+			insert_score_gear(
 				Executive{Chain{
-					Step{Combo{
-						Step{Wait{1.0}},
-						Step{Drop_gear()}
-					}},//make sure we're not attached to the gear
+					Step{Drive_straight{-12}},
 					Executive{Chain{
-						Step{Combo{
-							Step{Drop_gear()},
-							Step{Drive_straight{-3*12}}
-						}},//drive back from the peg
+						Step{Turn{deg_to_rad(-40)}},
+						dash
+					}}
+				}}
+			)
+		}}
+	}};
+
+	//scores a gear on the loading station-side peg
+	Executive auto_score_gear_loading_station_side{Chain{
+		Step{Drive_straight{5*12}},
+		Executive{Chain{
+			Step{Turn{deg_to_rad(-40)}},
+			insert_score_gear(Executive{Teleop()})
+		}}
+	}};
+	
+	//Gear Loading Extended
+	Executive auto_score_gear_loading_station_side_extended{Chain{
+		Step{Drive_straight{5*12}},
+		Executive{Chain{
+			Step{Turn{deg_to_rad(-40)}},
+			insert_score_gear(
+				Executive{Chain{
+				Step{Drive_straight{-12}},
+					Executive{Chain{
+						Step{Turn{deg_to_rad(40)}},
+						dash
+					}}
+				}}
+			)
+		}}
+	}};
+	
+	//Gear mid Extended right (goes around the airship to the right)
+	Executive auto_score_gear_middle_extended_right{Chain{
+		Step{Drive_straight{10*12}},
+		insert_score_gear(
+			Executive{Chain{
+				Step{Drive_straight{-12}},
+				Executive{Chain{
+					Step{Turn{deg_to_rad(-45)}},
+					Executive{Chain{
+						Step{Drive_straight{3*12}},
 						Executive{Chain{
-							Step{Drop_collector()},//lower the collector to the floor
-							Executive{Teleop()}
+							Step{Turn{deg_to_rad(45)}},
+							dash
 						}}
 					}}
 				}}
-			}}		
-		}}
+			}}
+		)
 	}};
 
-
-	Executive gear_drop_mid{Chain{
+	//Gear mid Extended left (goes around airship to the left)
+	Executive auto_score_gear_middle_extended_left{Chain{
 		Step{Drive_straight{10*12}},
-		Executive{Chain{
-			Step{Geardrop()},
-			backoff
-		}}
+		insert_score_gear(
+			Executive{Chain{
+			Step{Drive_straight{-12}},
+				Executive{Chain{
+					Step{Turn{deg_to_rad(45)}},
+					Executive{Chain{
+						Step{Drive_straight{3*12}},
+						Executive{Chain{
+							Step{Turn{deg_to_rad(-45)}},
+							dash
+						}}
+					}}
+				}}	
+			}}
+		)
 	}};
 
-	if (info.panel.in_use) {
+
+	if(info.panel.in_use){
 		switch(info.panel.auto_select){ 
-			case 0: //Do Nothing
-				return auto_null;
+			case 0: 
+				//return auto_null;//TODO
 				//tests for different steps
-				//return score_gear;
-				//return make_test(Lift_gear());
-				//return drive_straight_test; 
+				//return score_gear;				
+				//return make_test_test(Lift_gear());
+				return drive_straight_test; 
 				//return turn_test;
-			case 1: //Baseline
+			case 1: 
 				return auto_baseline;
-			case 2: //Baseline Extended
-				return Executive{Chain{
-					Step{Drive_straight{12*12}},
-					dash
-				}};
-			case 3: //Gear Boiler
-				return Executive{Chain{
-					Step{Drive_straight{5*12}},
-					Executive{Chain{
-						Step{Turn{deg_to_rad(40)}},
-						Executive{Chain{
-							Step{Drive_straight{12}}, //approach
-							Executive{Chain{
-								Step{Geardrop()},
-								backoff
-							}}
-						}}
-					}}
-				}};
-			case 4: //Gear Boiler Extended
+			case 2: 
+				return auto_baseline_extended;		
+			case 3: 
+				return auto_score_gear_boiler_side;
+			case 4: 
+				return auto_score_gear_boiler_side_extended;
+			case 5: 
+				return auto_score_gear_loading_station_side;
+			case 6: 
+				return auto_score_gear_loading_station_side_extended;
+			case 7: 
+				return auto_score_gear_middle;
+			case 8: 
+				return auto_score_gear_middle_extended_right;
+			case 9: 
+				return auto_score_gear_middle_extended_left;
+			case 10:
+				//Vision test (TEMP)
 				return Executive{Chain{
 					Step{Drive_straight{5*12}},
 					Executive{Chain{
 						Step{Turn{deg_to_rad(40)}},
-						Executive{Chain{
-							Step{Drive_straight{12}}, //approach
-							Executive{Chain{
-								Step{Geardrop()},
-								Executive{Chain{
-									Step{Drive_straight{-12}},
-									Executive{Chain{
-										Step{Turn{deg_to_rad(-40)}},
-										dash
-									}}
-								}}
-							}}
-						}}
-					}}
-				}};
-			case 5: //Gear Loading
-				return Executive{Chain{
-					Step{Drive_straight{5*12}},
-					Executive{Chain{
-						Step{Turn{deg_to_rad(-40)}},
-						Executive{Chain{
-							Step{Drive_straight{12}}, //approach
-							Executive{Chain{
-								Step{Geardrop()},
-								backoff
-							}}
-						}}
-					}}
-				}};
-			case 6: //Gear Loading Extended
-				return Executive{Chain{
-					Step{Drive_straight{5*12}},
-					Executive{Chain{
-						Step{Turn{deg_to_rad(-40)}},
-						Executive{Chain{
-							Step{Drive_straight{12}}, //approach
-							Executive{Chain{
-								Step{Geardrop()},
-								Executive{Chain{
-									Step{Drive_straight{-12}},
-									Executive{Chain{
-										Step{Turn{deg_to_rad(40)}},
-										dash
-									}}
-								}}
-							}}
-						}}
-					}}
-				}};	
-			case 7: //Gear Mid
-				return gear_drop_mid;
-			case 8: //Gear mid Extended right
-				return Executive{Chain{
-					Step{Drive_straight{10*12}},
-					Executive{Chain{
-						Step{Geardrop()},
-						Executive{Chain{
-							Step{Drive_straight{-12}},
-							Executive{Chain{
-								Step{Turn{deg_to_rad(-45)}},
-								Executive{Chain{
-									Step{Drive_straight{3*12}},
-									Executive{Chain{
-										Step{Turn{deg_to_rad(45)}},
-										dash
-									}}
-								}}
-							}}
-						}}
-					}}
-				}};
-			case 9: //Gear mid Extended left
-				return Executive{Chain{
-					Step{Drive_straight{10*12}},
-					Executive{Chain{
-						Step{Geardrop()},
-						Executive{Chain{
-							Step{Drive_straight{-12}},
-							Executive{Chain{
-								Step{Turn{deg_to_rad(45)}},
-								Executive{Chain{
-									Step{Drive_straight{3*12}},
-									Executive{Chain{
-										Step{Turn{deg_to_rad(-45)}},
-										dash
-									}}
-								}}
-							}}
-						}}
-					}}
-				}};
-			case 10: //Vision test (TEMP)
-				return Executive{Chain{
-					Step{Drive_straight{5*12}},
-					Executive{Chain{
-						Step{Turn{deg_to_rad(40)}},
-						Executive{Chain{
-							Step{Drive_straight{12}}, //approach
-							Executive{Chain{
-								Step{Geardrop()},
-								backoff
-							}}
-						}}
+						score_gear
 					}}
 				}};
 			case 11:

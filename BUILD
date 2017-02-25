@@ -505,21 +505,6 @@ cc_test(
 )
 
 cc_library(
-	name="shooter_feed",
-	srcs=["control/shooter_feed.cpp","control/nop.cpp"],
-	hdrs=["control/shooter_feed.h","control/nop.h"],
-	deps=[":interface"]
-)
-
-cc_test(
-	name="shooter_feed_test",
-	srcs=["control/shooter_feed.cpp","control/shooter_feed.h","control/nop.h","control/nop.cpp","control/formal.h"],
-	copts=["-DSHOOTER_FEED_TEST"],
-	deps=[":interface"],
-	timeout="short"
-)
-
-cc_library(
 	name="shooter",
 	srcs=["control/shooter.cpp"],
 	hdrs=["control/shooter.h","util/quick.h","control/formal.h"],
@@ -621,14 +606,14 @@ cc_library(
 	name="toplevel",
 	srcs=["control/toplevel.cpp"],
 	hdrs=["control/toplevel.h"],
-	deps=[":pump",":drivebase",":climber",":gear_shifter",":collector",":gear_collector",":shooter_feed",":shooter",":input",":lights"]
+	deps=[":pump",":drivebase",":climber",":gear_shifter",":collector",":gear_collector",":shooter",":input",":lights"]
 )
 
 cc_test(
 	name="toplevel_test",
 	srcs=["control/toplevel.cpp","control/toplevel.h","control/formal.h"],
 	copts=["-DTOPLEVEL_TEST"],
-	deps=[":pump",":drivebase",":climber",":gear_shifter",":collector",":input",":gear_collector",":shooter_feed",":output",":shooter",":lights"],
+	deps=[":pump",":drivebase",":climber",":gear_shifter",":collector",":input",":gear_collector",":output",":shooter",":lights"],
 	timeout="short"
 )
 

@@ -105,7 +105,7 @@ void Shooter::Estimator::update(Time,Shooter::Input in,Shooter::Output output){
 			return FREE_SPIN_RPM;
 		}();
 	} else if(output.mode==Talon_srx_output::Mode::SPEED){
-		
+		//TODO
 	}
 	last_output=output;
 } 

@@ -42,7 +42,6 @@ using Arm_sim=Nop_sim<Arm::Input>;
 using Ball_lifter_sim=Nop_sim<Ball_lifter::Input>;
 using Gear_grabber_sim=Nop_sim<Gear_grabber::Input>;
 using Gear_lifter_sim=Nop_sim<Gear_lifter::Input>;
-using Shooter_feed_sim=Nop_sim<Shooter_feed::Input>;
 using Shooter_sim=Nop_sim<Shooter::Input>;
 using Lights_sim=Nop_sim<Lights::Input>;
 
@@ -77,7 +76,7 @@ struct Drivebase_sim{
 		auto d=Digital_in::_0;
 		auto p=make_pair(d,d);
 		Drivebase::Input in = {Drivebase::Input{
-			{0,0,0,0,0,0},p,p,ticks_to_inches(Drivebase::Encoder_ticks{ticks_left,ticks_right})//because encoders are opotistes
+			{0,0,0,0,0,0},p,p,ticks_to_inches(Drivebase::Encoder_ticks{ticks_left,ticks_right}),0.0//because encoders are opotistes
 		}};
 		//cout<<"drive_in:"<<in<<"\n";
 		return in;

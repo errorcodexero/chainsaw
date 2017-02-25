@@ -2,6 +2,7 @@
 #include<queue>
 #include "executive.h"
 #include "../util/util.h"
+#include <cmath>
 //#include "teleop.h"
 
 using namespace std;
@@ -48,6 +49,7 @@ Toplevel::Goal Turn::run(Run_info info,Toplevel::Goal goals){
 	double power = motion_profile.target_speed(mean(distance_travelled.l,-distance_travelled.r)); 
 	goals.drive.left = power;
 	goals.drive.right = -power;
+	goals.shifter = Gear_shifter::Goal::LOW;
 	return goals;
 }
 
@@ -56,7 +58,7 @@ bool Turn::done(Next_mode_info info){
 	Drivebase::Distances distance_travelled = info.status.drive.distances - initial_distances;
 	Drivebase::Distances distance_left = fabs(side_goals - distance_travelled);
 	if(mean(distance_left.l,distance_left.r) < TOLERANCE){
-		in_range.update(info.in.now,info.in.robot_mode.enabled);
+		 in_range.update(info.in.now,info.in.robot_mode.enabled);
 	} else {
 		static const Time FINISH_TIME = 1.0;//seconds
 		in_range.set(FINISH_TIME);
@@ -108,20 +110,33 @@ Step_impl::~Step_impl(){}
 	return this->operator==(b);
 }*/
 
-Drive_straight::Drive_straight(Inch goal):target_dist(goal),initial_distances(Drivebase::Distances{0,0}),init(false),motion_profile(goal,0.1,.5){}//Motion profiling values from testing
+Drive_straight::Drive_straight(Inch goal):target_dist(goal),initial_distances(Drivebase::Distances{0,0}),init(false),motion_profile(goal,0.02,.5){}//Motion profiling values from testing
+Drive_straight::Drive_straight(Inch goal,double vel_modifier,double max):Drive_straight(goal){
+	motion_profile = {goal,vel_modifier,max};
+}
+
+Drivebase::Distances Drive_straight::get_distance_travelled(Drivebase::Distances current){
+	Drivebase::Distances distance_travelled = current - initial_distances;
+	cout<<"\nbefore:"<<distance_travelled;
+	distance_travelled.r += distance_travelled.r * RIGHT_DISTANCE_CORRECTION;//right encoder would read that it's moved less than it has without error correction
+	cout<<"    after:"<<distance_travelled<<"\n";
+	return distance_travelled;
+}
 
 bool Drive_straight::done(Next_mode_info info){
 	static const Inch TOLERANCE = 3.0;//inches
-	Drivebase::Distances distance_travelled = info.status.drive.distances - initial_distances;
-	Drivebase::Distances distance_left = fabs(Drivebase::Distances{target_dist,target_dist} - distance_travelled);
-	if(mean(distance_left.l,distance_left.r) < TOLERANCE){
+	Drivebase::Distances distance_travelled = get_distance_travelled(info.status.drive.distances);
+	Drivebase::Distances distance_left = (Drivebase::Distances{target_dist,target_dist} - distance_travelled);
+	if(fabs(mean(distance_left.l,distance_left.r)) < TOLERANCE){
 		in_range.update(info.in.now,info.in.robot_mode.enabled);
 	} else {
 		static const Time FINISH_TIME = 1.0;
 		in_range.set(FINISH_TIME);
 	}
+	cout<<"\ndistance_travelled:"<<distance_travelled<<"  mean:"<<mean(distance_travelled.l,distance_travelled.r)<<"   goal:"<<target_dist<<"   in_range:"<<in_range<<"\n";
 	return in_range.done();
 }
+
 Toplevel::Goal Drive_straight::run(Run_info info){
 	return run(info,{});
 }
@@ -132,11 +147,14 @@ Toplevel::Goal Drive_straight::run(Run_info info,Toplevel::Goal goals){
 		init = true;
 	}
 
-	Drivebase::Distances distance_travelled = info.status.drive.distances - initial_distances;	
+	Drivebase::Distances distance_travelled = get_distance_travelled(info.status.drive.distances);
 
-	double power = mean(motion_profile.target_speed(distance_travelled.l),motion_profile.target_speed(distance_travelled.r));
-	goals.drive.left = power;
-	goals.drive.right = power;
+	double power = target_to_out_power(motion_profile.target_speed(mean(distance_travelled.l,distance_travelled.r)));
+	
+	//cout<<"\ndistance_travelled:"<<distance_travelled<<"  mean:"<<mean(distance_travelled.l,distance_travelled.r)<<"   goal:"<<target_dist<<"     power:"<<power<<"    in_range:"<<in_range<<"\n";
+	
+	goals.drive.left = clip(power);
+	goals.drive.right = clip(power - power * RIGHT_SPEED_CORRECTION);//right side would go faster than the left without error correction
 	goals.shifter = Gear_shifter::Goal::LOW;
 	return goals;
 }
@@ -147,6 +165,107 @@ unique_ptr<Step_impl> Drive_straight::clone()const{
 
 bool Drive_straight::operator==(Drive_straight const& b)const{
 	return target_dist == b.target_dist && initial_distances == b.initial_distances && init == b.init && motion_profile == b.motion_profile && in_range == b.in_range;
+}
+
+
+Align::Align():firsttime(0){}
+
+bool Align::done(Next_mode_info info){
+	blocks=info.in.camera.blocks;
+	current=mean(blocks[0].x,blocks[1].x);
+	center=mean(blocks[0].min_x,blocks[0].max_x);
+	int const  TOLERANCE= 2;
+	if(firsttime) return 1;
+	if(!info.in.camera.enabled){
+		camera_con = Camera_con::DISABLED;
+		manualflag=true;
+	}
+	else if(blocks.size() <=0){
+		camera_con = Camera_con::NONVISION;
+		manualflag=true;
+	}
+	else if((blocks.size() >0) & info.in.camera.enabled){
+		camera_con = Camera_con::ENABLE;
+		manualflag=false;
+	}
+	if(!manualflag){
+		if(current<= center-TOLERANCE && current >=center+TOLERANCE){
+			in_range.update(info.in.now,info.in.robot_mode.enabled);
+		} else {
+			static const Time FINISH_TIME = 1.0;
+			in_range.set(FINISH_TIME);
+		}
+	}
+	if(manualflag){
+		if(!in_range.done()){
+			 in_range.update(info.in.now,info.in.robot_mode.enabled);
+		}else if(in_range.done()){
+			firsttime=true;
+		}else{
+			static const Time FINISH_TIME = 1.0;
+			in_range.set(FINISH_TIME);
+		}
+	}
+	return in_range.done();
+}
+
+Toplevel::Goal Align::run(Run_info info){
+	return run(info,{});
+}
+
+Toplevel::Goal Align::run(Run_info info,Toplevel::Goal goals){
+	blocks=info.in.camera.blocks;
+	current=mean(blocks[0].x,blocks[1].x);
+	center=mean(blocks[0].min_x,blocks[0].max_x);
+	cout << "Align:    " << blocks[0] << "," << blocks[1] << "   " << current << "   " << center << "\n";
+	const int TOLERANCE = 2;
+	double power = .2;
+	if(camera_con==Camera_con::ENABLE){
+		if(current<=center-TOLERANCE){
+			goals.drive.left = -power;
+			goals.drive.right = power;
+			goals.shifter = Gear_shifter::Goal::LOW;
+		} else if(current>=center+TOLERANCE) {
+			goals.drive.left = power;
+			goals.drive.right = -power;
+			goals.shifter = Gear_shifter::Goal::LOW;
+		}
+		goals.drive.left = -power;
+		goals.drive.right = power;
+		goals.shifter = Gear_shifter::Goal::LOW;
+	}
+	else if(camera_con==Camera_con::DISABLED){
+		if(info.panel.auto_select == 3 || info.panel.auto_select == 4){
+			goals.drive.left = power;
+			goals.drive.right = -power;
+			goals.shifter = Gear_shifter::Goal::LOW;
+		}
+		else if(info.panel.auto_select == 5 || info.panel.auto_select == 6){
+			goals.drive.left = -power;
+			goals.drive.right = power;	
+			goals.shifter = Gear_shifter::Goal::LOW;
+		}else{
+			goals.drive.left =0;
+			goals.drive.right=0;
+			goals.shifter = Gear_shifter::Goal::LOW;
+		}
+	}
+	else if(camera_con==Camera_con::NONVISION){
+		goals.drive.left = -power;
+		goals.drive.right = power;
+		goals.shifter = Gear_shifter::Goal::LOW;
+	}
+	
+	return goals;
+	
+}
+
+unique_ptr<Step_impl> Align::clone()const{
+	return unique_ptr<Step_impl>(new Align());
+}
+
+bool Align::operator==(Align const& b)const{
+	return in_range == b.in_range;
 }
 
 Wait::Wait(Time wait_time){
@@ -224,7 +343,7 @@ bool Drop_gear::operator==(Drop_gear const& b)const{
 	return true;
 }
 
-Drop_collector::Drop_collector():goal({Gear_grabber::Goal::OPEN,Gear_lifter::Goal::DOWN}){}
+Drop_collector::Drop_collector():goal({Gear_grabber::Goal::OPEN,Gear_lifter::Goal::DOWN}){}//TODO: close it?
 
 bool Drop_collector::done(Next_mode_info info){
 	return ready(status(info.status.gear_collector),goal);
