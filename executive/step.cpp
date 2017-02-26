@@ -27,12 +27,20 @@ Toplevel::Goal Step::run(Run_info info){
 	return impl->run(info,{});
 }
 
-static const Inch WIDTH_OF_ROBOT = 26.0;//inches, note: actual distance between centers of both wheels is 27.0 in, but 26 results in more precise turning  //TODO: finds some way of dealing with constants like this and wheel diameter
+static const Inch ROBOT_WIDTH = 26.0;//inches, note: actual distance between centers of both wheels is 27.0 in, but 26 results in more precise turning  //TODO: finds some way of dealing with constants like this and wheel diameter
+
+Drivebase::Distances Turn::get_distance_travelled(Drivebase::Distances current){
+	Drivebase::Distances distance_travelled = current - initial_distances;
+	cout<<"\nbefore:"<<distance_travelled;
+	distance_travelled.r += distance_travelled.r * RIGHT_DISTANCE_CORRECTION;//right encoder would read that it's moved less than it has without error correction
+	cout<<"    after:"<<distance_travelled<<"     goal:"<<side_goals<<"\n";
+	return distance_travelled;
+}
 
 Turn::Turn(Rad a):target_angle(a),initial_distances({0,0}),init(false),side_goals({0,0}){
-	Inch side_goal = target_angle * 0.5 * WIDTH_OF_ROBOT;
+	Inch side_goal = target_angle * 0.5 * ROBOT_WIDTH;
 	side_goals = Drivebase::Distances{side_goal,-side_goal};
-	motion_profile = {side_goal,0.1,0.25};
+	motion_profile = {side_goal,0.025,0.5};//from testing
 }
 
 Toplevel::Goal Turn::run(Run_info info){
@@ -44,20 +52,20 @@ Toplevel::Goal Turn::run(Run_info info,Toplevel::Goal goals){
 		initial_distances = info.status.drive.distances;
 		init = true;
 	}
-	Drivebase::Distances distance_travelled = info.status.drive.distances - initial_distances;
+	Drivebase::Distances distance_travelled = get_distance_travelled(info.status.drive.distances);
 	
 	double power = motion_profile.target_speed(mean(distance_travelled.l,-distance_travelled.r)); 
-	goals.drive.left = power;
-	goals.drive.right = -power;
+	goals.drive.left = clip(target_to_out_power(power));
+	goals.drive.right = -clip(target_to_out_power(power - RIGHT_SPEED_CORRECTION * power));
 	goals.shifter = Gear_shifter::Goal::LOW;
 	return goals;
 }
 
 bool Turn::done(Next_mode_info info){
-	static const Inch TOLERANCE = 3.0;//inches
-	Drivebase::Distances distance_travelled = info.status.drive.distances - initial_distances;
-	Drivebase::Distances distance_left = fabs(side_goals - distance_travelled);
-	if(mean(distance_left.l,distance_left.r) < TOLERANCE){
+	static const Inch TOLERANCE = 1.0;//inches
+	Drivebase::Distances distance_travelled = get_distance_travelled(info.status.drive.distances);
+	Drivebase::Distances distance_left = side_goals - distance_travelled;
+	if(fabs(mean(distance_left.l,-distance_left.r)) < TOLERANCE){
 		 in_range.update(info.in.now,info.in.robot_mode.enabled);
 	} else {
 		static const Time FINISH_TIME = 1.0;//seconds
@@ -110,7 +118,13 @@ Step_impl::~Step_impl(){}
 	return this->operator==(b);
 }*/
 
-Drive_straight::Drive_straight(Inch goal):target_dist(goal),initial_distances(Drivebase::Distances{0,0}),init(false),motion_profile(goal,0.02,.5),gear(Gear_shifter::Goal::LOW){}//Motion profiling values from testing
+Drive_straight::Drive_straight(Inch goal):target_dist(goal),initial_distances(Drivebase::Distances{0,0}),init(false),motion_profile(goal,0.02,.5),gear(Gear_shifter::Goal::LOW){
+	/*
+	double x = goal/12.0;
+	double shortec = (-.90925*x*x+7.587*x-0.61133)/(12.0*x);//only works well within 10' or so
+	RIGHT_DISTANCE_CORRECTION = max(shortec,0.08);
+	*/
+}//Motion profiling values from testing
 Drive_straight::Drive_straight(Inch goal,double vel_modifier,double max):Drive_straight(goal){
 	motion_profile = {goal,vel_modifier,max};
 }
@@ -220,37 +234,31 @@ Toplevel::Goal Align::run(Run_info info,Toplevel::Goal goals){
 		if(current<=center-TOLERANCE){
 			goals.drive.left = -power;
 			goals.drive.right = power;
-			goals.shifter = Gear_shifter::Goal::LOW;
 		} else if(current>=center+TOLERANCE) {
 			goals.drive.left = power;
 			goals.drive.right = -power;
-			goals.shifter = Gear_shifter::Goal::LOW;
 		}
 		goals.drive.left = -power;
 		goals.drive.right = power;
-		goals.shifter = Gear_shifter::Goal::LOW;
 	}
 	else if(camera_con==Camera_con::DISABLED){
 		if(info.panel.auto_select == 3 || info.panel.auto_select == 4){
 			goals.drive.left = power;
 			goals.drive.right = -power;
-			goals.shifter = Gear_shifter::Goal::LOW;
 		}
 		else if(info.panel.auto_select == 5 || info.panel.auto_select == 6){
 			goals.drive.left = -power;
 			goals.drive.right = power;	
-			goals.shifter = Gear_shifter::Goal::LOW;
 		}else{
 			goals.drive.left =0;
 			goals.drive.right=0;
-			goals.shifter = Gear_shifter::Goal::LOW;
 		}
 	}
 	else if(camera_con==Camera_con::NONVISION){
 		goals.drive.left = -power;
 		goals.drive.right = power;
-		goals.shifter = Gear_shifter::Goal::LOW;
 	}
+	goals.shifter = Gear_shifter::Goal::LOW;
 	
 	return goals;
 	

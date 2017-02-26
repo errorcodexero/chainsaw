@@ -70,8 +70,9 @@ class Drive_straight:public Step_impl_inner<Drive_straight>{//Drives straight a 
 	Motion_profile motion_profile;
 	Countdown_timer in_range;
 	Gear_shifter::Goal gear;
+	const double RIGHT_SPEED_CORRECTION = 0.05;//left and right sides of the robot drive at different speeds given the same power, left encoder gives us the actual distance, right is ~6% behind, always works pretty well
 	
-	Drivebase::Distances get_distance_travelled(Drivebase::Distances);
+	Drivebase::Distances get_distance_travelled(Drivebase::Distances);//TODO: do this better
 
 	public:
 	explicit Drive_straight(Inch);
@@ -157,6 +158,10 @@ struct Turn: Step_impl_inner<Turn>{//orients the robot to a certain angle relati
 	Drivebase::Distances side_goals;
 	Motion_profile motion_profile;
 	Countdown_timer in_range;
+	const double RIGHT_SPEED_CORRECTION = 0.05;
+	const double RIGHT_DISTANCE_CORRECTION = 0.08;
+
+	Drivebase::Distances get_distance_travelled(Drivebase::Distances);
 
 	explicit Turn(Rad);
 	Toplevel::Goal run(Run_info,Toplevel::Goal);
