@@ -26,18 +26,12 @@ Executive insert_score_gear(Executive last){
 				Step{Drop_gear()},//let go of gear
 				Executive{Chain{
 					Step{Combo{
-						Step{Wait{.5}},//TODO: is this necessary?
-						Step{Drop_gear()}
-					}},//make sure we're not attached to the gear
+						Step{Drop_gear()},
+						Step{Drive_straight{-SCORE_GEAR_APPROACH_DIST}}
+					}},//drive back from the peg
 					Executive{Chain{
-						Step{Combo{
-							Step{Drop_gear()},
-							Step{Drive_straight{-SCORE_GEAR_APPROACH_DIST}}
-						}},//drive back from the peg
-						Executive{Chain{
-							Step{Drop_collector()},//lower the collector to the floor
-							last //what to do after scoring the gear
-						}}
+						Step{Drop_collector()},//lower the collector to the floor
+						last //what to do after scoring the gear
 					}}
 				}}
 			}}		
@@ -71,6 +65,8 @@ Executive get_auto_mode(Next_mode_info info){
 		Executive{Teleop{}}
 	}};
 
+	static const Inch EXTENDED_GEAR_LENGTH = 7.6;//how far the gear extends out of the robot when deployed outward
+
 	//////////////////////////
 	//
 	// Full autonomous modes
@@ -90,7 +86,7 @@ Executive get_auto_mode(Next_mode_info info){
 	static const Inch DIST_TO_MIDDLE_PEG = 114;//distance from alliance wall to the middle peg //TODO: find out correct distance
 	Executive auto_score_gear_middle{Chain{
 		Step{Combo{
-			Step{Drive_straight{DIST_TO_MIDDLE_PEG - SCORE_GEAR_APPROACH_DIST - ROBOT_LENGTH}},
+			Step{Drive_straight{DIST_TO_MIDDLE_PEG - SCORE_GEAR_APPROACH_DIST - ROBOT_LENGTH - EXTENDED_GEAR_LENGTH}},
 			Step{Lift_gear()}
 		}},
 		score_gear
