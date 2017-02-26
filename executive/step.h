@@ -69,8 +69,9 @@ class Drive_straight:public Step_impl_inner<Drive_straight>{//Drives straight a 
 	bool init;
 	Motion_profile motion_profile;
 	Countdown_timer in_range;
+	Gear_shifter::Goal gear;
 	const double RIGHT_SPEED_CORRECTION = 0.05;//left and right sides of the robot drive at different speeds given the same power, left encoder gives us the actual distance, right is ~6% behind
-	const double RIGHT_DISTANCE_CORRECTION = 0.07;//these values are from testing
+	const double RIGHT_DISTANCE_CORRECTION = 0.08;//these values are from testing
 	
 	Drivebase::Distances get_distance_travelled(Drivebase::Distances);
 
@@ -98,7 +99,8 @@ class Wait: public Step_impl_inner<Wait>{//Either stops all operation for a give
 };
 
 class Lift_gear: public Step_impl_inner<Lift_gear>{//Closes the gear grabber and raises the gear collector to peg height
-	Gear_collector::Goal goal;//is the same in every one
+	Gear_collector::Goal gear_goal;//is the same in every one
+	Collector::Goal ball_goal;//is the same in every one
 	public:
 	explicit Lift_gear();
 
@@ -110,7 +112,9 @@ class Lift_gear: public Step_impl_inner<Lift_gear>{//Closes the gear grabber and
 };
 
 class Drop_gear: public Step_impl_inner<Drop_gear>{//Opens the gear grabber but keeps the manipulator at peg height
-	Gear_collector::Goal goal;
+	Gear_collector::Goal gear_goal;//is the same in every one
+	Collector::Goal ball_goal;//is the same in every one
+
 	public:
 	explicit Drop_gear();
 
@@ -122,7 +126,9 @@ class Drop_gear: public Step_impl_inner<Drop_gear>{//Opens the gear grabber but 
 };
 
 class Drop_collector: public Step_impl_inner<Drop_collector>{//Lowers the gear manipulator to the floor
-	Gear_collector::Goal goal;
+	Gear_collector::Goal gear_goal;//is the same in every one
+	Collector::Goal ball_goal;//is the same in every one
+	
 	public:
 	explicit Drop_collector();
 
@@ -177,10 +183,6 @@ struct Align: public Step_impl_inner<Align>{
 	bool done(Next_mode_info);
 	std::unique_ptr<Step_impl> clone()const;
 	bool operator==(Align const&)const;
-	
-
-
-
 };
 
 #endif

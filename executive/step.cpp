@@ -110,7 +110,7 @@ Step_impl::~Step_impl(){}
 	return this->operator==(b);
 }*/
 
-Drive_straight::Drive_straight(Inch goal):target_dist(goal),initial_distances(Drivebase::Distances{0,0}),init(false),motion_profile(goal,0.02,.5){}//Motion profiling values from testing
+Drive_straight::Drive_straight(Inch goal):target_dist(goal),initial_distances(Drivebase::Distances{0,0}),init(false),motion_profile(goal,0.02,.5),gear(Gear_shifter::Goal::LOW){}//Motion profiling values from testing
 Drive_straight::Drive_straight(Inch goal,double vel_modifier,double max):Drive_straight(goal){
 	motion_profile = {goal,vel_modifier,max};
 }
@@ -155,7 +155,7 @@ Toplevel::Goal Drive_straight::run(Run_info info,Toplevel::Goal goals){
 	
 	goals.drive.left = clip(power);
 	goals.drive.right = clip(power - power * RIGHT_SPEED_CORRECTION);//right side would go faster than the left without error correction
-	goals.shifter = Gear_shifter::Goal::LOW;
+	goals.shifter = gear;
 	return goals;
 }
 
@@ -164,7 +164,7 @@ unique_ptr<Step_impl> Drive_straight::clone()const{
 }
 
 bool Drive_straight::operator==(Drive_straight const& b)const{
-	return target_dist == b.target_dist && initial_distances == b.initial_distances && init == b.init && motion_profile == b.motion_profile && in_range == b.in_range;
+	return target_dist == b.target_dist && initial_distances == b.initial_distances && init == b.init && motion_profile == b.motion_profile && in_range == b.in_range && gear == b.gear;
 }
 
 
@@ -293,10 +293,10 @@ bool Wait::operator==(Wait const& b)const{
 	return wait_timer == b.wait_timer;
 }
 
-Lift_gear::Lift_gear():goal({Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::UP}){}
+Lift_gear::Lift_gear():gear_goal({Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::UP}),ball_goal({Intake::Goal::OFF,Arm::Goal::IN,Ball_lifter::Goal::OFF}){}
 
 bool Lift_gear::done(Next_mode_info info){
-	return ready(status(info.status.gear_collector),goal);
+	return ready(status(info.status.gear_collector),gear_goal) && ready(status(info.status.collector),ball_goal);
 }
 
 Toplevel::Goal Lift_gear::run(Run_info info){
@@ -305,7 +305,8 @@ Toplevel::Goal Lift_gear::run(Run_info info){
 
 Toplevel::Goal Lift_gear::run(Run_info info, Toplevel::Goal goals){
 	(void)info;
-	goals.gear_collector = goal;
+	goals.gear_collector = gear_goal;
+	goals.collector = ball_goal;
 	return goals;
 }
 
@@ -318,10 +319,10 @@ bool Lift_gear::operator==(Lift_gear const& b)const{
 	return true;
 }
 
-Drop_gear::Drop_gear():goal({Gear_grabber::Goal::OPEN,Gear_lifter::Goal::UP}){}
+Drop_gear::Drop_gear():gear_goal({Gear_grabber::Goal::OPEN,Gear_lifter::Goal::UP}),ball_goal({Intake::Goal::OFF,Arm::Goal::IN,Ball_lifter::Goal::OFF}){}
 
 bool Drop_gear::done(Next_mode_info info){	
-	return ready(status(info.status.gear_collector),goal);
+	return ready(status(info.status.gear_collector),gear_goal) && ready(status(info.status.collector),ball_goal);
 }
 
 Toplevel::Goal Drop_gear::run(Run_info info){
@@ -330,7 +331,8 @@ Toplevel::Goal Drop_gear::run(Run_info info){
 
 Toplevel::Goal Drop_gear::run(Run_info info,Toplevel::Goal goals){
 	(void)info;
-	goals.gear_collector = goal;
+	goals.gear_collector = gear_goal;
+	goals.collector = ball_goal;
 	return goals;
 }
 
@@ -343,10 +345,10 @@ bool Drop_gear::operator==(Drop_gear const& b)const{
 	return true;
 }
 
-Drop_collector::Drop_collector():goal({Gear_grabber::Goal::OPEN,Gear_lifter::Goal::DOWN}){}//TODO: close it?
+Drop_collector::Drop_collector():gear_goal({Gear_grabber::Goal::OPEN,Gear_lifter::Goal::DOWN}),ball_goal({Intake::Goal::OFF,Arm::Goal::IN,Ball_lifter::Goal::OFF}){}//TODO: close it?
 
 bool Drop_collector::done(Next_mode_info info){
-	return ready(status(info.status.gear_collector),goal);
+	return ready(status(info.status.gear_collector),gear_goal) && ready(status(info.status.collector),ball_goal);
 }
 
 Toplevel::Goal Drop_collector::run(Run_info info){
@@ -355,7 +357,8 @@ Toplevel::Goal Drop_collector::run(Run_info info){
 
 Toplevel::Goal Drop_collector::run(Run_info info,Toplevel::Goal goals){
 	(void)info;
-	goals.gear_collector = goal;
+	goals.gear_collector = gear_goal;
+	goals.collector = ball_goal;
 	return goals;
 }
 
