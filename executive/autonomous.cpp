@@ -200,9 +200,9 @@ Executive get_auto_mode(Next_mode_info info){
 				//
 				// Tests for different steps
 				//
-				return make_test_step(Drive_straight{7*12});
+				return make_test_step(Drive_straight{10*12});
 				//return score_gear;
-				//return make_test_step(Turn{PI/2});
+				//return make_test_step(Turn{PI*2});
 				//return make_test_step(Align());
 			case 1: 
 				return auto_baseline;
@@ -223,7 +223,47 @@ Executive get_auto_mode(Next_mode_info info){
 			case 9: 
 				return auto_score_gear_middle_extended_left;
 			case 10:
+				return Executive{Chain{
+					Step{Turn{PI/2}},
+					Executive{Chain{
+						Step{Turn{PI/2}},
+						Executive{Chain{
+							Step{Turn{PI/2}},
+							Executive{Chain{
+								Step{Turn{PI/2}},
+								Executive{Teleop()}
+							}}
+						}}
+						
+					}}
+				}};
 			case 11:
+				 return Executive{Chain{                            
+					Step{Turn{PI/4}},
+					Executive{Chain{
+						Step{Turn{PI/4}},
+						Executive{Chain{
+							Step{Turn{PI/4}},
+							Executive{Chain{
+								Step{Turn{PI/4}},
+								Executive{Chain{
+									Step{Turn{PI/4}},
+									Executive{Chain{
+										Step{Turn{PI/4}},
+										Executive{Chain{
+											Step{Turn{PI/4}},
+											Executive{Chain{
+												Step{Turn{PI/4}},
+												Executive{Teleop()}
+											}}
+										}}
+									}}
+								}}
+							}}
+						}}
+
+					}}
+				}};
 			case 12:
 			case 13:
 			case 14:
