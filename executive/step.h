@@ -5,7 +5,7 @@
 #include "../util/motion_profile.h"
 
 struct Step_impl;
-enum class Camera_con{ENABLE,DISABLED,NONVISION};
+
 class Step{
 	std::unique_ptr<Step_impl> impl;
 
@@ -157,26 +157,28 @@ struct Turn: Step_impl_inner<Turn>{//orients the robot to a certain angle relati
 	std::unique_ptr<Step_impl> clone()const;
 	bool operator==(Turn const&)const;
 };
+
 struct Align: public Step_impl_inner<Align>{
+	enum class Mode{VISION,NONVISION};
+	Mode mode;
 	std::vector<Pixy::Block> blocks;
 	int current;
 	int center;
-	bool manualflag;
-	bool firsttime;
-	Camera_con camera_con;
-	Countdown_timer in_range; 
+	Countdown_timer in_range;
+	double angle_estimate;//TODO: figure this out as a fail safe
+	Step nonvision_align;
+		
+	void update(Camera);
+
 	public:
 	explicit Align();
+	explicit Align(double);
 
-	Toplevel::Goal run(Run_info,Toplevel::Goal);//TODO
+	Toplevel::Goal run(Run_info,Toplevel::Goal);
 	Toplevel::Goal run(Run_info);
 	bool done(Next_mode_info);
 	std::unique_ptr<Step_impl> clone()const;
 	bool operator==(Align const&)const;
-	
-
-
-
 };
 
 #endif
