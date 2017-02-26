@@ -104,7 +104,7 @@ void Arm::Estimator::update(Time time,Arm::Input input,Arm::Output output){
 			if(last == Status::GOING_IN){
 				state_timer.update(time,input.enabled);
 			} else if(last != Status::IN){ 
-				const Time IN_TIME = 1.0;//seconds. assumed
+				const Time IN_TIME = 2.2;//seconds. assumed
 				last = Status::GOING_IN;
 				state_timer.set(IN_TIME);
 			}
