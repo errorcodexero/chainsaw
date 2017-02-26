@@ -65,8 +65,9 @@ Executive get_auto_mode(Next_mode_info info){
 	Executive score_gear = insert_score_gear(Executive{Teleop()});
 
 	//for when just want to run across the field at the end of autonomous
+	static const Inch DASH_DIST = 20*12;
 	Executive dash{Chain{
-		Step{Drive_straight{12*20}},
+		Step{Drive_straight{DASH_DIST}},
 		Executive{Teleop{}}
 	}};
 
@@ -79,15 +80,17 @@ Executive get_auto_mode(Next_mode_info info){
 	Executive auto_null{Teleop{}};
 
 	//Auto mode for crossing the baseline
+	static const Inch BASELINE_DIST = 7 * 12 + 9.25;//distance from baseline to alliance wall
 	Executive auto_baseline{Chain{
-		Step{Drive_straight{12*12}},
+		Step{Drive_straight{BASELINE_DIST + 12}},//move a little farther to give us some room for error
 		Executive{Teleop{}}
 	}};
 
 	//Scores a gear on the middle peg and then stops
+	static const Inch DIST_TO_MIDDLE_PEG = 114;//distance from alliance wall to the middle peg //TODO: find out correct distance
 	Executive auto_score_gear_middle{Chain{
 		Step{Combo{
-			Step{Drive_straight{114 - SCORE_GEAR_APPROACH_DIST - ROBOT_LENGTH}},//TODO: find out correct distance
+			Step{Drive_straight{DIST_TO_MIDDLE_PEG - SCORE_GEAR_APPROACH_DIST - ROBOT_LENGTH}},
 			Step{Lift_gear()}
 		}},
 		score_gear
