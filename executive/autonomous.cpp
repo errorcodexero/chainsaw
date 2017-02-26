@@ -189,7 +189,8 @@ Executive get_auto_mode(Next_mode_info info){
 			}}
 		)
 	}};
-
+	
+	return make_test_step(Drive_straight{12.0*info.panel.auto_select});/*
 
 	if(info.panel.in_use){
 		switch(info.panel.auto_select){ 
@@ -236,7 +237,7 @@ Executive get_auto_mode(Next_mode_info info){
 				return auto_null;
 		}
 	}
-	return Executive{Teleop()};//Default Executive if no panel exists (noramlly Teleop)
+	return Executive{Teleop()};//Default Executive if no panel exists (noramlly Teleop)*/
 }
 
 Executive Autonomous::next_mode(Next_mode_info info){

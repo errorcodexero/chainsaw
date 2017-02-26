@@ -116,24 +116,20 @@ Drive_straight::Drive_straight(Inch goal,double vel_modifier,double max):Drive_s
 }
 
 Drivebase::Distances Drive_straight::get_distance_travelled(Drivebase::Distances current){
-	Drivebase::Distances distance_travelled = current - initial_distances;
-	cout<<"\nbefore:"<<distance_travelled;
-	distance_travelled.r += distance_travelled.r * RIGHT_DISTANCE_CORRECTION;//right encoder would read that it's moved less than it has without error correction
-	cout<<"    after:"<<distance_travelled<<"\n";
-	return distance_travelled;
+	return current - initial_distances;
 }
 
 bool Drive_straight::done(Next_mode_info info){
 	static const Inch TOLERANCE = 3.0;//inches
 	Drivebase::Distances distance_travelled = get_distance_travelled(info.status.drive.distances);
-	Drivebase::Distances distance_left = (Drivebase::Distances{target_dist,target_dist} - distance_travelled);
-	if(fabs(mean(distance_left.l,distance_left.r)) < TOLERANCE){
+	Drivebase::Distances distance_left = Drivebase::Distances{target_dist,target_dist} - distance_travelled;
+	//ignoring right encoder because it's proven hard to get meaningful data from it
+	if(fabs(distance_left.l) < TOLERANCE){
 		in_range.update(info.in.now,info.in.robot_mode.enabled);
 	} else {
 		static const Time FINISH_TIME = 1.0;
 		in_range.set(FINISH_TIME);
 	}
-	cout<<"\ndistance_travelled:"<<distance_travelled<<"  mean:"<<mean(distance_travelled.l,distance_travelled.r)<<"   goal:"<<target_dist<<"   in_range:"<<in_range<<"\n";
 	return in_range.done();
 }
 
@@ -146,15 +142,16 @@ Toplevel::Goal Drive_straight::run(Run_info info,Toplevel::Goal goals){
 		initial_distances = info.status.drive.distances;
 		init = true;
 	}
-
 	Drivebase::Distances distance_travelled = get_distance_travelled(info.status.drive.distances);
 
-	double power = target_to_out_power(motion_profile.target_speed(mean(distance_travelled.l,distance_travelled.r)));
+	double power = motion_profile.target_speed(distance_travelled.l); //ignoring right encoder because it's proven hard to get meaningful data from it
+
+	cout<<"\nTravelled: "<<distance_travelled.l<<"\n";
+
+	const double RIGHT_SPEED_CORRECTION = 0.05;//left and right sides of the robot drive at different speeds given the same power, left encoder gives us the actual distance, right is ~6% behind
 	
-	//cout<<"\ndistance_travelled:"<<distance_travelled<<"  mean:"<<mean(distance_travelled.l,distance_travelled.r)<<"   goal:"<<target_dist<<"     power:"<<power<<"    in_range:"<<in_range<<"\n";
-	
-	goals.drive.left = clip(power);
-	goals.drive.right = clip(power - power * RIGHT_SPEED_CORRECTION);//right side would go faster than the left without error correction
+	goals.drive.left = clip(target_to_out_power(power));
+	goals.drive.right = clip(target_to_out_power(power - power * RIGHT_SPEED_CORRECTION)); //right side would go faster than the left without error correction
 	goals.shifter = gear;
 	return goals;
 }
@@ -166,7 +163,6 @@ unique_ptr<Step_impl> Drive_straight::clone()const{
 bool Drive_straight::operator==(Drive_straight const& b)const{
 	return target_dist == b.target_dist && initial_distances == b.initial_distances && init == b.init && motion_profile == b.motion_profile && in_range == b.in_range && gear == b.gear;
 }
-
 
 Align::Align():firsttime(0){}
 
