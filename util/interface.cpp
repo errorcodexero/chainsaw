@@ -686,7 +686,7 @@ ostream& operator<<(ostream& o,Robot_inputs a){
 	o<<"  ds_info:"<<a.ds_info<<"\n";
 	//o<<"joysticks:";
 	for(unsigned i=0;i<a.JOYSTICKS;i++){
-		o<<"  "<<a.joystick[i]<<"\n";
+		o<<"  "<<i<<":"<<a.joystick[i]<<"\n";
 	}
 	o<<"dio:"<<a.digital_io;
 	/*for(unsigned i=0;i<Robot_outputs::DIGITAL_IOS;i++){
