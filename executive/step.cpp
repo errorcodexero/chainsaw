@@ -290,7 +290,7 @@ bool Wait::operator==(Wait const& b)const{
 	return wait_timer == b.wait_timer;
 }
 
-Lift_gear::Lift_gear():gear_goal({Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::UP}),ball_goal({Intake::Goal::OFF,Arm::Goal::IN,Ball_lifter::Goal::OFF}){}
+Lift_gear::Lift_gear():gear_goal({Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::UP}),ball_goal({Intake::Goal::OFF,Arm::Goal::STOW,Ball_lifter::Goal::OFF}){}
 
 bool Lift_gear::done(Next_mode_info info){
 	return ready(status(info.status.gear_collector),gear_goal) && ready(status(info.status.collector),ball_goal);
@@ -316,7 +316,7 @@ bool Lift_gear::operator==(Lift_gear const& b)const{
 	return true;
 }
 
-Drop_gear::Drop_gear():gear_goal({Gear_grabber::Goal::OPEN,Gear_lifter::Goal::UP}),ball_goal({Intake::Goal::OFF,Arm::Goal::IN,Ball_lifter::Goal::OFF}){}
+Drop_gear::Drop_gear():gear_goal({Gear_grabber::Goal::OPEN,Gear_lifter::Goal::UP}),ball_goal({Intake::Goal::OFF,Arm::Goal::STOW,Ball_lifter::Goal::OFF}){}
 
 bool Drop_gear::done(Next_mode_info info){	
 	return ready(status(info.status.gear_collector),gear_goal) && ready(status(info.status.collector),ball_goal);
@@ -342,7 +342,7 @@ bool Drop_gear::operator==(Drop_gear const& b)const{
 	return true;
 }
 
-Drop_collector::Drop_collector():gear_goal({Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::DOWN}),ball_goal({Intake::Goal::OFF,Arm::Goal::IN,Ball_lifter::Goal::OFF}){}
+Drop_collector::Drop_collector():gear_goal({Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::DOWN}),ball_goal({Intake::Goal::OFF,Arm::Goal::STOW,Ball_lifter::Goal::OFF}){}
 
 bool Drop_collector::done(Next_mode_info info){
 	return ready(status(info.status.gear_collector),gear_goal) && ready(status(info.status.collector),ball_goal);

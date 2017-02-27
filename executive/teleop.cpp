@@ -74,12 +74,12 @@ void Teleop::collect_protocol(Toplevel::Status_detail const& status,Toplevel::Go
 	switch(collect_step){
 		case Collect_step::GEAR_COLLECTOR_DOWN:
 			goals.gear_collector=Gear_collector::Goal{Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::DOWN};
-			goals.collector=Collector::Goal{Intake::Goal::OFF, Arm::Goal::IN, Ball_lifter::Goal::OFF};
+			goals.collector=Collector::Goal{Intake::Goal::OFF, Arm::Goal::STOW, Ball_lifter::Goal::OFF};
 			if(status.gear_collector.gear_lifter==Gear_lifter::Status_detail::DOWN) collect_step = Collect_step::COLLECT;
 			break;	
 		case Collect_step::COLLECT:
 			goals.gear_collector=Gear_collector::Goal{Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::DOWN};
-			goals.collector=Collector::Goal{Intake::Goal::IN, Arm::Goal::OUT, Ball_lifter::Goal::UP};
+			goals.collector=Collector::Goal{Intake::Goal::IN, Arm::Goal::LOW, Ball_lifter::Goal::UP};
 			break;
 		default:
 			assert(0);
@@ -90,8 +90,8 @@ void Teleop::no_collect_protocol(Toplevel::Status_detail const& status,const boo
 	switch(no_collect_step){
 		case No_collect_step::BALL_COLLECTOR_IN:
 			goals.gear_collector=Gear_collector::Goal{Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::DOWN};
-			goals.collector=Collector::Goal{Intake::Goal::OFF, Arm::Goal::IN, Ball_lifter::Goal::OFF};
-			if(status.collector.arm==Arm::Status_detail::IN) {
+			goals.collector=Collector::Goal{Intake::Goal::OFF, Arm::Goal::STOW, Ball_lifter::Goal::OFF};
+			if(status.collector.arm==Arm::Status_detail::STOW) {
 				no_collect_step=No_collect_step::CLEAR_BALLS;
 				clear_ball_timer.set(CLEAR_BALL_TIME);
 			}
@@ -99,11 +99,11 @@ void Teleop::no_collect_protocol(Toplevel::Status_detail const& status,const boo
 		case No_collect_step::CLEAR_BALLS:
 			clear_ball_timer.update(now,enabled);
 			goals.gear_collector=Gear_collector::Goal{Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::DOWN};
-			goals.collector=Collector::Goal{Intake::Goal::OUT, Arm::Goal::IN, Ball_lifter::Goal::UP};
+			goals.collector=Collector::Goal{Intake::Goal::OUT, Arm::Goal::STOW, Ball_lifter::Goal::UP};
 			if(clear_ball_timer.done()) no_collect_step=No_collect_step::GEAR_COLLECTOR_ACTIVE;
 			break;
 		case No_collect_step::GEAR_COLLECTOR_ACTIVE:
-			goals.collector=Collector::Goal{Intake::Goal::OFF, Arm::Goal::IN, Ball_lifter::Goal::OFF};
+			goals.collector=Collector::Goal{Intake::Goal::OFF, Arm::Goal::STOW, Ball_lifter::Goal::OFF};
 			goals.gear_collector=[&]{
 				switch(gear_collector_mode){
 					case Gear_collector_mode::PREP_COLLECT: return Gear_collector::Goal{Gear_grabber::Goal::OPEN,Gear_lifter::Goal::DOWN};
@@ -180,19 +180,19 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	}*/
 
 	if (collect.get()){
-		goals.collector.arm=Arm::Goal::OUT;
-		if(info.status.collector.arm==Arm::Status_detail::OUT){
+		goals.collector.arm=Arm::Goal::LOW;
+		if(info.status.collector.arm==Arm::Status_detail::LOW){
 			goals.collector.intake=Intake::Goal::IN;
 			goals.collector.ball_lifter=Ball_lifter::Goal::UP;
 		}
 		goals.gear_collector=Gear_collector::Goal{Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::DOWN};
 	} else {
-		goals.collector=Collector::Goal{Intake::Goal::OFF,Arm::Goal::IN,Ball_lifter::Goal::OFF};
+		goals.collector=Collector::Goal{Intake::Goal::OFF,Arm::Goal::STOW,Ball_lifter::Goal::OFF};
 		goals.gear_collector=[&]{
 			switch(gear_collector_mode){
 				case Gear_collector_mode::PREP_COLLECT: 
-					goals.collector.arm=Arm::Goal::OUT;
-					if(info.status.collector.arm==Arm::Status_detail::OUT) goals.collector.ball_lifter=Ball_lifter::Goal::DOWN;
+					goals.collector.arm=Arm::Goal::LOW;
+					if(info.status.collector.arm==Arm::Status_detail::LOW) goals.collector.ball_lifter=Ball_lifter::Goal::DOWN;
 					return Gear_collector::Goal{Gear_grabber::Goal::OPEN,Gear_lifter::Goal::DOWN};
 				case Gear_collector_mode::COLLECT: return Gear_collector::Goal{Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::DOWN};
 				case Gear_collector_mode::PREP_SCORE: return Gear_collector::Goal{Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::UP};
@@ -205,13 +205,13 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	goals.climber = info.panel.climb ? Climber::Goal::CLIMB : Climber::Goal::STOP;
 
 	//Manual controls
-	if(info.panel.gear_grasper==Panel::Gear_grasper::OPEN) goals.gear_collector.gear_grabber=Gear_grabber::Goal::OPEN;
-	if(info.panel.gear_grasper==Panel::Gear_grasper::CLOSED) goals.gear_collector.gear_grabber=Gear_grabber::Goal::CLOSE;
-	if(info.panel.gear_collector==Panel::Gear_collector::UP) goals.gear_collector.gear_lifter=Gear_lifter::Goal::UP;
-	if(info.panel.gear_collector==Panel::Gear_collector::DOWN) goals.gear_collector.gear_lifter=Gear_lifter::Goal::DOWN;	
+	if(info.panel.gear_grabber==Panel::Gear_grabber::OPEN) goals.gear_collector.gear_grabber=Gear_grabber::Goal::OPEN;
+	if(info.panel.gear_grabber==Panel::Gear_grabber::CLOSED) goals.gear_collector.gear_grabber=Gear_grabber::Goal::CLOSE;
+	if(info.panel.gear_arm==Panel::Gear_arm::UP) goals.gear_collector.gear_lifter=Gear_lifter::Goal::UP;
+	if(info.panel.gear_arm==Panel::Gear_arm::DOWN) goals.gear_collector.gear_lifter=Gear_lifter::Goal::DOWN;	
 
-	if(info.panel.ball_arm==Panel::Ball_arm::UP) goals.collector.arm=Arm::Goal::IN;
-	if(info.panel.ball_arm==Panel::Ball_arm::DOWN) goals.collector.arm=Arm::Goal::OUT;
+	if(info.panel.ball_arm==Panel::Ball_arm::STOW) goals.collector.arm=Arm::Goal::STOW;
+	if(info.panel.ball_arm==Panel::Ball_arm::LOW) goals.collector.arm=Arm::Goal::LOW;
 	if(false){//info.panel.ball_collector==Panel::Ball_collector::DISABLED){
 		if(info.panel.ball_intake!=Panel::Ball_intake::AUTO) goals.collector.intake=Intake::Goal::OFF;
 		if(info.panel.ball_lift!=Panel::Ball_lift::AUTO) goals.collector.ball_lifter=Ball_lifter::Goal::OFF;
@@ -222,8 +222,8 @@ Toplevel::Goal Teleop::run(Run_info info) {
 		if(info.panel.ball_lift==Panel::Ball_lift::IN) goals.collector.ball_lifter=Ball_lifter::Goal::UP;
 	}
 
-	if(info.status.collector.arm!=Arm::Status::IN) goals.gear_collector.gear_lifter=Gear_lifter::Goal::DOWN;
-	if(info.status.gear_collector.gear_lifter!=Gear_lifter::Status::DOWN) goals.collector.arm=Arm::Goal::IN;	
+	if(info.status.collector.arm!=Arm::Status::STOW) goals.gear_collector.gear_lifter=Gear_lifter::Goal::DOWN;
+	if(info.status.gear_collector.gear_lifter!=Gear_lifter::Status::DOWN) goals.collector.arm=Arm::Goal::STOW;	
 	
 	if(info.in.ds_info.connected && (print_number%10)==0){
 		cout<<"\nUltrasonic sensor:"<<info.status.drive.ultrasonic<<"\n";
