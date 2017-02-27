@@ -222,7 +222,7 @@ Executive get_auto_mode(Next_mode_info info){
 			case 9: 
 				return auto_score_gear_middle_extended_left;
 			case 10:
-				return Executive{Chain{
+				return Executive{Chain{//turns 90 degrees four times (proven to be more accurate than one 360)
 					Step{Turn{PI/2}},
 					Executive{Chain{
 						Step{Turn{PI/2}},
@@ -237,32 +237,6 @@ Executive get_auto_mode(Next_mode_info info){
 					}}
 				}};
 			case 11:
-				 return Executive{Chain{                            
-					Step{Turn{PI/4}},
-					Executive{Chain{
-						Step{Turn{PI/4}},
-						Executive{Chain{
-							Step{Turn{PI/4}},
-							Executive{Chain{
-								Step{Turn{PI/4}},
-								Executive{Chain{
-									Step{Turn{PI/4}},
-									Executive{Chain{
-										Step{Turn{PI/4}},
-										Executive{Chain{
-											Step{Turn{PI/4}},
-											Executive{Chain{
-												Step{Turn{PI/4}},
-												Executive{Teleop()}
-											}}
-										}}
-									}}
-								}}
-							}}
-						}}
-
-					}}
-				}};
 			case 12:
 			case 13:
 			case 14:

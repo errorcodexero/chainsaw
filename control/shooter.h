@@ -7,35 +7,20 @@
 #include "../util/util.h"
 #include "../util/countdown_timer.h"
 #include "../util/quick.h"
+#include "nop.h"
 
 struct Shooter{
 	struct Goal{
-		PID_values constants;
-
-		#define SHOOTER_MODES X(VOLTAGE) X(SPEED)
-		enum class Mode{
-			#define X(name) name,
-			SHOOTER_MODES
-			#undef X
-		};
-		Mode mode;
-		double value;//0-1 for voltage mode, RPM for speed mode
+		double value;//percent power
 		Goal();
-		Goal(PID_values,Shooter::Goal::Mode,double);
+		Goal(double);
 	};
 	
-	struct Status_detail{
-		double speed;//rpm
-		
-		Status_detail();
-		Status_detail(double);
-	};
+	using Status_detail = Nop::Status_detail;
 	
 	using Status = Status_detail;
 
-	//speed is in RPM
 	#define SHOOTER_INPUT_ITEMS(X)\
-		X(int,speed)\
 		X(bool,enabled)
 	struct Input{
 		#define X(A,B) A B;
@@ -48,7 +33,7 @@ struct Shooter{
 		Robot_inputs operator()(Robot_inputs,Shooter::Input)const;
 	};
 
-	using Output = Talon_srx_output;
+	using Output = Goal;
 	
 	struct Output_applicator{
 		Shooter::Output operator()(Robot_outputs const&)const;
@@ -69,19 +54,17 @@ struct Shooter{
 	Output_applicator output_applicator;
 };
 
-std::ostream& operator<<(std::ostream&,Shooter::Goal::Mode);
 std::ostream& operator<<(std::ostream&,Shooter::Goal);
 std::ostream& operator<<(std::ostream&,Shooter::Input);
-std::ostream& operator<<(std::ostream&,Shooter::Status_detail);
 std::ostream& operator<<(std::ostream&,Shooter);
-
-bool operator==(Shooter::Input,Shooter::Input);
-bool operator!=(Shooter::Input,Shooter::Input);
-bool operator<(Shooter::Input,Shooter::Input);
 
 bool operator<(Shooter::Status_detail,Shooter::Status_detail);
 bool operator==(Shooter::Status_detail,Shooter::Status_detail);
 bool operator!=(Shooter::Status_detail,Shooter::Status_detail);
+
+bool operator==(Shooter::Input,Shooter::Input);
+bool operator!=(Shooter::Input,Shooter::Input);
+bool operator<(Shooter::Input,Shooter::Input);
 
 bool operator==(Shooter::Goal,Shooter::Goal);
 bool operator!=(Shooter::Goal,Shooter::Goal);
@@ -100,11 +83,9 @@ bool operator!=(Shooter,Shooter);
 
 std::set<Shooter::Input> examples(Shooter::Input*);
 std::set<Shooter::Goal> examples(Shooter::Goal*);
-std::set<Shooter::Status_detail> examples(Shooter::Status_detail*);
-std::set<Shooter::Status> examples(Shooter::Status*);
 
-Shooter::Output control(Shooter::Status_detail,Shooter::Goal);
 Shooter::Status status(Shooter::Status_detail);
+Shooter::Output control(Shooter::Status_detail,Shooter::Goal);
 bool ready(Shooter::Status,Shooter::Goal);
 
 #endif
