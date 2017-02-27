@@ -189,19 +189,17 @@ Executive get_auto_mode(Next_mode_info info){
 			}}
 		)
 	}};
-	
-	return make_test_step(Drive_straight{12.0*info.panel.auto_select});/*
 
 	if(info.panel.in_use){
 		switch(info.panel.auto_select){ 
 			case 0: 
-				//return auto_null;//TODO
+				return auto_null;//TODO: make sure this is un-commented for competition
 				
 				////////////////////////////
 				//
 				// Tests for different steps
 				//
-				return make_test_step(Drive_straight{10*12});
+				//return make_test_step(Drive_straight{10*12});
 				//return score_gear;
 				//return make_test_step(Turn{PI*2});
 				//return make_test_step(Align());
@@ -277,7 +275,7 @@ Executive get_auto_mode(Next_mode_info info){
 				return auto_null;
 		}
 	}
-	return Executive{Teleop()};//Default Executive if no panel exists (noramlly Teleop)*/
+	return Executive{Teleop()};//Default Executive if no panel exists (noramlly Teleop)
 }
 
 Executive Autonomous::next_mode(Next_mode_info info){

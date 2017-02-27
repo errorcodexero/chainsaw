@@ -27,20 +27,22 @@ Toplevel::Goal Step::run(Run_info info){
 	return impl->run(info,{});
 }
 
-static const Inch ROBOT_WIDTH = 26.0;//inches, note: actual distance between centers of both wheels is 27.0 in, but 26 results in more precise turning  //TODO: finds some way of dealing with constants like this and wheel diameter
+const double RIGHT_SPEED_CORRECTION = 0.05;//left and right sides of the robot drive at different speeds given the same power, left encoder gives us the actual distance, right is ~6% behind, always works pretty well
 
-Drivebase::Distances Turn::get_distance_travelled(Drivebase::Distances current){
-	Drivebase::Distances distance_travelled = current - initial_distances;
-	cout<<"\nbefore:"<<distance_travelled;
-	distance_travelled.r += distance_travelled.r * RIGHT_DISTANCE_CORRECTION;//right encoder would read that it's moved less than it has without error correction
-	cout<<"    after:"<<distance_travelled<<"     goal:"<<side_goals<<"\n";
-	return distance_travelled;
+static const Inch ROBOT_WIDTH = 28; //inches //TODO: finds some way of dealing with constants like this and wheel diameter
+
+Drivebase::Distances Turn::angle_to_distances(Rad target_angle){
+	Inch side_goal = target_angle * 0.5 * ROBOT_WIDTH;
+	return Drivebase::Distances{side_goal,-side_goal};
 }
 
-Turn::Turn(Rad a):target_angle(a),initial_distances({0,0}),init(false),side_goals({0,0}){
-	Inch side_goal = target_angle * 0.5 * ROBOT_WIDTH;
-	side_goals = Drivebase::Distances{side_goal,-side_goal};
-	motion_profile = {side_goal,0.025,0.5};//from testing
+Drivebase::Distances Turn::get_distance_travelled(Drivebase::Distances current){
+	return current - initial_distances;
+}
+
+Turn::Turn(Rad a):Turn(a,0.02,0.5){}//from testing
+Turn::Turn(Rad a,double vel_modifier,double max):target_angle(a),initial_distances({0,0}),init(false),side_goals(angle_to_distances(a)){
+	motion_profile = {side_goals.l,vel_modifier,max};//from testing
 }
 
 Toplevel::Goal Turn::run(Run_info info){
@@ -54,7 +56,8 @@ Toplevel::Goal Turn::run(Run_info info,Toplevel::Goal goals){
 	}
 	Drivebase::Distances distance_travelled = get_distance_travelled(info.status.drive.distances);
 	
-	double power = motion_profile.target_speed(mean(distance_travelled.l,-distance_travelled.r)); 
+	//ignoring right encoder because it's proven hard to get meaningful data from it
+	double power = motion_profile.target_speed(distance_travelled.l); 
 	goals.drive.left = clip(target_to_out_power(power));
 	goals.drive.right = -clip(target_to_out_power(power - RIGHT_SPEED_CORRECTION * power));
 	goals.shifter = Gear_shifter::Goal::LOW;
@@ -65,7 +68,7 @@ bool Turn::done(Next_mode_info info){
 	static const Inch TOLERANCE = 1.0;//inches
 	Drivebase::Distances distance_travelled = get_distance_travelled(info.status.drive.distances);
 	Drivebase::Distances distance_left = side_goals - distance_travelled;
-	if(fabs(mean(distance_left.l,-distance_left.r)) < TOLERANCE){
+	if(fabs(distance_left.l) < TOLERANCE){
 		 in_range.update(info.in.now,info.in.robot_mode.enabled);
 	} else {
 		static const Time FINISH_TIME = 1.0;//seconds
@@ -118,16 +121,8 @@ Step_impl::~Step_impl(){}
 	return this->operator==(b);
 }*/
 
-Drive_straight::Drive_straight(Inch goal):target_dist(goal),initial_distances(Drivebase::Distances{0,0}),init(false),motion_profile(goal,0.02,.5),gear(Gear_shifter::Goal::LOW){
-	/*
-	double x = goal/12.0;
-	double shortec = (-.90925*x*x+7.587*x-0.61133)/(12.0*x);//only works well within 10' or so
-	RIGHT_DISTANCE_CORRECTION = max(shortec,0.08);
-	*/
-}//Motion profiling values from testing
-Drive_straight::Drive_straight(Inch goal,double vel_modifier,double max):Drive_straight(goal){
-	motion_profile = {goal,vel_modifier,max};
-}
+Drive_straight::Drive_straight(Inch goal):Drive_straight(goal,0.02,0.5){}
+Drive_straight::Drive_straight(Inch goal,double vel_modifier,double max):target_dist(goal),initial_distances(Drivebase::Distances{0,0}),init(false),motion_profile(goal,vel_modifier,max),gear(Gear_shifter::Goal::LOW){}//Motion profiling values from testing
 
 Drivebase::Distances Drive_straight::get_distance_travelled(Drivebase::Distances current){
 	return current - initial_distances;
@@ -159,8 +154,6 @@ Toplevel::Goal Drive_straight::run(Run_info info,Toplevel::Goal goals){
 	Drivebase::Distances distance_travelled = get_distance_travelled(info.status.drive.distances);
 
 	double power = motion_profile.target_speed(distance_travelled.l); //ignoring right encoder because it's proven hard to get meaningful data from it
-
-	cout<<"\nTravelled: "<<distance_travelled.l<<"\n";
 
 	const double RIGHT_SPEED_CORRECTION = 0.05;//left and right sides of the robot drive at different speeds given the same power, left encoder gives us the actual distance, right is ~6% behind
 	
