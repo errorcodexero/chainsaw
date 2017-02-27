@@ -4,7 +4,7 @@
 using namespace std;
 
 #define BALL_LIFTER_ADDRESS 6
-#define BALL_LIFTER_SPEED 1.0
+#define BALL_LIFTER_SPEED .40 //TODO: tune this
 
 ostream& operator<<(ostream& o, Ball_lifter::Goal a){
 	#define X(name) if(a==Ball_lifter::Goal::name)return o<<"Ball_lifter::Goal("#name")";

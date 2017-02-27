@@ -10,9 +10,9 @@ double deg_to_rad(double deg){
 	return deg/180*PI;
 }
 
-const Inch SCORE_GEAR_APPROACH_DIST = 18.0;//inches
+const Inch SCORE_GEAR_APPROACH_DIST = 12.0;//inches
 
-const Inch ROBOT_LENGTH = 29.0; //inches from front to back
+const Inch ROBOT_LENGTH = 28.0; //inches from front to back
 
 Executive insert_score_gear(Executive last){
 	Executive score_gear{Chain{
@@ -26,18 +26,12 @@ Executive insert_score_gear(Executive last){
 				Step{Drop_gear()},//let go of gear
 				Executive{Chain{
 					Step{Combo{
-						Step{Wait{.5}},
-						Step{Drop_gear()}
-					}},//make sure we're not attached to the gear
+						Step{Drop_gear()},
+						Step{Drive_straight{-SCORE_GEAR_APPROACH_DIST}}
+					}},//drive back from the peg
 					Executive{Chain{
-						Step{Combo{
-							Step{Drop_gear()},
-							Step{Drive_straight{-SCORE_GEAR_APPROACH_DIST}}
-						}},//drive back from the peg
-						Executive{Chain{
-							Step{Drop_collector()},//lower the collector to the floor
-							last //what to do after scoring the gear
-						}}
+						Step{Drop_collector()},//lower the collector to the floor
+						last //what to do after scoring the gear
 					}}
 				}}
 			}}		
@@ -58,14 +52,6 @@ Executive get_auto_mode(Next_mode_info info){
 
 	////////////////////////////
 	//
-	// Tests for different steps
-	//
-		
-	Executive drive_straight_test = make_test_step(Drive_straight{7*12});//used to test the Step Drive_straight
-	Executive turn_test = make_test_step(Turn{PI/2});//used to test the Step Turn
-
-	////////////////////////////
-	//
 	// Parts of other autonomous modes
 	// 
 
@@ -73,10 +59,13 @@ Executive get_auto_mode(Next_mode_info info){
 	Executive score_gear = insert_score_gear(Executive{Teleop()});
 
 	//for when just want to run across the field at the end of autonomous
+	static const Inch DASH_DIST = 20*12;
 	Executive dash{Chain{
-		Step{Drive_straight{12*20}},
+		Step{Drive_straight{DASH_DIST}},
 		Executive{Teleop{}}
 	}};
+
+	static const Inch EXTENDED_GEAR_LENGTH = 7.6;//how far the gear extends out of the robot when deployed outward
 
 	//////////////////////////
 	//
@@ -87,15 +76,17 @@ Executive get_auto_mode(Next_mode_info info){
 	Executive auto_null{Teleop{}};
 
 	//Auto mode for crossing the baseline
+	static const Inch BASELINE_DIST = 7 * 12 + 9.25;//distance from baseline to alliance wall
 	Executive auto_baseline{Chain{
-		Step{Drive_straight{12*12}},
+		Step{Drive_straight{BASELINE_DIST + 12}},//move a little farther to give us some room for error
 		Executive{Teleop{}}
 	}};
 
 	//Scores a gear on the middle peg and then stops
+	static const Inch DIST_TO_MIDDLE_PEG = 114;//distance from alliance wall to the middle peg //TODO: find out correct distance
 	Executive auto_score_gear_middle{Chain{
 		Step{Combo{
-			Step{Drive_straight{114.3 - SCORE_GEAR_APPROACH_DIST - ROBOT_LENGTH}},//TODO: find out correct distance
+			Step{Drive_straight{DIST_TO_MIDDLE_PEG - SCORE_GEAR_APPROACH_DIST - ROBOT_LENGTH - EXTENDED_GEAR_LENGTH}},
 			Step{Lift_gear()}
 		}},
 		score_gear
@@ -204,11 +195,15 @@ Executive get_auto_mode(Next_mode_info info){
 		switch(info.panel.auto_select){ 
 			case 0: 
 				return auto_null;//TODO
-				//tests for different steps
-				//return score_gear;				
-				//return make_test_test(Lift_gear());
-				//return drive_straight_test; 
-				//return turn_test;
+				
+				////////////////////////////
+				//
+				// Tests for different steps
+				//
+				//return make_test_step(Drive_straight{7*12});
+				//return score_gear;
+				//return make_test_step(Turn{PI/2});
+				//return make_test_step(Align());
 			case 1: 
 				return auto_baseline;
 			case 2: 

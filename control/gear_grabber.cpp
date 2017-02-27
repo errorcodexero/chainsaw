@@ -186,13 +186,13 @@ Gear_grabber::Output control(Gear_grabber::Status status, Gear_grabber::Goal goa
 }
 
 Robot_outputs Gear_grabber::Output_applicator::operator()(Robot_outputs r,Output out)const{
-	r.solenoid[PISTON_LOC] = out.piston == Gear_grabber::Output::Piston::CLOSE;
+	r.solenoid[PISTON_LOC] = out.piston == Gear_grabber::Output::Piston::OPEN;
 	r.driver_station.digital[GEAR_LIGHT_OUT] = out.gear_light; 
 	return r;
 }
 
 Gear_grabber::Output Gear_grabber::Output_applicator::operator()(Robot_outputs r)const{
-	return {r.solenoid[PISTON_LOC] ? Gear_grabber::Output::Piston::CLOSE : Gear_grabber::Output::Piston::OPEN,r.driver_station.digital[GEAR_LIGHT_OUT]};
+	return {r.solenoid[PISTON_LOC] ? Gear_grabber::Output::Piston::OPEN : Gear_grabber::Output::Piston::CLOSE,r.driver_station.digital[GEAR_LIGHT_OUT]};
 }
 
 Robot_inputs Gear_grabber::Input_reader::operator()(Robot_inputs r,Input in)const{

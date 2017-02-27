@@ -68,7 +68,7 @@ Executive Teleop::next_mode(Next_mode_info info) {
 
 IMPL_STRUCT(Teleop::Teleop,TELEOP_ITEMS)
 
-Teleop::Teleop():gear_collector_mode(Gear_collector_mode::PREP_COLLECT),collect_step(Collect_step::GEAR_COLLECTOR_DOWN),no_collect_step(No_collect_step::BALL_COLLECTOR_IN),print_number(0){}
+Teleop::Teleop():gear_collector_mode(Gear_collector_mode::COLLECT),collect_step(Collect_step::GEAR_COLLECTOR_DOWN),no_collect_step(No_collect_step::BALL_COLLECTOR_IN),print_number(0){}
 
 void Teleop::collect_protocol(Toplevel::Status_detail const& status,Toplevel::Goal& goals){
 	switch(collect_step){
@@ -170,13 +170,36 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	if(info.panel.gear_score) gear_collector_mode=Gear_collector_mode::SCORE;
 
 	collect.update(info.panel.ball_collect);
-	bool collect_t=collect_trigger(info.panel.ball_collect);
+	/*bool collect_t=collect_trigger(info.panel.ball_collect);
 	if(collect.get()) {
 		if(collect_t) collect_step=Collect_step::GEAR_COLLECTOR_DOWN;
 		collect_protocol(info.status,goals);
 	} else {
 		if(collect_t) no_collect_step=No_collect_step::BALL_COLLECTOR_IN;
 		no_collect_protocol(info.status,enabled,info.in.now,goals);
+	}*/
+
+	if (collect.get()){
+		goals.collector.arm=Arm::Goal::OUT;
+		if(info.status.collector.arm==Arm::Status_detail::OUT){
+			goals.collector.intake=Intake::Goal::IN;
+			goals.collector.ball_lifter=Ball_lifter::Goal::UP;
+		}
+		goals.gear_collector=Gear_collector::Goal{Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::DOWN};
+	} else {
+		goals.collector=Collector::Goal{Intake::Goal::OFF,Arm::Goal::IN,Ball_lifter::Goal::OFF};
+		goals.gear_collector=[&]{
+			switch(gear_collector_mode){
+				case Gear_collector_mode::PREP_COLLECT: 
+					goals.collector.arm=Arm::Goal::OUT;
+					if(info.status.collector.arm==Arm::Status_detail::OUT) goals.collector.ball_lifter=Ball_lifter::Goal::DOWN;
+					return Gear_collector::Goal{Gear_grabber::Goal::OPEN,Gear_lifter::Goal::DOWN};
+				case Gear_collector_mode::COLLECT: return Gear_collector::Goal{Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::DOWN};
+				case Gear_collector_mode::PREP_SCORE: return Gear_collector::Goal{Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::UP};
+				case Gear_collector_mode::SCORE: return Gear_collector::Goal{Gear_grabber::Goal::OPEN,Gear_lifter::Goal::UP};
+				default: assert(0);
+			}
+		}();
 	}
 
 	goals.climber = info.panel.climb ? Climber::Goal::CLIMB : Climber::Goal::STOP;
@@ -199,8 +222,8 @@ Toplevel::Goal Teleop::run(Run_info info) {
 		if(info.panel.ball_lift==Panel::Ball_lift::IN) goals.collector.ball_lifter=Ball_lifter::Goal::UP;
 	}
 
-	if(info.status.collector.arm==Arm::Status::OUT) goals.gear_collector.gear_lifter=Gear_lifter::Goal::DOWN;
-	if(info.status.gear_collector.gear_lifter==Gear_lifter::Status::UP) goals.collector.arm=Arm::Goal::IN;	
+	if(info.status.collector.arm!=Arm::Status::IN) goals.gear_collector.gear_lifter=Gear_lifter::Goal::DOWN;
+	if(info.status.gear_collector.gear_lifter!=Gear_lifter::Status::DOWN) goals.collector.arm=Arm::Goal::IN;	
 	
 	if(info.in.ds_info.connected && (print_number%10)==0){
 		cout<<"\nUltrasonic sensor:"<<info.status.drive.ultrasonic<<"\n";

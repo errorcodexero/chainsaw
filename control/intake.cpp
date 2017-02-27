@@ -5,7 +5,7 @@
 using namespace std;
 
 #define INTAKE_ADDRESS 7
-#define INTAKE_SPEED 1.0
+#define INTAKE_SPEED .40 //TODO tune this
 
 ostream& operator<<(ostream& o, Intake::Goal a){
 	#define X(name) if(a==Intake::Goal::name)return o<<"Intake::Goal("#name")";

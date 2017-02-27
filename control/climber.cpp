@@ -103,15 +103,15 @@ Robot_inputs Climber::Input_reader::operator()(Robot_inputs r, Climber::Input in
 }
 */
 Robot_outputs Climber::Output_applicator::operator()(Robot_outputs r, Climber::Output o)const{
-	if(o==Climber::Output::CLIMB) r.pwm[CLIMBER_PWM] = CLIMBER_POWER;
-	else if(o==Climber::Output::RELEASE) r.pwm[CLIMBER_PWM] = -CLIMBER_POWER;
+	if(o==Climber::Output::CLIMB) r.pwm[CLIMBER_PWM] = -CLIMBER_POWER;
+	else if(o==Climber::Output::RELEASE) r.pwm[CLIMBER_PWM] = CLIMBER_POWER;
 	else r.pwm[CLIMBER_PWM] = 0;
 	return r;
 }
 
 Climber::Output Climber::Output_applicator::operator()(Robot_outputs const& r)const{
-	if(r.pwm[CLIMBER_PWM] > 0) return Climber::Output::CLIMB;
-	if(r.pwm[CLIMBER_PWM] < 0) return Climber::Output::RELEASE;
+	if(r.pwm[CLIMBER_PWM] < 0) return Climber::Output::CLIMB;
+	if(r.pwm[CLIMBER_PWM] > 0) return Climber::Output::RELEASE;
 	return Climber::Output::STOP;
 }
 
