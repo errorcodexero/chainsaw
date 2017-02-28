@@ -64,7 +64,7 @@ Toplevel::Goal Turn::run(Run_info info,Toplevel::Goal goals){
 	return goals;
 }
 
-bool Turn::done(Next_mode_info info){
+Step::Status Turn::done(Next_mode_info info){
 	static const Inch TOLERANCE = 1.0;//inches
 	Drivebase::Distances distance_travelled = get_distance_travelled(info.status.drive.distances);
 	Drivebase::Distances distance_left = side_goals - distance_travelled;
@@ -74,7 +74,7 @@ bool Turn::done(Next_mode_info info){
 		static const Time FINISH_TIME = 1.0;//seconds
 		in_range.set(FINISH_TIME);
 	}
-	return in_range.done();
+	return in_range.done() ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;
 }
 
 std::unique_ptr<Step_impl> Turn::clone()const{
@@ -92,7 +92,7 @@ Step::Step(Step_impl const& a){
 	impl=move(c);
 }
 
-bool Step::done(Next_mode_info a){
+Step::Status Step::done(Next_mode_info a){
 	return impl->done(a);
 }
 
@@ -128,7 +128,7 @@ Drivebase::Distances Drive_straight::get_distance_travelled(Drivebase::Distances
 	return current - initial_distances;
 }
 
-bool Drive_straight::done(Next_mode_info info){
+Step::Status Drive_straight::done(Next_mode_info info){
 	static const Inch TOLERANCE = 3.0;//inches
 	Drivebase::Distances distance_travelled = get_distance_travelled(info.status.drive.distances);
 	Drivebase::Distances distance_left = Drivebase::Distances{target_dist,target_dist} - distance_travelled;
@@ -139,7 +139,16 @@ bool Drive_straight::done(Next_mode_info info){
 		static const Time FINISH_TIME = 1.0;
 		in_range.set(FINISH_TIME);
 	}
-	return in_range.done();
+	/*
+	if(info.status.drive.stall){
+		stall_timer.update(info.in.now,info.in.robot_mode.enabled);
+	} else{
+		static const Time STALL_TIME = 1.0;
+		stall_timer.set(STALL_TIME);
+	}
+	if(stall_timer.done()) return Step::Status::FINISHED_FAILURE;
+	*/
+	return in_range.done() ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;
 }
 
 Toplevel::Goal Drive_straight::run(Run_info info){
@@ -168,17 +177,17 @@ unique_ptr<Step_impl> Drive_straight::clone()const{
 }
 
 bool Drive_straight::operator==(Drive_straight const& b)const{
-	return target_dist == b.target_dist && initial_distances == b.initial_distances && init == b.init && motion_profile == b.motion_profile && in_range == b.in_range && gear == b.gear;
+	return target_dist == b.target_dist && initial_distances == b.initial_distances && init == b.init && motion_profile == b.motion_profile && in_range == b.in_range /*&& stall_timer == b.stall_timer*/ && gear == b.gear;
 }
 
 Align::Align():firsttime(0){}
 
-bool Align::done(Next_mode_info info){
+Step::Status Align::done(Next_mode_info info){
 	blocks=info.in.camera.blocks;
 	current=mean(blocks[0].x,blocks[1].x);
 	center=mean(blocks[0].min_x,blocks[0].max_x);
 	int const  TOLERANCE= 2;
-	if(firsttime) return 1;
+	if(firsttime) return Step::Status::FINISHED_SUCCESS;
 	if(!info.in.camera.enabled){
 		camera_con = Camera_con::DISABLED;
 		manualflag=true;
@@ -209,7 +218,7 @@ bool Align::done(Next_mode_info info){
 			in_range.set(FINISH_TIME);
 		}
 	}
-	return in_range.done();
+	return in_range.done() ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED; 
 }
 
 Toplevel::Goal Align::run(Run_info info){
@@ -269,8 +278,8 @@ Wait::Wait(Time wait_time){
 	wait_timer.set(wait_time);
 }
 
-bool Wait::done(Next_mode_info){
-	return wait_timer.done();
+Step::Status Wait::done(Next_mode_info){
+	return wait_timer.done() ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;
 }
 
 Toplevel::Goal Wait::run(Run_info info){
@@ -292,8 +301,8 @@ bool Wait::operator==(Wait const& b)const{
 
 Lift_gear::Lift_gear():gear_goal({Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::UP}),ball_goal({Intake::Goal::OFF,Arm::Goal::STOW,Ball_lifter::Goal::OFF}){}
 
-bool Lift_gear::done(Next_mode_info info){
-	return ready(status(info.status.gear_collector),gear_goal) && ready(status(info.status.collector),ball_goal);
+Step::Status Lift_gear::done(Next_mode_info info){
+	return (ready(status(info.status.gear_collector),gear_goal) && ready(status(info.status.collector),ball_goal)) ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;
 }
 
 Toplevel::Goal Lift_gear::run(Run_info info){
@@ -318,8 +327,8 @@ bool Lift_gear::operator==(Lift_gear const& b)const{
 
 Drop_gear::Drop_gear():gear_goal({Gear_grabber::Goal::OPEN,Gear_lifter::Goal::UP}),ball_goal({Intake::Goal::OFF,Arm::Goal::STOW,Ball_lifter::Goal::OFF}){}
 
-bool Drop_gear::done(Next_mode_info info){	
-	return ready(status(info.status.gear_collector),gear_goal) && ready(status(info.status.collector),ball_goal);
+Step::Status Drop_gear::done(Next_mode_info info){	
+	return (ready(status(info.status.gear_collector),gear_goal) && ready(status(info.status.collector),ball_goal)) ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;
 }
 
 Toplevel::Goal Drop_gear::run(Run_info info){
@@ -344,8 +353,8 @@ bool Drop_gear::operator==(Drop_gear const& b)const{
 
 Drop_collector::Drop_collector():gear_goal({Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::DOWN}),ball_goal({Intake::Goal::OFF,Arm::Goal::STOW,Ball_lifter::Goal::OFF}){}
 
-bool Drop_collector::done(Next_mode_info info){
-	return ready(status(info.status.gear_collector),gear_goal) && ready(status(info.status.collector),ball_goal);
+Step::Status Drop_collector::done(Next_mode_info info){
+	return (ready(status(info.status.gear_collector),gear_goal) && ready(status(info.status.collector),ball_goal)) ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;
 }
 
 Toplevel::Goal Drop_collector::run(Run_info info){
@@ -370,8 +379,19 @@ bool Drop_collector::operator==(Drop_collector const& b)const{
 
 Combo::Combo(Step a,Step b):step_a(a),step_b(b){}
 
-bool Combo::done(Next_mode_info info){
-	return step_a.done(info) && step_b.done(info);
+Step::Status Combo::done(Next_mode_info info){
+	Step::Status a_status = step_a.done(info);
+	Step::Status b_status = step_b.done(info);
+	switch(a_status){
+		case Step::Status::FINISHED_SUCCESS:
+			return b_status;
+		case Step::Status::UNFINISHED:
+			return a_status;//TODO
+		case Step::Status::FINISHED_FAILURE:
+			nyi //TODO
+		default:
+			assert(0);
+	} 
 }
 
 Toplevel::Goal Combo::run(Run_info info){
@@ -412,7 +432,7 @@ class Do_list:public Step_impl_inner<Do_list>{
 
 	virtual Toplevel::Goal run(Run_info,Toplevel::Goal);
 	virtual Toplevel::Goal run(Run_info);
-	virtual bool done(Next_mode_info);
+	virtual Step::Status done(Next_mode_info);
 	//virtual unique_ptr<Step_impl> clone()const;
 	//virtual void display(ostream&)const;
 	bool operator==(Do_list const&)const;
@@ -432,7 +452,7 @@ bool Do_list::operator==(Do_list const& a)const{
 	return steps==a.steps && index==a.index;
 }
 
-bool Do_list::done(Next_mode_info){
+Step::Status Do_list::done(Next_mode_info){
 	nyi
 }
 

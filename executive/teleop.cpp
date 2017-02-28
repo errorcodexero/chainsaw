@@ -226,7 +226,8 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	if(info.status.gear_collector.gear_lifter!=Gear_lifter::Status::DOWN) goals.collector.arm=Arm::Goal::STOW;	
 	
 	if(info.in.ds_info.connected && (print_number%10)==0){
-		cout<<"\nUltrasonic sensor:"<<info.status.drive.ultrasonic<<"\n";
+		cout<<"\nstalled:"<<info.status.drive.stall<<"\n";
+		//cout<<"\nUltrasonic sensor:"<<info.status.drive.ultrasonic<<"\n";
 		if(info.in.camera.enabled){
 			cout<<"size: "<<info.in.camera.blocks.size()<<" blocks:\n";
 			for (vector<Pixy::Block>::const_iterator it=info.in.camera.blocks.begin();it!=info.in.camera.blocks.end();it++){

@@ -308,16 +308,16 @@ void Drivebase::Estimator::update(Time now,Drivebase::Input in,Drivebase::Output
 	last.distances = in.distances;
 	last.ultrasonic = in.ultrasonic;
 	
-	//cout<<"\ndistances:"<<last.distances<<"\n";
-	
 	for(unsigned i=0;i<MOTORS;i++){
 		Drivebase::Motor m=(Drivebase::Motor)i;
 		auto current=in.current[i];
 		auto set_power_level=get_output(out,m);
 		motor_check[i].update(now,current,set_power_level);
-		
 	}
-	last.stall = mean(in.current) > 5;
+
+	static const double STALL_CURRENT = 5.0;
+	static const double STALL_SPEED = .1;//ft/s speed at which we assume robot is stalled when current spikes
+	last.stall = mean(in.current) > STALL_CURRENT && mean(last.speeds.l,last.speeds.r) < STALL_SPEED;
 }
 
 Robot_outputs Drivebase::Output_applicator::operator()(Robot_outputs robot,Drivebase::Output b)const{

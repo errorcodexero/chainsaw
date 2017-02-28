@@ -224,20 +224,6 @@ Executive get_auto_mode(Next_mode_info info){
 			case 9: 
 				return auto_score_gear_middle_extended_left;
 			case 10:
-				return Executive{Chain{//turns 90 degrees four times (proven to be more accurate than one 360)
-					Step{Turn{PI/2}},
-					Executive{Chain{
-						Step{Turn{PI/2}},
-						Executive{Chain{
-							Step{Turn{PI/2}},
-							Executive{Chain{
-								Step{Turn{PI/2}},
-								Executive{Teleop()}
-							}}
-						}}
-						
-					}}
-				}};
 			case 11:
 			case 12:
 			case 13:
@@ -255,7 +241,7 @@ Executive get_auto_mode(Next_mode_info info){
 }
 
 Executive Autonomous::next_mode(Next_mode_info info){
-	static const Time DELAY = 0.0;//seconds, TODO: base it off of the dial on the OI? Or maybe during autonomous wait until we reach a certain air pressure?
+	static const Time DELAY = 0.0;//seconds, TODO: base it off of the dial on the OI? 
 	if(!info.autonomous) return Executive{Teleop()};
 	if(info.since_switch > DELAY) return get_auto_mode(info);
 	return Executive{Autonomous()};
