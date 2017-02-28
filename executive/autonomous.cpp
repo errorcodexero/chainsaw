@@ -12,7 +12,9 @@ double deg_to_rad(double deg){
 
 const Inch SCORE_GEAR_APPROACH_DIST = 12.0;//inches
 
-const Inch ROBOT_LENGTH = 28.0; //inches from front to back
+const Inch BUMPER_LENGTH = 3.0;//inches thickness of one bumper
+
+const Inch ROBOT_LENGTH = 28.0 + 1 * BUMPER_LENGTH; //inches from front to back //TODO: change to match number of sides with bumpers
 
 Executive insert_score_gear(Executive last){
 	Executive score_gear{Chain{
