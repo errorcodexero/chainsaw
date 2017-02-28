@@ -589,7 +589,7 @@ ostream& operator<<(ostream& o,Camera const& a){
 	o<<"Camera(";
 	o<<"enabled:"<<a.enabled;
 	o<<" blocks:";
-	for(vector<Pixy::Block>::const_iterator it=a.blocks.begin();it!=a.blocks.end();it++) cout<<*it<<",";
+	for(vector<Pixy::Block>::const_iterator it=a.blocks.begin();it!=a.blocks.end();it++) o<<*it<<",";
 	return o<<")";
 }
 

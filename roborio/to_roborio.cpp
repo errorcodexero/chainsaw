@@ -375,22 +375,22 @@ public:
 	void run(Robot_inputs in){
 		const int PRINT_SPEED=10;
 		static int print_num=0;
-		//std::ostream print_stream=cout;//(in.ds_info.connected && (print_num%PRINT_SPEED)==0)?cout:null_stream;
-		Robot_outputs out=main(in/*,print_stream*/);
+		std::ostream& print_stream=(in.ds_info.connected && (print_num%PRINT_SPEED)==0)?cout:null_stream;
+		Robot_outputs out=main(in,print_stream);
 		if(in.ds_info.connected && (print_num%PRINT_SPEED)==0){	
-			cout<<"in: "<<in<<"\n";
-			cout<<"main: "<<main<<"\n";
-			cout<<"out: "<<out<<"\n";
+			print_stream<<"in: "<<in<<"\n";
+			print_stream<<"main: "<<main<<"\n";
+			print_stream<<"out: "<<out<<"\n";
 			if(camera.isNewData()) {
 				vector<Pixy::Block> blocks=camera.getBlocks();
-				cout<<"size: "<<blocks.size()<<" blocks: "<<blocks<<"\n";
+				print_stream<<"size: "<<blocks.size()<<" blocks: "<<blocks<<"\n";
 			}
-			else cout<<"No new data."<<in.now<<"\n";
-			cout<<"cam_data_recieved: "<<cam_data_recieved<<"\n";
-			cout<<"CLEAR_SCREEN\n";
+			else print_stream<<"No new data."<<in.now<<"\n";
+			print_stream<<"cam_data_recieved: "<<cam_data_recieved<<"\n";
+			print_stream<<"CLEAR_SCREEN\n";
 		}
 		int x=set_outputs(out,in.robot_mode.enabled);
-		if(x) cout<<"x was:"<<x<<"\n";
+		if(x) print_stream<<"x was:"<<x<<"\n";
 		print_num++;
 	}
 	

@@ -68,7 +68,7 @@ Executive Teleop::next_mode(Next_mode_info info) {
 
 IMPL_STRUCT(Teleop::Teleop,TELEOP_ITEMS)
 
-Teleop::Teleop():gear_collector_mode(Gear_collector_mode::COLLECT),collect_step(Collect_step::GEAR_COLLECTOR_DOWN),no_collect_step(No_collect_step::BALL_COLLECTOR_IN),print_number(0){}
+Teleop::Teleop():gear_collector_mode(Gear_collector_mode::COLLECT),collect_step(Collect_step::GEAR_COLLECTOR_DOWN),no_collect_step(No_collect_step::BALL_COLLECTOR_IN){}
 
 void Teleop::collect_protocol(Toplevel::Status_detail const& status,Toplevel::Goal& goals){
 	switch(collect_step){
@@ -225,18 +225,15 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	if(info.status.collector.arm!=Arm::Status::STOW) goals.gear_collector.gear_lifter=Gear_lifter::Goal::DOWN;
 	if(info.status.gear_collector.gear_lifter!=Gear_lifter::Status::DOWN) goals.collector.arm=Arm::Goal::STOW;	
 	
-	if(info.in.ds_info.connected && (print_number%10)==0){
-		cout<<"\nUltrasonic sensor:"<<info.status.drive.ultrasonic<<"\n";
-		if(info.in.camera.enabled){
-			cout<<"size: "<<info.in.camera.blocks.size()<<" blocks:\n";
-			for (vector<Pixy::Block>::const_iterator it=info.in.camera.blocks.begin();it!=info.in.camera.blocks.end();it++){
-				cout<<"\tarea: "<<(it->width * it->height)<<"\n";
-			}
+	cout<<"\nUltrasonic sensor:"<<info.status.drive.ultrasonic<<"\n";
+	if(info.in.camera.enabled){
+		info.print_stream<<"size: "<<info.in.camera.blocks.size()<<" blocks:\n";
+		for (vector<Pixy::Block>::const_iterator it=info.in.camera.blocks.begin();it!=info.in.camera.blocks.end();it++){
+			info.print_stream<<"\tarea: "<<(it->width * it->height)<<"\n";
 		}
-		cout<<"\n";
 	}
-	print_number++;
-	
+	info.print_stream<<"\n";
+		
 	return goals;
 }
 

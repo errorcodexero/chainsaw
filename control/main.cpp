@@ -19,7 +19,7 @@ Main::Main():
 	autonomous_start(0)
 {}
 
-Robot_outputs Main::operator()(const Robot_inputs in,ostream& /*print_stream*/){
+Robot_outputs Main::operator()(const Robot_inputs in,ostream& print_stream){
 	print_count++;
 	static const unsigned MAIN_JOYSTICK_PORT = 0, GUNNER_JOYSTICK_PORT = 1;
 
@@ -38,7 +38,7 @@ Robot_outputs Main::operator()(const Robot_inputs in,ostream& /*print_stream*/){
 	since_switch.update(in.now,mode != next);
 	mode=next;
 		
-	Toplevel::Goal goals = mode.run(Run_info{in,driver_joystick,panel,status});
+	Toplevel::Goal goals = mode.run(Run_info{in,driver_joystick,panel,status,print_stream});
 	Toplevel::Output r_out = control(status,goals); 
 	Robot_outputs r = toplevel.output_applicator(Robot_outputs{},r_out);
 	
@@ -63,10 +63,8 @@ Robot_outputs Main::operator()(const Robot_inputs in,ostream& /*print_stream*/){
 	
 	log(in,status,r);
 
-	if(in.ds_info.connected && (print_count % 10) == 0){
-		cout<<"mode: "<<mode<<"\n\n";
-		cout<<"panel:"<<panel<<"\n";
-	}
+	print_stream<<"mode: "<<mode<<"\n\n";
+	print_stream<<"panel:"<<panel<<"\n";
 
 	return r;
 }

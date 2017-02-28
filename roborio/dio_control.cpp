@@ -167,7 +167,7 @@ void DIO_controls::set(Checked_array<Digital_out,Robot_outputs::DIGITAL_IOS> con
 	for(unsigned i=0;i<channel.size();i++){
 		r|=channel[i].set(a[i]);
 	}
-	if(r)cout<<"r:"<<r<<"\n";
+	//if(r)cout<<"r:"<<r<<"\n";
 
 	//create new encoders
 	for(unsigned i=0;i<Digital_inputs::ENCODERS;i++){
