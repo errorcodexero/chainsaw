@@ -78,7 +78,7 @@ Executive get_auto_mode(Next_mode_info info){
 	Executive auto_null{Teleop{}};
 
 	//Auto mode for crossing the baseline
-	static const Inch BASELINE_DIST = 7 * 12 + 9.25;//distance from baseline to alliance wall
+	static const Inch BASELINE_DIST = 7 * 12 + 9.25;//distance from baseline to alliance wall // from testing
 	Executive auto_baseline{Chain{
 		Step{Drive_straight{BASELINE_DIST + 12}},//move a little farther to give us some room for error
 		Executive{Teleop{}}
@@ -95,11 +95,24 @@ Executive get_auto_mode(Next_mode_info info){
 	}};
 
 	//Score a gear on the boiler-side peg
+	static const Inch FIRST_DRIVE_DIST_BOILER = (133 - ROBOT_LENGTH) + .5 * ROBOT_LENGTH;//centers the robot on the turning point to align with gear peg //from testing
 	Executive auto_score_gear_boiler_side{Chain{
-		Step{Drive_straight{5*12}},
+		Step{Combo{
+			Step{Drive_straight{FIRST_DRIVE_DIST_BOILER}},
+			Step{Lift_gear()}
+		}},
 		Executive{Chain{
-			Step{Turn{deg_to_rad(40)}},
-			score_gear
+			Step{Combo{
+				Step{Turn{deg_to_rad(40)}},//from testing
+				Step{Lift_gear()}
+			}},
+			Executive{Chain{
+				Step{Combo{
+					Step{Drive_straight{7}},//drive forward a bit so score_gear can take over
+					Step{Lift_gear()}
+				}},
+				score_gear
+			}}
 		}}
 	}};
 
@@ -116,7 +129,7 @@ Executive get_auto_mode(Next_mode_info info){
 			Step{Turn{deg_to_rad(40)}},
 			insert_score_gear(
 				Executive{Chain{
-					Step{Drive_straight{-12}},
+					Step{Drive_straight{-2 * 12}},
 					Executive{Chain{
 						Step{Turn{deg_to_rad(-40)}},
 						dash
@@ -195,13 +208,13 @@ Executive get_auto_mode(Next_mode_info info){
 	if(info.panel.in_use){
 		switch(info.panel.auto_select){ 
 			case 0: 
-				return auto_null;//TODO: make sure this is un-commented for competition
+				//return auto_null;//TODO: make sure this is un-commented for competition
 				
 				////////////////////////////
 				//
 				// Tests for different steps
 				//
-				//return make_test_step(Drive_straight{10*12});
+				return make_test_step(Drive_straight{9*12});
 				//return score_gear;
 				//return make_test_step(Turn{PI*2});
 				//return make_test_step(Align());

@@ -27,9 +27,9 @@ Toplevel::Goal Step::run(Run_info info){
 	return impl->run(info,{});
 }
 
-const double RIGHT_SPEED_CORRECTION = 0.05;//left and right sides of the robot drive at different speeds given the same power, left encoder gives us the actual distance, right is ~6% behind, always works pretty well
+const double RIGHT_SPEED_CORRECTION = -0.07;//left and right sides of the robot drive at different speeds given the same power, adjust this to make the robot drive straight
 
-static const Inch ROBOT_WIDTH = 28; //inches //TODO: finds some way of dealing with constants like this and wheel diameter
+static const Inch ROBOT_WIDTH = 28; //inches, ignores bumpers //TODO: finds some way of dealing with constants like this and wheel diameter
 
 Drivebase::Distances Turn::angle_to_distances(Rad target_angle){
 	Inch side_goal = target_angle * 0.5 * ROBOT_WIDTH;
@@ -164,10 +164,8 @@ Toplevel::Goal Drive_straight::run(Run_info info,Toplevel::Goal goals){
 
 	double power = motion_profile.target_speed(distance_travelled.l); //ignoring right encoder because it's proven hard to get meaningful data from it
 
-	const double RIGHT_SPEED_CORRECTION = 0.05;//left and right sides of the robot drive at different speeds given the same power, left encoder gives us the actual distance, right is ~6% behind
-	
 	goals.drive.left = clip(target_to_out_power(power));
-	goals.drive.right = clip(target_to_out_power(power - power * RIGHT_SPEED_CORRECTION)); //right side would go faster than the left without error correction
+	goals.drive.right = clip(target_to_out_power(power + power * RIGHT_SPEED_CORRECTION)); //right side would go faster than the left without error correction
 	goals.shifter = gear;
 	return goals;
 }
