@@ -1,14 +1,12 @@
 HIGH PRIORITY:
-	- Drive base
-		- Auto gear shifting
-	- Ball collector
-		- Lift
-		- Intake
-	- OI
-	- Shooter
 	- Autonomous:
 		- Gear scoring (TOP PRIORITY)
+			- Middle
+			- Boiler side
+			- Loading station side
 		- Vision
+	- Controls (OI and gamepad)
+	- Shooter
 
 
 NOT AS HIGH PRIORITY:
@@ -48,4 +46,3 @@ LOG LIST:
 
 Eric's random thoughts:
 	-Sim stuff could benefit from using Monitor
-	-There's a better way to do SLOW_PRINT
