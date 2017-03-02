@@ -6,7 +6,7 @@
 #include "../util/countdown_timer.h"
 
 struct Arm{
-	enum class Goal{IN,OUT};
+	enum class Goal{STOW,LOW};
 	
 	typedef Goal Output;
 
@@ -16,7 +16,7 @@ struct Arm{
 		Input(bool);
 	};
 
-	enum class Status_detail{IN,GOING_IN,GOING_OUT,OUT};
+	enum class Status_detail{STOW,STOWING,LOWERING,LOW};
 	
 	typedef Status_detail Status;
 	

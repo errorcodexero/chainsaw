@@ -1,15 +1,15 @@
 #include "motion_profile.h"
 #include <iostream>
 #include <assert.h>
-#include <algorithm>
+#include <cmath>
 #include "interface.h"
 #include "util.h"
 
 using namespace std;
 
 double target_to_out_power(double target_power){//tries to account for the fact that small out powers to the motors will not move them
-	if(target_power == 0) return 0.0;
-	static const double K = 0.05;
+	if(fabs(target_power) - .01 < 0) return 0.0;
+	static const double K = 0.11;//from testing, robot doesn't move at .1 power but moves at .11 power
 	double slope = 1.0 - K;
 	return target_power * slope + copysign(K,target_power);//copysign returns magnitude of the first and the sign of second
 }

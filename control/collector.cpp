@@ -4,7 +4,7 @@ using namespace std;
 
 #define COLLECTING_LIGHT 2 //-1
 
-Collector::Goal::Goal():intake(Intake::Goal::OFF),arm(Arm::Goal::IN),ball_lifter(Ball_lifter::Goal::OFF){}
+Collector::Goal::Goal():intake(Intake::Goal::OFF),arm(Arm::Goal::STOW),ball_lifter(Ball_lifter::Goal::OFF){}
 
 Collector::Goal::Goal(Intake::Goal i,Arm::Goal a,Ball_lifter::Goal c):intake(i),arm(a),ball_lifter(c){}
 
@@ -202,7 +202,7 @@ Robot_outputs Collector::Output_applicator::operator()(Robot_outputs a,Output co
 	#define X(A,B) a=B(a,b.B);
 	COLLECTOR_ITEMS(X)
 	#undef X
-	a.driver_station.digital[COLLECTING_LIGHT]=b.arm==Arm::Output::OUT && b.ball_lifter==Ball_lifter::Output::UP && b.intake==Intake::Output::IN;
+	a.driver_station.digital[COLLECTING_LIGHT]=b.arm==Arm::Output::LOW && b.ball_lifter==Ball_lifter::Output::UP && b.intake==Intake::Output::IN;
 	return a;
 }
 

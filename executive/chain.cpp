@@ -15,12 +15,18 @@ Toplevel::Goal Chain::run(Run_info info){
 
 Executive Chain::next_mode(Next_mode_info a){
 	if(!a.autonomous) return Executive{Teleop()};
-	if(step.done(a)){
-		/*if(next) return next->clone();
-		return unique_ptr<Mode>();*/
-		return next;
+	switch(step.done(a)){
+		case Step::Status::FINISHED_SUCCESS:
+			/*if(next) return next->clone();
+			return unique_ptr<Mode>();*/
+			return next;
+		case Step::Status::UNFINISHED:
+			return Executive{*this};
+		case Step::Status::FINISHED_FAILURE:
+			nyi //TODO
+		default:
+			assert(0);
 	}
-	return Executive{*this};
 }
 
 void Chain::display(ostream& o)const{
