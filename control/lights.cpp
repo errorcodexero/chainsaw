@@ -4,7 +4,8 @@
 
 using namespace std;
 
-#define LIGHTS_ADDRESS 0
+#define LOADING_ADDRESS 0
+#define CAMERA_ADDRESS 10
 
 ostream& operator<<(ostream& o, Lights::Loading_indicator a){
 	#define X(name) if(a==Lights::Loading_indicator::name)return o<<"Lights::Loading_indicator("#name")";
@@ -59,21 +60,26 @@ bool operator==(Lights a, Lights b){ return (a.input_reader==b.input_reader && a
 bool operator!=(Lights a, Lights b){ return !(a==b);}
 
 Lights::Output Lights::Output_applicator::operator()(Robot_outputs r)const{
-	switch(r.relay[LIGHTS_ADDRESS]){
-		case Relay_output::_00: return Output(0, 0);
-		case Relay_output::_01: return Output(0, 1);
-		case Relay_output::_10: return Output(1, 0);
-		case Relay_output::_11: return Output(1, 1);
-		default: assert(0);
-	}
+	Output out;
+	out.loading_indicator=[&]{
+		switch(r.relay[LOADING_ADDRESS]){
+			case Relay_output::_00: 
+			case Relay_output::_01: return 0;
+			case Relay_output::_10:
+			case Relay_output::_11: return 1;
+			default: assert(0);
+		}
+	}();
+	if(r.digital_io[CAMERA_ADDRESS]==Digital_out::zero()) out.camera_light=0;
+	else if(r.digital_io[CAMERA_ADDRESS]==Digital_out::one()) out.camera_light=1;
+	else assert(0);
+	return out;
 }
 
 Robot_outputs Lights::Output_applicator::operator()(Robot_outputs r, Lights::Output out)const{
-	if(!out.loading_indicator&&!out.camera_light) r.relay[LIGHTS_ADDRESS]=Relay_output::_00;
-	else if(!out.loading_indicator&&out.camera_light) r.relay[LIGHTS_ADDRESS]=Relay_output::_01;
-	else if(out.loading_indicator&&!out.camera_light) r.relay[LIGHTS_ADDRESS]=Relay_output::_10;
-	else if(out.loading_indicator&&out.camera_light) r.relay[LIGHTS_ADDRESS]=Relay_output::_11;
-	else assert(0);
+	r.relay[LOADING_ADDRESS]=out.loading_indicator?Relay_output::_10:Relay_output::_00;
+	r.digital_io[CAMERA_ADDRESS]=out.camera_light?Digital_out::one():Digital_out::zero();
+	//r.pwm[9]=.5;
 	return r;
 }
 

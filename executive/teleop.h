@@ -44,6 +44,7 @@ struct Teleop : Executive_impl<Teleop> {
 		X(No_collect_step,no_collect_step) \
 		X(Countdown_timer,clear_ball_timer) \
 		X(Posedge_toggle,indicator_toggle) \
+		X(Posedge_toggle,camera_light_toggle) \
 		X(int,print_number)
 	STRUCT_MEMBERS(TELEOP_ITEMS)
 
