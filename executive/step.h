@@ -182,14 +182,13 @@ struct Align: public Step_impl_inner<Align>{
 	int current;
 	int center;
 	Countdown_timer in_range;
-	double angle_estimate;//TODO: figure this out as a fail safe
 	Step nonvision_align;
 		
 	void update(Camera);
 
 	public:
 	explicit Align();
-	explicit Align(double);
+	explicit Align(Turn);
 
 	Toplevel::Goal run(Run_info,Toplevel::Goal);
 	Toplevel::Goal run(Run_info);

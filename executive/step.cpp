@@ -178,8 +178,8 @@ bool Drive_straight::operator==(Drive_straight const& b)const{
 	return target_dist == b.target_dist && initial_distances == b.initial_distances && init == b.init && motion_profile == b.motion_profile && in_range == b.in_range /*&& stall_timer == b.stall_timer*/ && gear == b.gear;
 }
 
-Align::Align(double a):mode(Align::Mode::NONVISION),blocks({}),current(0),center(0),angle_estimate(a),nonvision_align(Step{Turn(a)}){}
-Align::Align():Align(0){}
+Align::Align(Turn a):mode(Align::Mode::NONVISION),blocks({}),current(0),center(0),nonvision_align(Step{a}){}
+Align::Align():Align(Turn(0)){}
 
 void Align::update(Camera camera){
 	if(!camera.enabled || camera.blocks.size() == 0){
@@ -262,7 +262,7 @@ unique_ptr<Step_impl> Align::clone()const{
 }
 
 bool Align::operator==(Align const& b)const{
-	return mode == b.mode && blocks == b.blocks && current == b.current && center == b.center && in_range == b.in_range && angle_estimate == b.angle_estimate && nonvision_align == b.nonvision_align;
+	return mode == b.mode && blocks == b.blocks && current == b.current && center == b.center && in_range == b.in_range && nonvision_align == b.nonvision_align;
 }
 
 Wait::Wait(Time wait_time){
