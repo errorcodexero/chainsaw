@@ -26,7 +26,7 @@ std::ostream& operator<<(std::ostream&,Next_mode_info const&);
 	X(Joystick_data,driver_joystick)\
 	X(Panel,panel)\
 	X(Toplevel::Status_detail,status)\
-	X(std::ostream&,print_stream)
+	X(std::ostream*,print_stream)
 DECLARE_STRUCT(Run_info,RUN_INFO_ITEMS)
 Run_info rand(Run_info*);
 Run_info example(Run_info*);

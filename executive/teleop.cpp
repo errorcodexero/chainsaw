@@ -227,12 +227,12 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	
 	cout<<"\nUltrasonic sensor:"<<info.status.drive.ultrasonic<<"\n";
 	if(info.in.camera.enabled){
-		info.print_stream<<"size: "<<info.in.camera.blocks.size()<<" blocks:\n";
+		*info.print_stream<<"size: "<<info.in.camera.blocks.size()<<" blocks:\n";
 		for (vector<Pixy::Block>::const_iterator it=info.in.camera.blocks.begin();it!=info.in.camera.blocks.end();it++){
-			info.print_stream<<"\tarea: "<<(it->width * it->height)<<"\n";
+			*info.print_stream<<"\tarea: "<<(it->width * it->height)<<"\n";
 		}
 	}
-	info.print_stream<<"\n";
+	*info.print_stream<<"\n";
 		
 	return goals;
 }
