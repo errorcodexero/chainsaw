@@ -8,11 +8,11 @@ Arm::Input::Input():enabled(false){}
 Arm::Input::Input(bool a):enabled(a){}
 
 Arm::Estimator::Estimator(){
-	last = Status_detail::IN;
+	last = Status_detail::STOW;
 }
 
 std::set<Arm::Goal> examples(Arm::Goal*){
-	return {Arm::Goal::IN, Arm::Goal::OUT};
+	return {Arm::Goal::STOW, Arm::Goal::LOW};
 }
 
 std::set<Arm::Input> examples(Arm::Input*){
@@ -23,12 +23,12 @@ std::set<Arm::Input> examples(Arm::Input*){
 }
 
 std::set<Arm::Status_detail> examples(Arm::Status_detail*){
-	return {Arm::Status_detail::IN,Arm::Status_detail::GOING_IN,Arm::Status_detail::GOING_OUT,Arm::Status_detail::OUT};
+	return {Arm::Status_detail::STOW,Arm::Status_detail::STOWING,Arm::Status_detail::LOWERING,Arm::Status_detail::LOW};
 }
 
 std::ostream& operator<<(std::ostream& o,Arm::Goal g){
 	#define X(name) if(g==Arm::Goal::name) return o<<""#name;
-	X(IN) X(OUT)
+	X(STOW) X(LOW)
 	#undef X
 	assert(0);
 }
@@ -39,10 +39,10 @@ std::ostream& operator<<(std::ostream& o,Arm::Input a){
 
 std::ostream& operator<<(std::ostream& o,Arm::Status_detail a){
 	#define X(STATUS) if(a==Arm::Status_detail::STATUS) return o<<""#STATUS;
-	X(IN)
-	X(GOING_IN)
-	X(GOING_OUT)
-	X(OUT)
+	X(STOW)
+	X(STOWING)
+	X(LOWERING)
+	X(LOW)
 	#undef X
 	assert(0);
 }
@@ -78,38 +78,38 @@ Robot_inputs Arm::Input_reader::operator()(Robot_inputs r, Arm::Input in) const{
 }
 
 Robot_outputs Arm::Output_applicator::operator()(Robot_outputs r, Arm::Output o)const{
-	r.solenoid[PISTON_LOC] = o == Arm::Output::OUT;
+	r.solenoid[PISTON_LOC] = o == Arm::Output::LOW;
 	return r;
 }
 
 Arm::Output Arm::Output_applicator::operator()(Robot_outputs const& r)const{
-	return r.solenoid[PISTON_LOC] ? Output::OUT : Output::IN;
+	return r.solenoid[PISTON_LOC] ? Output::LOW : Output::STOW;
 }
 
 void Arm::Estimator::update(Time time,Arm::Input input,Arm::Output output){
 	switch(output){
-		case Arm::Output::OUT:
-			if(last == Status::GOING_OUT){
+		case Arm::Output::LOW:
+			if(last == Status::LOWERING){
 				state_timer.update(time,input.enabled);
-			} else if(last != Status::OUT){ 
-				const Time OUT_TIME = 1.0;//seconds. assumed
-				last = Status::GOING_OUT;
-				state_timer.set(OUT_TIME);
+			} else if(last != Status::LOW){ 
+				const Time LOW_TIME = 1.0;//seconds. assumed
+				last = Status::LOWERING;
+				state_timer.set(LOW_TIME);
 			}
-			if(state_timer.done() || last == Status::OUT) {
-				last = Status::OUT;
+			if(state_timer.done() || last == Status::LOW) {
+				last = Status::LOW;
 			}
 			break;
-		case Arm::Output::IN:
-			if(last == Status::GOING_IN){
+		case Arm::Output::STOW:
+			if(last == Status::STOWING){
 				state_timer.update(time,input.enabled);
-			} else if(last != Status::IN){ 
-				const Time IN_TIME = 2.2;//seconds. assumed
-				last = Status::GOING_IN;
-				state_timer.set(IN_TIME);
+			} else if(last != Status::STOW){ 
+				const Time STOW_TIME = 2.2;//seconds. assumed
+				last = Status::STOWING;
+				state_timer.set(STOW_TIME);
 			}
-			if(state_timer.done() || last == Status::IN) { 
-				last = Status::IN;
+			if(state_timer.done() || last == Status::STOW) { 
+				last = Status::STOW;
 			}
 			break;
 		default:
@@ -131,10 +131,10 @@ Arm::Status status(Arm::Status s){
 
 bool ready(Arm::Status status,Arm::Goal goal){
 	switch(goal){
-		case Arm::Goal::IN:
-			return status == Arm::Status::IN;
-		case Arm::Goal::OUT:
-			return status == Arm::Status::OUT;
+		case Arm::Goal::STOW:
+			return status == Arm::Status::STOW;
+		case Arm::Goal::LOW:
+			return status == Arm::Status::LOW;
 		default:
 			assert(0);
 	}
@@ -150,7 +150,7 @@ int main(){
 	}
 	{
 		Arm a;
-		Arm::Goal goal = Arm::Goal::OUT;
+		Arm::Goal goal = Arm::Goal::LOW;
 
 		const bool ENABLED = true;	
 		for(Time t: range(100)){
@@ -166,7 +166,7 @@ int main(){
 			}
 		}
 
-		goal = Arm::Goal::IN;
+		goal = Arm::Goal::STOW;
 		
 		for(Time t: range(100)){
 			Arm::Status_detail status = a.estimator.get();

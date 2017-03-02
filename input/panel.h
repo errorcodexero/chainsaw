@@ -19,21 +19,21 @@ struct Panel{
 	bool learn;
 	//2 position swicthes:
 	//3 position switches:
-	enum class Ball_arm{UP,DOWN,AUTO};
+	enum class Ball_arm{STOW,LOW,AUTO};
 	Ball_arm ball_arm;
-	enum class Gear_grasper{OPEN,CLOSED,AUTO};
-	Gear_grasper gear_grasper;
-	enum class Gear_collector{UP,DOWN,AUTO};
-	Gear_collector gear_collector;
+	enum class Gear_grabber{OPEN,CLOSED,AUTO};
+	Gear_grabber gear_grabber;//grasper;
+	enum class Gear_arm{UP,DOWN,AUTO};
+	Gear_arm gear_arm;//gear_collector;
 	enum class Shooter{ENABLED,DISABLED,AUTO};
 	Shooter shooter;
 	enum class Ball_intake{OUT,IN,AUTO};
 	Ball_intake ball_intake;
 	enum class Ball_lift{OUT,IN,AUTO};
 	Ball_lift ball_lift;
-	enum class Shooter_belt{ENABLED,DISABLED,AUTO};
+	enum class Shooter_belt{ENABLED,DISABLED,AUTO};//TODO: no longer exists
 	Shooter_belt shooter_belt;
-	enum class Ball_collector{DISABLED,AUTO};
+	enum class Ball_collector{DISABLED,AUTO};//TODO: is this a button?
 	Ball_collector ball_collector;
 	//10 *position switches:
 	int auto_select;//0-19

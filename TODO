@@ -1,24 +1,17 @@
 HIGH PRIORITY:
 	- Drive base
 		- Auto gear shifting
-	- Gear mainipulator
-		- Gear grabber
-		- Gear lift
-	- Climber
 	- Ball collector
 		- Lift
-		- Arm
 		- Intake
 	- OI
-	- Shooter feed
 	- Shooter
 	- Autonomous:
-		- Simple one that only crosses the base line
 		- Gear scoring (TOP PRIORITY)
+		- Vision
 
 
 NOT AS HIGH PRIORITY:
-	- Vision
 	- Logging
 	- Laptop configuration
 		-ssh config:
