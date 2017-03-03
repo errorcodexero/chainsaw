@@ -1,5 +1,5 @@
 #include "executive.h"
-#include<queue>
+#include <queue>
 
 using namespace std;
 
@@ -86,6 +86,10 @@ vector<Next_mode_info> examples(Next_mode_info *a){
 
 Joystick_data rand(Joystick_data*){
 	return driver_station_input_rand();
+}
+
+ostream* rand(ostream**){
+	return &cout;
 }
 
 Run_info rand(Run_info*){

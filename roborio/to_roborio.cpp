@@ -377,18 +377,16 @@ public:
 		static int print_num=0;
 		std::ostream& print_stream=(in.ds_info.connected && (print_num%PRINT_SPEED)==0)?cout:null_stream;
 		Robot_outputs out=main(in,print_stream);
-		if(in.ds_info.connected && (print_num%PRINT_SPEED)==0){	
-			print_stream<<"in: "<<in<<"\n";
-			print_stream<<"main: "<<main<<"\n";
-			print_stream<<"out: "<<out<<"\n";
-			if(camera.isNewData()) {
-				vector<Pixy::Block> blocks=camera.getBlocks();
-				print_stream<<"size: "<<blocks.size()<<" blocks: "<<blocks<<"\n";
-			}
-			else print_stream<<"No new data."<<in.now<<"\n";
-			print_stream<<"cam_data_recieved: "<<cam_data_recieved<<"\n";
-			print_stream<<"CLEAR_SCREEN\n";
+		print_stream<<"in: "<<in<<"\n";
+		print_stream<<"main: "<<main<<"\n";
+		print_stream<<"out: "<<out<<"\n";
+		if(camera.isNewData()) {
+			vector<Pixy::Block> blocks=camera.getBlocks();
+			print_stream<<"size: "<<blocks.size()<<" blocks: "<<blocks<<"\n";
 		}
+		else print_stream<<"No new data."<<in.now<<"\n";
+		print_stream<<"cam_data_recieved: "<<cam_data_recieved<<"\n";
+		print_stream<<"CLEAR_SCREEN\n";
 		int x=set_outputs(out,in.robot_mode.enabled);
 		if(x) print_stream<<"x was:"<<x<<"\n";
 		print_num++;

@@ -220,7 +220,7 @@ Toplevel::Goal Align::run(Run_info info,Toplevel::Goal goals){
 	blocks=info.in.camera.blocks;
 	current=mean(blocks[0].x,blocks[1].x);
 	center=mean(blocks[0].min_x,blocks[0].max_x);
-	info.print_stream << "Align:    " << blocks[0] << "," << blocks[1] << "   " << current << "   " << center << "\n";
+	*info.print_stream << "Align:    " << blocks[0] << "," << blocks[1] << "   " << current << "   " << center << "\n";
 	const int TOLERANCE = 2;
 	double power = .2;
 	if(camera_con==Camera_con::ENABLE){

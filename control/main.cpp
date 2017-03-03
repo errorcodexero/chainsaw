@@ -12,15 +12,12 @@
 
 using namespace std;
 
-static int print_count=0;
-
 Main::Main():
 	mode(Executive{Teleop()}),//start in teleop because it is safer (it starts autonomous if it needs to anyway)
 	autonomous_start(0)
 {}
 
 Robot_outputs Main::operator()(const Robot_inputs in,ostream& print_stream){
-	print_count++;
 	static const unsigned MAIN_JOYSTICK_PORT = 0, GUNNER_JOYSTICK_PORT = 1;
 
 	perf.update(in.now);
