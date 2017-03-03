@@ -116,10 +116,11 @@ Executive get_auto_mode(Next_mode_info info){
 	}};
 
 	//scores a gear on the loading station-side peg
+	static const Inch FIRST_DRIVE_DIST_LOADING = (127 - ROBOT_LENGTH) + .5 * ROBOT_LENGTH;
 	Executive auto_score_gear_loading_station_side{Chain{
-		Step{Drive_straight{5*12}},
+		Step{Drive_straight{FIRST_DRIVE_DIST_LOADING}},
 		Executive{Chain{
-			Step{Turn{deg_to_rad(-40)}},
+			Step{Turn{deg_to_rad(-31)}},
 			Executive{Chain{
 				Step{Score_gear()},
 				Executive{Teleop()}
@@ -129,9 +130,9 @@ Executive get_auto_mode(Next_mode_info info){
 	
 	//Gear Loading Extended
 	Executive auto_score_gear_loading_station_side_extended{Chain{
-		Step{Drive_straight{5*12}},
+		Step{Drive_straight{FIRST_DRIVE_DIST_LOADING}},
 		Executive{Chain{
-			Step{Turn{deg_to_rad(-40)}},
+			Step{Turn{deg_to_rad(-31)}},
 			Executive{Chain{
 				Step{Score_gear()},
 				Executive{Chain{
