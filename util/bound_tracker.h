@@ -20,12 +20,11 @@ struct Bound_tracker{
 	};
 	
 	Maybe<Bounds> bounds;
-	bool data;
 	
-	Bound_tracker():data(false){}
+	Bound_tracker(){}
 	
 	void update(T const& v){
-		if(data){
+		if(bounds){
 			//std::min and std::max don't work right on the cRIO. //TODO see if this works on the roboRIO
 			//min=std::min(min,v);
 			//max=std::max(max,v);
@@ -33,7 +32,6 @@ struct Bound_tracker{
 			if(v > (*bounds).max) (*bounds).max=v;
 		}else{
 			bounds = {v,v};
-			data = true;
 		}
 	}
 	/*
