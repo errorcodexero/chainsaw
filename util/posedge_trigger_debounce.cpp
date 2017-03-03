@@ -2,6 +2,8 @@
 
 using namespace std;
 
+Posedge_trigger_debounce::Posedge_trigger_debounce():debounce({false}),trigger({}){}
+
 bool Posedge_trigger_debounce::operator()(Time now,bool in){
 	debounce.update(now,in);
 	return trigger(debounce.get());

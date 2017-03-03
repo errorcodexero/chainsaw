@@ -263,9 +263,7 @@ set<Drivebase::Input> examples(Drivebase::Input*){
 	}};
 }
 
-Drivebase::Estimator::Estimator():motor_check(),last({{{}},false,{0,0},{0,0},0.0}){
-	timer.set(.05);
-}
+Drivebase::Estimator::Estimator():motor_check(),last({{{}},false,{0,0},{0,0},0.0}){}
 
 Drivebase::Status_detail Drivebase::Estimator::get()const{
 	/*array<Motor_check::Status,MOTORS> a;
@@ -297,12 +295,12 @@ double get_output(Drivebase::Output out,Drivebase::Motor m){
 }
 
 void Drivebase::Estimator::update(Time now,Drivebase::Input in,Drivebase::Output out){
-	timer.update(now,true);
+	speed_timer.update(now,true);
 	static const double POLL_TIME = .05;//seconds
-	if(timer.done()){
+	if(speed_timer.done()){
 		last.speeds.l = (last.distances.l-in.distances.l)/POLL_TIME;
 		last.speeds.r = (last.distances.r-in.distances.r)/POLL_TIME;
-		timer.set(POLL_TIME);
+		speed_timer.set(POLL_TIME);
 	}
 	
 	last.distances = in.distances;
@@ -315,9 +313,10 @@ void Drivebase::Estimator::update(Time now,Drivebase::Input in,Drivebase::Output
 		motor_check[i].update(now,current,set_power_level);
 	}
 
-	static const double STALL_CURRENT = 5.0;
-	static const double STALL_SPEED = .1;//ft/s speed at which we assume robot is stalled when current spikes
-	last.stall = mean(in.current) > STALL_CURRENT && mean(last.speeds.l,last.speeds.r) < STALL_SPEED;
+	static const double STALL_CURRENT = .30;//from testing with autonomous
+	static const double STALL_SPEED = .10;//ft/s speed at which we assume robot is stalled when current spikes
+	last.stall = mean(in.current) > STALL_CURRENT && fabs(mean(last.speeds.l,last.speeds.r)) < STALL_SPEED;
+	cout<<"curr:"<<mean(in.current)<<" "<<mean(last.speeds.l,last.speeds.r)<<"\n";
 }
 
 Robot_outputs Drivebase::Output_applicator::operator()(Robot_outputs robot,Drivebase::Output b)const{
@@ -358,7 +357,7 @@ bool operator==(Drivebase::Output_applicator const&,Drivebase::Output_applicator
 
 bool operator==(Drivebase::Estimator const& a,Drivebase::Estimator const& b){
 	if(a.last != b.last) return false;
-	if(a.timer != b.timer) return false;
+	if(a.speed_timer != b.speed_timer) return false;
 	/*for(unsigned i=0; i<Drivebase::MOTORS; i++){
 		if(a.motor_check[i]!=b.motor_check[i])return false;
 	}*/

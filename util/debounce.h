@@ -3,27 +3,67 @@
 
 #include "countdown_timer.h"
 
+template <typename T>
 class Debounce{
 	#define DEBOUNCE_ITEMS(X) \
 		X(Countdown_timer,timer)\
-		X(bool,value)
+		X(T,value) \
+		X(Time,interval) 
 
 	#define X(A,B) A B;
 	DEBOUNCE_ITEMS(X)
 	#undef X
 
 	public:
-	Debounce();
-	bool get()const;
-	void update(Time,bool);
+	Debounce(T a):Debounce<T>::Debounce(a,.5){}
+	Debounce(T a,Time b):value(a),interval(b){}
 
-	friend bool operator<(Debounce const&,Debounce const&);
-	friend bool operator==(Debounce const&,Debounce const&);
-	friend std::ostream& operator<<(std::ostream&,Debounce const&);
+
+	T get()const{ return value; }
+	void update(Time now,T v){
+		timer.update(now,1);
+		if(!timer.done()) return;
+		if(v==value) return;
+		value=v;
+		timer.set(interval);
+		timer.update(now,1);
+	}
+
+	template <typename S>
+	friend bool operator<(Debounce<S> const&,Debounce<S> const&);
+	template <typename S>
+	friend bool operator==(Debounce<S> const&,Debounce<S> const&);
+	template <typename S>
+	friend std::ostream& operator<<(std::ostream&,Debounce<S> const&);
 };
+template<typename T>
+bool operator<(Debounce<T> const& a,Debounce<T> const& b){
+	#define X(A,B) if(a.B<b.B) return 1; if(b.B<a.B) return 0;
+	DEBOUNCE_ITEMS(X)
+	#undef X
+	return 0;
+}
 
-bool operator<(Debounce const&,Debounce const&);
-bool operator!=(Debounce const&,Debounce const&);
-std::ostream& operator<<(std::ostream&,Debounce const&);
+template<typename T>
+bool operator==(Debounce<T> const& a,Debounce<T> const& b){
+	return 1
+	#define X(A,B) && a.B==b.B
+	DEBOUNCE_ITEMS(X)
+	#undef X
+	;
+}
 
+template<typename T>
+bool operator!=(Debounce<T> const& a,Debounce<T> const& b){
+	return !(a==b);
+}
+
+template<typename T>
+std::ostream& operator<<(std::ostream& o,Debounce<T> const& a){
+	o<<"Debounce( ";
+	#define X(A,B) o<<""#B<<":"<<a.B<<" ";
+	DEBOUNCE_ITEMS(X)
+	#undef X
+	return o<<")";
+}
 #endif
