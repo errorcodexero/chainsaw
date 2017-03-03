@@ -120,7 +120,7 @@ Executive get_auto_mode(Next_mode_info info){
 	Executive auto_score_gear_loading_station_side{Chain{
 		Step{Drive_straight{FIRST_DRIVE_DIST_LOADING}},
 		Executive{Chain{
-			Step{Turn{deg_to_rad(-31)}},
+			Step{Turn{deg_to_rad(-35)}},
 			Executive{Chain{
 				Step{Score_gear()},
 				Executive{Teleop()}
