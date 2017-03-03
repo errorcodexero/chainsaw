@@ -139,7 +139,7 @@ Step::Status Drive_straight::done(Next_mode_info info){
 		static const Time FINISH_TIME = 1.0;
 		in_range.set(FINISH_TIME);
 	}
-	/*
+	
 	if(info.status.drive.stall){
 		stall_timer.update(info.in.now,info.in.robot_mode.enabled);
 	} else{
@@ -147,7 +147,9 @@ Step::Status Drive_straight::done(Next_mode_info info){
 		stall_timer.set(STALL_TIME);
 	}
 	if(stall_timer.done()) return Step::Status::FINISHED_FAILURE;
-	*/
+	
+	cout<<"stall:"<<info.status.drive.stall<<"\n";
+
 	return in_range.done() ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;
 }
 
@@ -431,6 +433,7 @@ Toplevel::Goal Score_gear::run(Run_info info){
 }
 
 Toplevel::Goal Score_gear::run(Run_info info,Toplevel::Goal goals){
+	if(stage == Stage::DONE) return goals;
 	return steps[stage].run(info, goals);
 }
 
@@ -465,12 +468,11 @@ Step::Status Score_gear::done(Next_mode_info info){
 	switch(steps[stage].done(info)){
 		case Step::Status::UNFINISHED:
 			break;
+		case Step::Status::FINISHED_FAILURE: //treat a failure as a success
 		case Step::Status::FINISHED_SUCCESS:
 			advance();
 			if(stage == Stage::DONE) return Step::Status::FINISHED_SUCCESS;
 			break;
-		case Step::Status::FINISHED_FAILURE:
-			nyi //TODO
 		default:
 			assert(0);
 	}

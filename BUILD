@@ -418,14 +418,14 @@ cc_library(
 	name="drivebase",
 	srcs=["control/drivebase.cpp"],
 	hdrs=["control/drivebase.h","util/quick.h"],
-	deps=[":interface",":motor_check",":countdown_timer"]
+	deps=[":interface",":motor_check",":countdown_timer",":debounce"]
 )
 
 cc_test(
 	name="drivebase_test",
 	srcs=["control/drivebase.cpp","control/drivebase.h","util/quick.h","control/formal.h"],
 	copts=["-DDRIVEBASE_TEST"],
-	deps=[":interface",":motor_check",":countdown_timer"],
+	deps=[":interface",":motor_check",":countdown_timer",":debounce"],
 	timeout="short"
 )
 

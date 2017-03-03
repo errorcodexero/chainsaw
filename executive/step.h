@@ -75,7 +75,7 @@ class Drive_straight:public Step_impl_inner<Drive_straight>{//Drives straight a 
 	bool init;
 	Motion_profile motion_profile;
 	Countdown_timer in_range;	
-	//Countdown_timer stall_timer;
+	Countdown_timer stall_timer;
 	Gear_shifter::Goal gear;
 	
 	Drivebase::Distances get_distance_travelled(Drivebase::Distances);//TODO: do this better
