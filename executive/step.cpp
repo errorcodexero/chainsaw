@@ -58,8 +58,8 @@ Toplevel::Goal Turn::run(Run_info info,Toplevel::Goal goals){
 	
 	//ignoring right encoder because it's proven hard to get meaningful data from it
 	double power = motion_profile.target_speed(distance_travelled.l); 
-	goals.drive.left = clip(target_to_out_power(power));
-	goals.drive.right = -clip(target_to_out_power(power - RIGHT_SPEED_CORRECTION * power));
+	goals.drive.left = clip(target_to_out_power(power,.15));
+	goals.drive.right = -clip(target_to_out_power(power - RIGHT_SPEED_CORRECTION * power,.15));
 	goals.shifter = Gear_shifter::Goal::LOW;
 	return goals;
 }
@@ -166,8 +166,8 @@ Toplevel::Goal Drive_straight::run(Run_info info,Toplevel::Goal goals){
 
 	double power = motion_profile.target_speed(distance_travelled.l); //ignoring right encoder because it's proven hard to get meaningful data from it
 
-	goals.drive.left = clip(target_to_out_power(power));
-	goals.drive.right = clip(target_to_out_power(power + power * RIGHT_SPEED_CORRECTION)); //right side would go faster than the left without error correction
+	goals.drive.left = clip(target_to_out_power(power,.11));
+	goals.drive.right = clip(target_to_out_power(power + power * RIGHT_SPEED_CORRECTION,.11)); //right side would go faster than the left without error correction
 	goals.shifter = gear;
 	return goals;
 }
@@ -185,7 +185,7 @@ Align::Align():firsttime(0){}
 Step::Status Align::done(Next_mode_info info){
 	blocks=info.in.camera.blocks;
 	current=mean(blocks[0].x,blocks[1].x);
-	center=mean(blocks[0].min_x,blocks[0].max_x);
+	center=160;
 	int const  TOLERANCE= 2;
 	if(firsttime) return Step::Status::FINISHED_SUCCESS;
 	if(!info.in.camera.enabled){
@@ -237,11 +237,13 @@ Toplevel::Goal Align::run(Run_info info,Toplevel::Goal goals){
 			goals.drive.left = -power;
 			goals.drive.right = power;
 		} else if(current>=center+TOLERANCE) {
-			goals.drive.left = power;
-			goals.drive.right = -power;
+			goals.drive.left = 0;
+			goals.drive.right = 0;
 		}
-		goals.drive.left = -power;
+		else{
+		goals.drive.left = power;
 		goals.drive.right = power;
+		}
 	}
 	else if(camera_con==Camera_con::DISABLED){
 		if(info.panel.auto_select == 3 || info.panel.auto_select == 4){
