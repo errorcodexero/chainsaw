@@ -410,6 +410,73 @@ bool Combo::operator==(Combo const& b)const{
 	return step_a == b.step_a && step_b == b.step_b;
 }
 
+Score_gear::Score_gear():
+	steps({
+			Step{Lift_gear()},//lift the gear
+			Step{Combo{ //slide the gear on the peg
+				Step{Lift_gear()},
+				Step{Drive_straight{SCORE_GEAR_APPROACH_DIST}}
+			}},
+			Step{Drop_gear()}, //release the gear
+			Step{Combo{ //back off
+				Step{Drop_gear()},
+				Step{Drive_straight{-SCORE_GEAR_APPROACH_DIST}}
+			}},
+			Step{Drop_collector()}, // lower the collector to the floor
+	}),
+	stage(Stage::LIFT){}
+
+Toplevel::Goal Score_gear::run(Run_info info){
+	return run(info,{});
+}
+
+Toplevel::Goal Score_gear::run(Run_info info,Toplevel::Goal goals){
+	return steps[stage].run(info, goals);
+}
+
+bool Score_gear::operator==(Score_gear const& b)const{
+	return steps == b.steps && stage == b.stage;
+}
+
+unique_ptr<Step_impl> Score_gear::clone()const{
+	return unique_ptr<Step_impl>(new Score_gear(*this));
+}
+void Score_gear::advance(){
+	stage = [&]{ //move onto next step
+		switch(stage){
+			case LIFT:
+				return SCORE;
+			case SCORE:
+				return RELEASE;
+			case RELEASE:
+				return BACK_OFF;
+			case BACK_OFF:
+				return STOW;
+			case STOW:
+			case DONE:
+				return DONE;
+			default:
+				assert(0);
+		}
+	}();
+}
+
+Step::Status Score_gear::done(Next_mode_info info){
+	switch(steps[stage].done(info)){
+		case Step::Status::UNFINISHED:
+			break;
+		case Step::Status::FINISHED_SUCCESS:
+			advance();
+			if(stage == Stage::DONE) return Step::Status::FINISHED_SUCCESS;
+			break;
+		case Step::Status::FINISHED_FAILURE:
+			nyi //TODO
+		default:
+			assert(0);
+	}
+	return Step::Status::UNFINISHED;
+}
+
 Step_impl const& Step::get()const{
 	assert(impl);
 	return *impl.get();
