@@ -209,12 +209,12 @@ cc_test(
 cc_library(
 	name="bound_tracker",
 	srcs=["util/bound_tracker.cpp"],
-	hdrs=["util/bound_tracker.h"]
+	hdrs=["util/bound_tracker.h","util/maybe.h"],
 )
 
 cc_test(
 	name="bound_tracker_test",
-	srcs=["util/bound_tracker.cpp","util/bound_tracker.h"],
+	srcs=["util/bound_tracker.cpp","util/bound_tracker.h","util/maybe.h"],
 	copts=["-DBOUND_TRACKER_TEST"],
 	deps=[],
 	timeout="short"
