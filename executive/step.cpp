@@ -58,8 +58,8 @@ Toplevel::Goal Turn::run(Run_info info,Toplevel::Goal goals){
 	
 	//ignoring right encoder because it's proven hard to get meaningful data from it
 	double power = motion_profile.target_speed(distance_travelled.l); 
-	goals.drive.left = clip(target_to_out_power(power));
-	goals.drive.right = -clip(target_to_out_power(power - RIGHT_SPEED_CORRECTION * power));
+	goals.drive.left = clip(target_to_out_power(power,.15));
+	goals.drive.right = -clip(target_to_out_power(power - RIGHT_SPEED_CORRECTION * power,.15));
 	goals.shifter = Gear_shifter::Goal::LOW;
 	return goals;
 }
@@ -166,8 +166,8 @@ Toplevel::Goal Drive_straight::run(Run_info info,Toplevel::Goal goals){
 
 	double power = motion_profile.target_speed(distance_travelled.l); //ignoring right encoder because it's proven hard to get meaningful data from it
 
-	goals.drive.left = clip(target_to_out_power(power));
-	goals.drive.right = clip(target_to_out_power(power + power * RIGHT_SPEED_CORRECTION)); //right side would go faster than the left without error correction
+	goals.drive.left = clip(target_to_out_power(power,.11));
+	goals.drive.right = clip(target_to_out_power(power + power * RIGHT_SPEED_CORRECTION,.11)); //right side would go faster than the left without error correction
 	goals.shifter = gear;
 	return goals;
 }
@@ -180,7 +180,7 @@ bool Drive_straight::operator==(Drive_straight const& b)const{
 	return target_dist == b.target_dist && initial_distances == b.initial_distances && init == b.init && motion_profile == b.motion_profile && in_range == b.in_range /*&& stall_timer == b.stall_timer*/ && gear == b.gear;
 }
 
-Align::Align(Turn a):mode(Align::Mode::NONVISION),blocks({}),current(0),center(0),nonvision_align(Step{a}){}
+Align::Align(Turn a):mode(Align::Mode::NONVISION),blocks({}),current(0),center(160),nonvision_align(Step{a}){}
 Align::Align():Align(Turn(0)){}
 
 void Align::update(Camera camera){
@@ -194,7 +194,6 @@ void Align::update(Camera camera){
 		blocks = camera.blocks;
 		//TODO: check for two largest blocks that are in the expected y range
 		current = mean(blocks[0].x,blocks[1].x);
-		center = mean(blocks[0].min_x,blocks[1].max_x);
 	}
 }
 
@@ -231,6 +230,7 @@ Toplevel::Goal Align::run(Run_info info){
 	return run(info,{});
 }
 
+
 Toplevel::Goal Align::run(Run_info info,Toplevel::Goal goals){
 	update(info.in.camera);
 	cout << "Align:    " << blocks[0] << "," << blocks[1] << "   " << current << "   " << center << "\n";
@@ -238,7 +238,7 @@ Toplevel::Goal Align::run(Run_info info,Toplevel::Goal goals){
 	switch(mode){
 		case Mode::VISION:
 			{
-				const double power = .1;
+				const double power = .18;
 				const int TOLERANCE = 3.0;
 				if(current < center - TOLERANCE){
 					goals.drive.left = power;
