@@ -209,12 +209,12 @@ cc_test(
 cc_library(
 	name="bound_tracker",
 	srcs=["util/bound_tracker.cpp"],
-	hdrs=["util/bound_tracker.h"]
+	hdrs=["util/bound_tracker.h","util/maybe.h"],
 )
 
 cc_test(
 	name="bound_tracker_test",
-	srcs=["util/bound_tracker.cpp","util/bound_tracker.h"],
+	srcs=["util/bound_tracker.cpp","util/bound_tracker.h","util/maybe.h"],
 	copts=["-DBOUND_TRACKER_TEST"],
 	deps=[],
 	timeout="short"
@@ -418,14 +418,14 @@ cc_library(
 	name="drivebase",
 	srcs=["control/drivebase.cpp"],
 	hdrs=["control/drivebase.h","util/quick.h"],
-	deps=[":interface",":motor_check",":countdown_timer"]
+	deps=[":interface",":motor_check",":countdown_timer",":debounce"]
 )
 
 cc_test(
 	name="drivebase_test",
 	srcs=["control/drivebase.cpp","control/drivebase.h","util/quick.h","control/formal.h"],
 	copts=["-DDRIVEBASE_TEST"],
-	deps=[":interface",":motor_check",":countdown_timer"],
+	deps=[":interface",":motor_check",":countdown_timer",":debounce"],
 	timeout="short"
 )
 
@@ -564,6 +564,20 @@ cc_test(
 	timeout="short"
 )
 
+cc_library(
+	name="lights",
+	srcs=["control/lights.cpp"],
+	hdrs=["control/lights.h"],
+	deps=[":interface",":nop"]
+)
+
+cc_test(
+	name="lights_test",
+	srcs=["control/lights.cpp","control/lights.h","control/formal.h"],
+	copts=["-DLIGHTS_TEST"],
+	deps=[":interface",":nop"],
+	timeout="short"
+)
 
 cc_library(
 	name="force",
@@ -592,14 +606,14 @@ cc_library(
 	name="toplevel",
 	srcs=["control/toplevel.cpp"],
 	hdrs=["control/toplevel.h"],
-	deps=[":pump",":drivebase",":climber",":gear_shifter",":collector",":gear_collector",":shooter",":input"]
+	deps=[":pump",":drivebase",":climber",":gear_shifter",":collector",":gear_collector",":shooter",":input",":lights"]
 )
 
 cc_test(
 	name="toplevel_test",
 	srcs=["control/toplevel.cpp","control/toplevel.h","control/formal.h"],
 	copts=["-DTOPLEVEL_TEST"],
-	deps=[":pump",":drivebase",":climber",":gear_shifter",":collector",":input",":gear_collector",":output",":shooter"],
+	deps=[":pump",":drivebase",":climber",":gear_shifter",":collector",":input",":gear_collector",":output",":shooter",":lights"],
 	timeout="short"
 )
 

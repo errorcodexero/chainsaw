@@ -10,37 +10,9 @@ double deg_to_rad(double deg){
 	return deg/180*PI;
 }
 
-const Inch SCORE_GEAR_APPROACH_DIST = 12.0;//inches
-
 const Inch BUMPER_LENGTH = 3.0;//inches thickness of one bumper
 
 const Inch ROBOT_LENGTH = 28.0 + 1 * BUMPER_LENGTH; //inches from front to back //TODO: change to match number of sides with bumpers
-
-Executive insert_score_gear(Executive last){
-	Executive score_gear{Chain{
-		Step{Lift_gear()},//lift gear from floor
-		Executive{Chain{
-			Step{Combo{
-				Step{Lift_gear()},
-				Step{Drive_straight{SCORE_GEAR_APPROACH_DIST}}
-			}},//slide gear onto peg
-			Executive{Chain{
-				Step{Drop_gear()},//let go of gear
-				Executive{Chain{
-					Step{Combo{
-						Step{Drop_gear()},
-						Step{Drive_straight{-SCORE_GEAR_APPROACH_DIST}}
-					}},//drive back from the peg
-					Executive{Chain{
-						Step{Drop_collector()},//lower the collector to the floor
-						last //what to do after scoring the gear
-					}}
-				}}
-			}}		
-		}}
-	}};
-	return score_gear;
-}
 
 Executive make_test_step(auto a){
 	return Executive{Chain{
@@ -56,9 +28,6 @@ Executive get_auto_mode(Next_mode_info info){
 	//
 	// Parts of other autonomous modes
 	// 
-
-	//for scoring a gear after the robot is lined up in front of any of the pegs
-	Executive score_gear = insert_score_gear(Executive{Teleop()});
 
 	//for when just want to run across the field at the end of autonomous
 	static const Inch DASH_DIST = 20*12;
@@ -91,7 +60,10 @@ Executive get_auto_mode(Next_mode_info info){
 			Step{Drive_straight{DIST_TO_MIDDLE_PEG - SCORE_GEAR_APPROACH_DIST - ROBOT_LENGTH - EXTENDED_GEAR_LENGTH}},
 			Step{Lift_gear()}
 		}},
-		score_gear
+		Executive{Chain{
+			Step{Score_gear()},
+			Executive{Teleop()}
+		}}
 	}};
 
 	//Score a gear on the boiler-side peg
@@ -111,7 +83,10 @@ Executive get_auto_mode(Next_mode_info info){
 					Step{Drive_straight{7}},//drive forward a bit so score_gear can take over
 					Step{Lift_gear()}
 				}},
-				score_gear
+				Executive{Chain{
+					Step{Score_gear()},
+					Executive{Teleop()}
+				}}
 			}}
 		}}
 	}};
@@ -127,7 +102,8 @@ Executive get_auto_mode(Next_mode_info info){
 		Step{Drive_straight{5*12}},
 		Executive{Chain{
 			Step{Turn{deg_to_rad(40)}},
-			insert_score_gear(
+			Executive{Chain{
+				Step{Score_gear()},
 				Executive{Chain{
 					Step{Drive_straight{-2 * 12}},
 					Executive{Chain{
@@ -135,40 +111,46 @@ Executive get_auto_mode(Next_mode_info info){
 						dash
 					}}
 				}}
-			)
+			}}
 		}}
 	}};
 
 	//scores a gear on the loading station-side peg
+	static const Inch FIRST_DRIVE_DIST_LOADING = (127 - ROBOT_LENGTH) + .5 * ROBOT_LENGTH;
 	Executive auto_score_gear_loading_station_side{Chain{
-		Step{Drive_straight{5*12}},
+		Step{Drive_straight{FIRST_DRIVE_DIST_LOADING}},
 		Executive{Chain{
-			Step{Turn{deg_to_rad(-40)}},
-			insert_score_gear(Executive{Teleop()})
+			Step{Turn{deg_to_rad(-35)}},
+			Executive{Chain{
+				Step{Score_gear()},
+				Executive{Teleop()}
+			}}
 		}}
 	}};
 	
 	//Gear Loading Extended
 	Executive auto_score_gear_loading_station_side_extended{Chain{
-		Step{Drive_straight{5*12}},
+		Step{Drive_straight{FIRST_DRIVE_DIST_LOADING}},
 		Executive{Chain{
-			Step{Turn{deg_to_rad(-40)}},
-			insert_score_gear(
+			Step{Turn{deg_to_rad(-31)}},
+			Executive{Chain{
+				Step{Score_gear()},
 				Executive{Chain{
-				Step{Drive_straight{-12}},
+					Step{Drive_straight{-12}},
 					Executive{Chain{
 						Step{Turn{deg_to_rad(40)}},
 						dash
 					}}
 				}}
-			)
+			}}
 		}}
 	}};
 	
 	//Gear mid Extended right (goes around the airship to the right)
 	Executive auto_score_gear_middle_extended_right{Chain{
 		Step{Drive_straight{10*12}},
-		insert_score_gear(
+		Executive{Chain{
+			Step{Score_gear()},
 			Executive{Chain{
 				Step{Drive_straight{-12}},
 				Executive{Chain{
@@ -182,15 +164,16 @@ Executive get_auto_mode(Next_mode_info info){
 					}}
 				}}
 			}}
-		)
+		}}
 	}};
 
 	//Gear mid Extended left (goes around airship to the left)
 	Executive auto_score_gear_middle_extended_left{Chain{
 		Step{Drive_straight{10*12}},
-		insert_score_gear(
+		Executive{Chain{
+			Step{Score_gear()},
 			Executive{Chain{
-			Step{Drive_straight{-12}},
+				Step{Drive_straight{-12}},
 				Executive{Chain{
 					Step{Turn{deg_to_rad(45)}},
 					Executive{Chain{
@@ -202,7 +185,7 @@ Executive get_auto_mode(Next_mode_info info){
 					}}
 				}}	
 			}}
-		)
+		}}
 	}};
 
 	if(info.panel.in_use){
@@ -214,8 +197,8 @@ Executive get_auto_mode(Next_mode_info info){
 				//
 				// Tests for different steps
 				//
-				//return make_test_step(Drive_straight{7*12});
-				//return score_gear;
+				//return make_test_step(Drive_straight{9*12});
+				return make_test_step(Step{Score_gear()});
 				//return make_test_step(Turn{PI*2});
 				//return make_test_step(Align());
 			case 1: 

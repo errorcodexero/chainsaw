@@ -60,7 +60,8 @@ struct Drivebase{
 	struct Estimator{
 		std::array<Motor_check,MOTORS> motor_check;
 		Status_detail last;
-		Countdown_timer timer;
+		Countdown_timer speed_timer;
+
 		void update(Time,Input,Output);
 		Status_detail get()const;
 		Estimator();
