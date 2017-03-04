@@ -191,11 +191,13 @@ ostream& operator<<(ostream& o,Align::Mode a){
 	}
 }
 
-Align::Align(Turn a):mode(Align::Mode::NONVISION),blocks({}),current(0),center(130),nonvision_align(Step{a}){}
+static const int CENTER = 115;
+
+Align::Align(Turn a):mode(Align::Mode::NONVISION),blocks({}),current(0),center(CENTER),nonvision_align(Step{a}){}
 Align::Align():Align(Turn(0)){}
 
 void Align::update(Camera camera){
-	/*if(!camera.enabled || camera.blocks.size() == 0){
+	/*if(!camera.enabled || camera.blocks.empty()){
 		mode = Mode::NONVISION;
 		blocks = {};
 		current = 0;
@@ -204,8 +206,8 @@ void Align::update(Camera camera){
 		mode = Mode::VISION;
 		blocks = camera.blocks;
 		//TODO: check for two largest blocks that are in the expected y range
-		if(blocks.size()==2) current = mean(blocks[0].x,blocks[1].x);
-		else if((blocks.size()>0) & (blocks.size()<1)) current = blocks[0].x;
+		if(blocks.size()>=2) current = mean(blocks[0].x,blocks[1].x);
+		else if((blocks.size()==1) & (blocks.size()<1)) current = blocks[0].x;
 		else blocks= {};
 
 }
@@ -215,14 +217,14 @@ Step::Status Align::done(Next_mode_info info){
 	switch(mode){
 		case Mode::VISION:
 			{
-				const int TOLERANCE= 6;
-				if(current > center - TOLERANCE && current < center + TOLERANCE){
+				const int TOLERANCE= 4;
+				if((current > center - TOLERANCE && current < center + TOLERANCE) || (info.since_switch > 6)){
 					in_range.update(info.in.now,info.in.robot_mode.enabled);
 				} else {
 					static const Time FINISH_TIME = 1.0;
 					in_range.set(FINISH_TIME);
 				}
-				return /*in_range.done() ? Step::Status::FINISHED_SUCCESS :*/ Step::Status::UNFINISHED;
+				return in_range.done() ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;
 			}
 		case Mode::NONVISION:
 			{
@@ -255,7 +257,7 @@ Toplevel::Goal Align::run(Run_info info,Toplevel::Goal goals){
 		case Mode::VISION:
 			{
 				const double power = .25;
-				const int TOLERANCE = 6.0;
+				const int TOLERANCE = 4;
 				if(current < center - TOLERANCE){
 					goals.drive.left = -power;
 					goals.drive.right = power;

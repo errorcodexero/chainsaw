@@ -37,7 +37,7 @@ Executive get_auto_mode(Next_mode_info info){
 	}};
 
 	static const Inch EXTENDED_GEAR_LENGTH = 7.6;//how far the gear extends out of the robot when deployed outward
-
+	static const Inch ALIGN_DIST = 12;//decreases distance from the drive distance to compinsate for the fact that vision doesnt work well at close distances
 	//////////////////////////
 	//
 	// Full autonomous modes
@@ -57,12 +57,24 @@ Executive get_auto_mode(Next_mode_info info){
 	static const Inch DIST_TO_MIDDLE_PEG = 114;//distance from alliance wall to the middle peg //TODO: find out correct distance
 	Executive auto_score_gear_middle{Chain{
 		Step{Combo{
-			Step{Drive_straight{DIST_TO_MIDDLE_PEG - SCORE_GEAR_APPROACH_DIST - ROBOT_LENGTH - EXTENDED_GEAR_LENGTH}},
+			Step{Drive_straight{DIST_TO_MIDDLE_PEG - SCORE_GEAR_APPROACH_DIST - ROBOT_LENGTH - EXTENDED_GEAR_LENGTH-ALIGN_DIST}},
 			Step{Lift_gear()}
 		}},
 		Executive{Chain{
-			Step{Score_gear()},
-			Executive{Teleop()}
+			Step{Combo{
+				Step{Align()},
+				Step{Drop_collector()}
+			}},
+			Executive{Chain{
+				Step{Combo{
+					Step{Drive_straight{ALIGN_DIST}},
+					Step{Lift_gear()},
+				}},
+				Executive{Chain{
+					Step{Score_gear()},
+					Executive{Teleop()}
+				}}
+			}}
 		}}
 	}};
 
