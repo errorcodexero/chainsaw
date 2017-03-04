@@ -278,6 +278,8 @@ public:
 			if(camera.isNewData()) cam_data_recieved=true;
 		} else */{
 			camera.enable();
+			c.enabled=1;
+			if (camera.isNewData()) c.blocks=camera.getBlocks();
 			//if (camera.isNewData() && ) ;
 			/*c.enabled=true;//cam_data_recieved&&camera.enable()&&r.robot_mode.enabled;
 			if(c.enabled && camera.isNewData()) c.blocks=camera.getBlocks();
@@ -381,11 +383,11 @@ public:
 			cout<<"in: "<<in<<"\n";
 			cout<<"main: "<<main<<"\n";
 			cout<<"out: "<<out<<"\n";
-			if(camera.isNewData()) {
+			/*if(camera.isNewData()) {
 				vector<Pixy::Block> blocks=camera.getBlocks();
 				cout<<"size: "<<blocks.size()<<" blocks: "<<blocks<<"\n";
 			}
-			else cout<<"No new data."<<in.now<<"\n";
+			else cout<<"No new data."<<in.now<<"\n";*/
 			cout<<"cam_data_recieved: "<<cam_data_recieved<<"\n";
 			cout<<"CLEAR_SCREEN\n";
 		}
