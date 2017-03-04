@@ -103,7 +103,8 @@ Toplevel::Output::Output():
 	drive(0.0,0.0),
 	collector(),
 	gear_collector(),
-	shooter()
+	shooter(),
+	lights()
 {}
 
 bool operator<(Toplevel::Output const& a,Toplevel::Output const& b){
@@ -163,7 +164,8 @@ Toplevel::Status::Status():
 	),
 	collector(),
 	gear_collector(),
-	shooter()
+	shooter(),
+	lights(0)
 {}
 bool operator==(Toplevel::Status a,Toplevel::Status b){
 	#define X(A,name,C) if(a.name!=b.name) return 0;
@@ -342,7 +344,8 @@ set<Toplevel::Status_detail> examples(Toplevel::Status_detail*){
 		*examples((Drivebase::Status_detail*)0).begin(),
 		*examples((Collector::Status_detail*)0).begin(),
 		*examples((Gear_collector::Status_detail*)0).begin(),
-		*examples((Shooter::Status_detail*)nullptr).begin()
+		*examples((Shooter::Status_detail*)nullptr).begin(),
+		*examples((Lights::Status_detail*)nullptr).begin()
 	}};
 }
 
@@ -362,7 +365,8 @@ set<Toplevel::Input> examples(Toplevel::Input*){
 		*examples((Drivebase::Input*)0).begin(),
 		*examples((Collector::Input*)0).begin(),
 		*examples((Gear_collector::Input*)0).begin(),
-		*examples((Shooter::Input*)nullptr).begin()
+		*examples((Shooter::Input*)nullptr).begin(),
+		*examples((Lights::Input*)nullptr).begin()
 	};
 	return {a};
 }

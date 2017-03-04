@@ -9,6 +9,7 @@
 #include "collector.h"
 #include "gear_collector.h"
 #include "shooter.h"
+#include "lights.h"
 
 #define TOPLEVEL_ITEMS \
 	X(Pump,pump,Pump::Goal::AUTO)\
@@ -17,7 +18,8 @@
 	X(Drivebase,drive,)\
 	X(Collector,collector,)\
 	X(Gear_collector,gear_collector,) \
-	X(Shooter,shooter,)
+	X(Shooter,shooter,) \
+	X(Lights,lights,)
 	
 class Toplevel{
 	public:
