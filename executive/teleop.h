@@ -42,7 +42,9 @@ struct Teleop : Executive_impl<Teleop> {
 		X(Gear_collector_mode,gear_collector_mode) \
 		X(Collect_step,collect_step) \
 		X(No_collect_step,no_collect_step) \
-		X(Countdown_timer,clear_ball_timer)
+		X(Countdown_timer,clear_ball_timer) \
+		X(Posedge_toggle,indicator_toggle) \
+		X(Posedge_toggle,camera_light_toggle)	
 	STRUCT_MEMBERS(TELEOP_ITEMS)
 
 	void collect_protocol(Toplevel::Status_detail const&,Toplevel::Goal&);

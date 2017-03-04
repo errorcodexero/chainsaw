@@ -5,6 +5,7 @@
 #include "step.h"
 
 struct Chain:Executive_impl<Chain>{
+	//enum class Failure_procedure{TREAT_AS_SUCCESS,ENTER_TELEOP,ABORT};
 	Step step;
 	Executive next;
 

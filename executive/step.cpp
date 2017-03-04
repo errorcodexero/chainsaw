@@ -27,9 +27,9 @@ Toplevel::Goal Step::run(Run_info info){
 	return impl->run(info,{});
 }
 
-const double RIGHT_SPEED_CORRECTION = 0.05;//left and right sides of the robot drive at different speeds given the same power, left encoder gives us the actual distance, right is ~6% behind, always works pretty well
+const double RIGHT_SPEED_CORRECTION = -0.07;//left and right sides of the robot drive at different speeds given the same power, adjust this to make the robot drive straight
 
-static const Inch ROBOT_WIDTH = 28; //inches //TODO: finds some way of dealing with constants like this and wheel diameter
+static const Inch ROBOT_WIDTH = 28; //inches, ignores bumpers //TODO: finds some way of dealing with constants like this and wheel diameter
 
 Drivebase::Distances Turn::angle_to_distances(Rad target_angle){
 	Inch side_goal = target_angle * 0.5 * ROBOT_WIDTH;
@@ -64,7 +64,7 @@ Toplevel::Goal Turn::run(Run_info info,Toplevel::Goal goals){
 	return goals;
 }
 
-bool Turn::done(Next_mode_info info){
+Step::Status Turn::done(Next_mode_info info){
 	static const Inch TOLERANCE = 1.0;//inches
 	Drivebase::Distances distance_travelled = get_distance_travelled(info.status.drive.distances);
 	Drivebase::Distances distance_left = side_goals - distance_travelled;
@@ -74,7 +74,7 @@ bool Turn::done(Next_mode_info info){
 		static const Time FINISH_TIME = 1.0;//seconds
 		in_range.set(FINISH_TIME);
 	}
-	return in_range.done();
+	return in_range.done() ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;
 }
 
 std::unique_ptr<Step_impl> Turn::clone()const{
@@ -92,7 +92,7 @@ Step::Step(Step_impl const& a){
 	impl=move(c);
 }
 
-bool Step::done(Next_mode_info a){
+Step::Status Step::done(Next_mode_info a){
 	return impl->done(a);
 }
 
@@ -128,7 +128,7 @@ Drivebase::Distances Drive_straight::get_distance_travelled(Drivebase::Distances
 	return current - initial_distances;
 }
 
-bool Drive_straight::done(Next_mode_info info){
+Step::Status Drive_straight::done(Next_mode_info info){
 	static const Inch TOLERANCE = 3.0;//inches
 	Drivebase::Distances distance_travelled = get_distance_travelled(info.status.drive.distances);
 	Drivebase::Distances distance_left = Drivebase::Distances{target_dist,target_dist} - distance_travelled;
@@ -139,7 +139,18 @@ bool Drive_straight::done(Next_mode_info info){
 		static const Time FINISH_TIME = 1.0;
 		in_range.set(FINISH_TIME);
 	}
-	return in_range.done();
+	
+	if(info.status.drive.stall){
+		stall_timer.update(info.in.now,info.in.robot_mode.enabled);
+	} else{
+		static const Time STALL_TIME = 1.0;
+		stall_timer.set(STALL_TIME);
+	}
+	if(stall_timer.done()) return Step::Status::FINISHED_FAILURE;
+	
+	cout<<"stall:"<<info.status.drive.stall<<"\n";
+
+	return in_range.done() ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;
 }
 
 Toplevel::Goal Drive_straight::run(Run_info info){
@@ -155,10 +166,8 @@ Toplevel::Goal Drive_straight::run(Run_info info,Toplevel::Goal goals){
 
 	double power = motion_profile.target_speed(distance_travelled.l); //ignoring right encoder because it's proven hard to get meaningful data from it
 
-	const double RIGHT_SPEED_CORRECTION = 0.05;//left and right sides of the robot drive at different speeds given the same power, left encoder gives us the actual distance, right is ~6% behind
-	
 	goals.drive.left = clip(target_to_out_power(power));
-	goals.drive.right = clip(target_to_out_power(power - power * RIGHT_SPEED_CORRECTION)); //right side would go faster than the left without error correction
+	goals.drive.right = clip(target_to_out_power(power + power * RIGHT_SPEED_CORRECTION)); //right side would go faster than the left without error correction
 	goals.shifter = gear;
 	return goals;
 }
@@ -168,17 +177,17 @@ unique_ptr<Step_impl> Drive_straight::clone()const{
 }
 
 bool Drive_straight::operator==(Drive_straight const& b)const{
-	return target_dist == b.target_dist && initial_distances == b.initial_distances && init == b.init && motion_profile == b.motion_profile && in_range == b.in_range && gear == b.gear;
+	return target_dist == b.target_dist && initial_distances == b.initial_distances && init == b.init && motion_profile == b.motion_profile && in_range == b.in_range /*&& stall_timer == b.stall_timer*/ && gear == b.gear;
 }
 
 Align::Align():firsttime(0){}
 
-bool Align::done(Next_mode_info info){
+Step::Status Align::done(Next_mode_info info){
 	blocks=info.in.camera.blocks;
 	current=mean(blocks[0].x,blocks[1].x);
 	center=mean(blocks[0].min_x,blocks[0].max_x);
 	int const  TOLERANCE= 2;
-	if(firsttime) return 1;
+	if(firsttime) return Step::Status::FINISHED_SUCCESS;
 	if(!info.in.camera.enabled){
 		camera_con = Camera_con::DISABLED;
 		manualflag=true;
@@ -209,7 +218,7 @@ bool Align::done(Next_mode_info info){
 			in_range.set(FINISH_TIME);
 		}
 	}
-	return in_range.done();
+	return in_range.done() ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED; 
 }
 
 Toplevel::Goal Align::run(Run_info info){
@@ -269,8 +278,8 @@ Wait::Wait(Time wait_time){
 	wait_timer.set(wait_time);
 }
 
-bool Wait::done(Next_mode_info){
-	return wait_timer.done();
+Step::Status Wait::done(Next_mode_info){
+	return wait_timer.done() ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;
 }
 
 Toplevel::Goal Wait::run(Run_info info){
@@ -292,8 +301,8 @@ bool Wait::operator==(Wait const& b)const{
 
 Lift_gear::Lift_gear():gear_goal({Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::UP}),ball_goal({Intake::Goal::OFF,Arm::Goal::STOW,Ball_lifter::Goal::OFF}){}
 
-bool Lift_gear::done(Next_mode_info info){
-	return ready(status(info.status.gear_collector),gear_goal) && ready(status(info.status.collector),ball_goal);
+Step::Status Lift_gear::done(Next_mode_info info){
+	return (ready(status(info.status.gear_collector),gear_goal) && ready(status(info.status.collector),ball_goal)) ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;
 }
 
 Toplevel::Goal Lift_gear::run(Run_info info){
@@ -318,8 +327,8 @@ bool Lift_gear::operator==(Lift_gear const& b)const{
 
 Drop_gear::Drop_gear():gear_goal({Gear_grabber::Goal::OPEN,Gear_lifter::Goal::UP}),ball_goal({Intake::Goal::OFF,Arm::Goal::STOW,Ball_lifter::Goal::OFF}){}
 
-bool Drop_gear::done(Next_mode_info info){	
-	return ready(status(info.status.gear_collector),gear_goal) && ready(status(info.status.collector),ball_goal);
+Step::Status Drop_gear::done(Next_mode_info info){	
+	return (ready(status(info.status.gear_collector),gear_goal) && ready(status(info.status.collector),ball_goal)) ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;
 }
 
 Toplevel::Goal Drop_gear::run(Run_info info){
@@ -344,8 +353,8 @@ bool Drop_gear::operator==(Drop_gear const& b)const{
 
 Drop_collector::Drop_collector():gear_goal({Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::DOWN}),ball_goal({Intake::Goal::OFF,Arm::Goal::STOW,Ball_lifter::Goal::OFF}){}
 
-bool Drop_collector::done(Next_mode_info info){
-	return ready(status(info.status.gear_collector),gear_goal) && ready(status(info.status.collector),ball_goal);
+Step::Status Drop_collector::done(Next_mode_info info){
+	return (ready(status(info.status.gear_collector),gear_goal) && ready(status(info.status.collector),ball_goal)) ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;
 }
 
 Toplevel::Goal Drop_collector::run(Run_info info){
@@ -370,8 +379,19 @@ bool Drop_collector::operator==(Drop_collector const& b)const{
 
 Combo::Combo(Step a,Step b):step_a(a),step_b(b){}
 
-bool Combo::done(Next_mode_info info){
-	return step_a.done(info) && step_b.done(info);
+Step::Status Combo::done(Next_mode_info info){
+	Step::Status a_status = step_a.done(info);
+	Step::Status b_status = step_b.done(info);
+	switch(a_status){
+		case Step::Status::FINISHED_SUCCESS:
+			return b_status;
+		case Step::Status::UNFINISHED:
+			return a_status;//TODO
+		case Step::Status::FINISHED_FAILURE:
+			nyi //TODO
+		default:
+			assert(0);
+	} 
 }
 
 Toplevel::Goal Combo::run(Run_info info){
@@ -390,6 +410,73 @@ unique_ptr<Step_impl> Combo::clone()const{
 
 bool Combo::operator==(Combo const& b)const{
 	return step_a == b.step_a && step_b == b.step_b;
+}
+
+Score_gear::Score_gear():
+	steps({
+			Step{Lift_gear()},//lift the gear
+			Step{Combo{ //slide the gear on the peg
+				Step{Lift_gear()},
+				Step{Drive_straight{SCORE_GEAR_APPROACH_DIST}}
+			}},
+			Step{Drop_gear()}, //release the gear
+			Step{Combo{ //back off
+				Step{Drop_gear()},
+				Step{Drive_straight{-SCORE_GEAR_APPROACH_DIST}}
+			}},
+			Step{Drop_collector()}, // lower the collector to the floor
+	}),
+	stage(Stage::LIFT){}
+
+Toplevel::Goal Score_gear::run(Run_info info){
+	return run(info,{});
+}
+
+Toplevel::Goal Score_gear::run(Run_info info,Toplevel::Goal goals){
+	if(stage == Stage::DONE) return goals;
+	return steps[stage].run(info, goals);
+}
+
+bool Score_gear::operator==(Score_gear const& b)const{
+	return steps == b.steps && stage == b.stage;
+}
+
+unique_ptr<Step_impl> Score_gear::clone()const{
+	return unique_ptr<Step_impl>(new Score_gear(*this));
+}
+void Score_gear::advance(){
+	stage = [&]{ //move onto next step
+		switch(stage){
+			case LIFT:
+				return SCORE;
+			case SCORE:
+				return RELEASE;
+			case RELEASE:
+				return BACK_OFF;
+			case BACK_OFF:
+				return STOW;
+			case STOW:
+			case DONE:
+				return DONE;
+			default:
+				assert(0);
+		}
+	}();
+}
+
+Step::Status Score_gear::done(Next_mode_info info){
+	switch(steps[stage].done(info)){
+		case Step::Status::UNFINISHED:
+			break;
+		case Step::Status::FINISHED_FAILURE: //treat a failure as a success
+		case Step::Status::FINISHED_SUCCESS:
+			advance();
+			if(stage == Stage::DONE) return Step::Status::FINISHED_SUCCESS;
+			break;
+		default:
+			assert(0);
+	}
+	return Step::Status::UNFINISHED;
 }
 
 Step_impl const& Step::get()const{
@@ -412,7 +499,7 @@ class Do_list:public Step_impl_inner<Do_list>{
 
 	virtual Toplevel::Goal run(Run_info,Toplevel::Goal);
 	virtual Toplevel::Goal run(Run_info);
-	virtual bool done(Next_mode_info);
+	virtual Step::Status done(Next_mode_info);
 	//virtual unique_ptr<Step_impl> clone()const;
 	//virtual void display(ostream&)const;
 	bool operator==(Do_list const&)const;
@@ -432,7 +519,7 @@ bool Do_list::operator==(Do_list const& a)const{
 	return steps==a.steps && index==a.index;
 }
 
-bool Do_list::done(Next_mode_info){
+Step::Status Do_list::done(Next_mode_info){
 	nyi
 }
 

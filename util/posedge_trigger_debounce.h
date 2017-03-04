@@ -6,7 +6,7 @@
 
 class Posedge_trigger_debounce{
 	#define POSEDGE_TRIGGER_DEBOUNCE_ITEMS(X)\
-		X(Debounce,debounce)\
+		X(Debounce<bool>,debounce)\
 		X(Posedge_trigger,trigger)
 
 	#define X(A,B) A B;
@@ -14,6 +14,7 @@ class Posedge_trigger_debounce{
 	#undef X
 
 	public:
+	Posedge_trigger_debounce();
 	bool operator()(Time,bool);
 
 	friend std::ostream& operator<<(std::ostream&,Posedge_trigger_debounce const&);

@@ -2,32 +2,12 @@ g++ --std=c++14 -Wall -Wextra -Werror -DSTEP_TEST \
 	test.cpp\
 	../util/type.cpp\
 	executive.cpp \
-	delay.cpp \
-	auto_null.cpp \
-	auto_reach.cpp \
-	auto_statictwo.cpp \
-	auto_static.cpp \
-	auto_stop.cpp \
-	portcullis.cpp \
-	cheval.cpp \
-	low_bar_low_score.cpp \
-	low_bar_wall_low_score.cpp \
-	low_bar_wall_high_score.cpp \
-	barrelracer.cpp \
 	../control/toplevel.cpp\
 	../control/drivebase.cpp\
 	../control/pump.cpp\
-	../control/shooter.cpp\
-	../control/collector.cpp\
-	../control/climb_release.cpp\
-	../control/winch.cpp\
 	../util/interface.cpp\
 	../util/countdown_timer.cpp\
 	../control/motor_check.cpp\
-	../control/tilt.cpp\
-	../control/front.cpp\
-	../util/pwm.cpp\
-	../control/sides.cpp\
 	../control/nop.cpp\
 	../util/driver_station_interface.cpp\
 	../util/util.cpp\

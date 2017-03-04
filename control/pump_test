@@ -1,4 +1,4 @@
-g++ -Wall -Werror -std=c++0x -DPUMP_TEST \
+g++ -Wall -Werror -std=c++14 -DPUMP_TEST \
 	pump.cpp \
 	../util/interface.cpp \
 	../util/jag_interface.cpp \
