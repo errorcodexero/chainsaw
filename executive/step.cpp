@@ -180,21 +180,34 @@ bool Drive_straight::operator==(Drive_straight const& b)const{
 	return target_dist == b.target_dist && initial_distances == b.initial_distances && init == b.init && motion_profile == b.motion_profile && in_range == b.in_range /*&& stall_timer == b.stall_timer*/ && gear == b.gear;
 }
 
-Align::Align(Turn a):mode(Align::Mode::NONVISION),blocks({}),current(0),center(160),nonvision_align(Step{a}){}
+ostream& operator<<(ostream& o,Align::Mode a){
+	switch(a){
+		case(Align::Mode::VISION):
+			return o << "VISION";	
+		case(Align::Mode::NONVISION):	
+			return o << "NON-VISION";
+		default:
+			assert(0);
+	}
+}
+
+Align::Align(Turn a):mode(Align::Mode::NONVISION),blocks({}),current(0),center(130),nonvision_align(Step{a}){}
 Align::Align():Align(Turn(0)){}
 
 void Align::update(Camera camera){
-	if(!camera.enabled || camera.blocks.size() == 0){
+	/*if(!camera.enabled || camera.blocks.size() == 0){
 		mode = Mode::NONVISION;
 		blocks = {};
 		current = 0;
 		center = 0;
-	} else {
+	} else {*/
 		mode = Mode::VISION;
 		blocks = camera.blocks;
 		//TODO: check for two largest blocks that are in the expected y range
-		current = mean(blocks[0].x,blocks[1].x);
-	}
+		if(blocks.size()==2) current = mean(blocks[0].x,blocks[1].x);
+		else if((blocks.size()>0) & (blocks.size()<1)) current = blocks[0].x;
+		else blocks= {};
+
 }
 
 Step::Status Align::done(Next_mode_info info){
@@ -202,14 +215,14 @@ Step::Status Align::done(Next_mode_info info){
 	switch(mode){
 		case Mode::VISION:
 			{
-				const int TOLERANCE= 2;
+				const int TOLERANCE= 6;
 				if(current > center - TOLERANCE && current < center + TOLERANCE){
 					in_range.update(info.in.now,info.in.robot_mode.enabled);
 				} else {
 					static const Time FINISH_TIME = 1.0;
 					in_range.set(FINISH_TIME);
 				}
-				return in_range.done() ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;
+				return /*in_range.done() ? Step::Status::FINISHED_SUCCESS :*/ Step::Status::UNFINISHED;
 			}
 		case Mode::NONVISION:
 			{
@@ -232,20 +245,23 @@ Toplevel::Goal Align::run(Run_info info){
 
 
 Toplevel::Goal Align::run(Run_info info,Toplevel::Goal goals){
+	goals.lights.camera_light=1;
 	update(info.in.camera);
-	cout << "Align:    " << blocks[0] << "," << blocks[1] << "   " << current << "   " << center << "\n";
+	cout << "Align:    " << blocks << "   " << current << "   " << center << "\n";
+	cout << mode << "\n";
+	cout<<"A mode: "<<mode<<"\n";
 	goals.shifter = Gear_shifter::Goal::LOW;
 	switch(mode){
 		case Mode::VISION:
 			{
-				const double power = .18;
-				const int TOLERANCE = 3.0;
+				const double power = .25;
+				const int TOLERANCE = 6.0;
 				if(current < center - TOLERANCE){
-					goals.drive.left = power;
-					goals.drive.right = -power;
-				} else if(current > center + TOLERANCE){
 					goals.drive.left = -power;
 					goals.drive.right = power;
+				} else if(current > center + TOLERANCE){
+					goals.drive.left = power;
+					goals.drive.right = -power;
 				} else {
 					goals.drive.left = 0;
 					goals.drive.right = 0;
@@ -520,7 +536,6 @@ ostream& operator<<(ostream& o,Step_impl const& a){
 	a.display(o);
 	return o;
 }
-
 #ifdef STEP_TEST
 void test_step(Step a){
 	PRINT(a);
