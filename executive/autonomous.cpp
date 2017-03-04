@@ -120,10 +120,13 @@ Executive get_auto_mode(Next_mode_info info){
 	Executive auto_score_gear_loading_station_side{Chain{
 		Step{Drive_straight{FIRST_DRIVE_DIST_LOADING}},
 		Executive{Chain{
-			Step{Turn{deg_to_rad(-35)}},
+			Step{Turn{deg_to_rad(-33)}},
 			Executive{Chain{
-				Step{Score_gear()},
-				Executive{Teleop()}
+				Step{Drive_straight{6}},
+				Executive{Chain{
+					Step{Score_gear()},
+					Executive{Teleop()}
+				}}
 			}}
 		}}
 	}};
@@ -200,7 +203,7 @@ Executive get_auto_mode(Next_mode_info info){
 				//return make_test_step(Drive_straight{9*12});
 				return make_test_step(Step{Score_gear()});
 				//return make_test_step(Turn{PI*2});
-				//return make_test_step(Align());
+				return make_test_step(Align());
 			case 1: 
 				return auto_baseline;
 			case 2: 
