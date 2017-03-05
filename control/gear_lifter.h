@@ -6,10 +6,20 @@
 #include "../util/countdown_timer.h"
 
 struct Gear_lifter{
-	enum class Goal{DOWN,UP};
-	
-	typedef Goal Output;
+	#define GEAR_LIFTER_GOALS(X) X(DOWN) X(UP) X(X)
+	enum class Goal{
+		#define X(NAME) NAME,
+		GEAR_LIFTER_GOALS(X)
+		#undef X
+	};
 
+	#define GEAR_LIFTER_OUTPUTS(X) X(DOWN) X(UP)
+	enum class Output{
+		#define X(NAME) NAME,
+		GEAR_LIFTER_OUTPUTS(X)
+		#undef X
+	};
+	
 	struct Input{
 		bool enabled;
 		Input();
@@ -46,10 +56,12 @@ struct Gear_lifter{
 
 std::set<Gear_lifter::Goal> examples(Gear_lifter::Goal*);
 std::set<Gear_lifter::Input> examples(Gear_lifter::Input*);
+std::set<Gear_lifter::Output> examples(Gear_lifter::Output*);
 std::set<Gear_lifter::Status_detail> examples(Gear_lifter::Status_detail*);
 
 std::ostream& operator<<(std::ostream&,Gear_lifter::Goal);
 std::ostream& operator<<(std::ostream&,Gear_lifter::Input);
+std::ostream& operator<<(std::ostream&,Gear_lifter::Output);
 std::ostream& operator<<(std::ostream&,Gear_lifter::Status_detail);
 std::ostream& operator<<(std::ostream&,Gear_lifter const&);
 
