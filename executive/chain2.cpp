@@ -4,6 +4,7 @@
 using namespace std;
 
 Chain2::Chain2(vector<Step> s, Executive n):current_step(0),steps(s),next(n){}
+Chain2::Chain2(Step s, Executive n):Chain2(vector<Step>{s},n){}
 
 /*Chain2::Chain2(Chain2 const& a):step(a.step){
 	if(a.next)nyi

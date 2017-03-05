@@ -32,10 +32,10 @@ Executive get_auto_mode(Next_mode_info info){
 
 	//for when just want to run across the field at the end of autonomous
 	static const Inch DASH_DIST = 20*12;
-	Executive dash{Chain{
+	Executive dash{Chain2(
 		Step{Drive_straight{DASH_DIST}},
 		Executive{Teleop{}}
-	}};
+	)};
 
 	static const Inch EXTENDED_GEAR_LENGTH = 7.6;//how far the gear extends out of the robot when deployed outward
 
@@ -49,159 +49,113 @@ Executive get_auto_mode(Next_mode_info info){
 
 	//Auto mode for crossing the baseline
 	static const Inch BASELINE_DIST = 7 * 12 + 9.25;//distance from baseline to alliance wall // from testing
-	Executive auto_baseline{Chain{
+	Executive auto_baseline{Chain2(
 		Step{Drive_straight{BASELINE_DIST + 12}},//move a little farther to give us some room for error
 		Executive{Teleop{}}
-	}};
+	)};
 
 	//Scores a gear on the middle peg and then stops
 	static const Inch DIST_TO_MIDDLE_PEG = 114;//distance from alliance wall to the middle peg //TODO: find out correct distance
-	Executive auto_score_gear_middle{Chain{
-		Step{Combo{
-			Step{Drive_straight{DIST_TO_MIDDLE_PEG - SCORE_GEAR_APPROACH_DIST - ROBOT_LENGTH - EXTENDED_GEAR_LENGTH}},
-			Step{Lift_gear()}
-		}},
-		Executive{Chain{
-			Step{Score_gear()},
-			Executive{Teleop()}
-		}}
-	}};
+	Executive auto_score_gear_middle{Chain2(
+		vector<Step>{
+			Step{Combo{
+				Step{Drive_straight{DIST_TO_MIDDLE_PEG - SCORE_GEAR_APPROACH_DIST - ROBOT_LENGTH - EXTENDED_GEAR_LENGTH}},
+				Step{Lift_gear()}
+			}},
+			Step{Score_gear()}
+		},
+		Executive{Teleop()}
+	)};
 
 	//Score a gear on the boiler-side peg
 	static const Inch FIRST_DRIVE_DIST_BOILER = (133 - ROBOT_LENGTH) + .5 * ROBOT_LENGTH;//centers the robot on the turning point to align with gear peg //from testing
-	Executive auto_score_gear_boiler_side{Chain{
-		Step{Combo{
-			Step{Drive_straight{FIRST_DRIVE_DIST_BOILER}},
-			Step{Lift_gear()}
-		}},
-		Executive{Chain{
+	Executive auto_score_gear_boiler_side{Chain2(
+		vector<Step>{
+			Step{Combo{
+				Step{Drive_straight{FIRST_DRIVE_DIST_BOILER}},
+				Step{Lift_gear()}
+			}},
 			Step{Combo{
 				Step{Turn{deg_to_rad(40)}},//from testing
 				Step{Lift_gear()}
 			}},
-			Executive{Chain{
-				Step{Combo{
-					Step{Drive_straight{7}},//drive forward a bit so score_gear can take over
-					Step{Lift_gear()}
-				}},
-				Executive{Chain{
-					Step{Score_gear()},
-					Executive{Teleop()}
-				}}
-			}}
-		}}
-	}};
+			Step{Combo{
+				Step{Drive_straight{7}},//drive forward a bit so score_gear can take over
+				Step{Lift_gear()}
+			}},
+			Step{Score_gear()}
+		},
+		Executive{Teleop()}
+	)};
 
 	//Crosses the baseline and continues driving to the other side of the field
-	Executive auto_baseline_extended{Chain{
+	Executive auto_baseline_extended{Chain2(
 		Step{Drive_straight{12*12}},
 		dash
-	}};
+	)};
 	
 	//scores gear on the boilder-side of the field and then drives towards the other side of the field
-	Executive auto_score_gear_boiler_side_extended{Chain{
-		Step{Drive_straight{5*12}},
-		Executive{Chain{
+	Executive auto_score_gear_boiler_side_extended{Chain2(
+		vector<Step>{
+			Step{Drive_straight{5*12}},
 			Step{Turn{deg_to_rad(40)}},
-			Executive{Chain{
-				Step{Score_gear()},
-				Executive{Chain{
-					Step{Drive_straight{-2 * 12}},
-					Executive{Chain{
-						Step{Turn{deg_to_rad(-40)}},
-						dash
-					}}
-				}}
-			}}
-		}}
-	}};
+			Step{Score_gear()},
+			Step{Drive_straight{-2 * 12}},
+			Step{Turn{deg_to_rad(-40)}}
+		},
+		dash
+	)};
 
 	//scores a gear on the loading station-side peg
 	static const Inch FIRST_DRIVE_DIST_LOADING = (127 - ROBOT_LENGTH) + .5 * ROBOT_LENGTH;
-	Executive auto_score_gear_loading_station_side{Chain{
-		Step{Drive_straight{FIRST_DRIVE_DIST_LOADING}},
-		Executive{Chain{
+	Executive auto_score_gear_loading_station_side{Chain2(
+		vector<Step>{
+			Step{Drive_straight{FIRST_DRIVE_DIST_LOADING}},
 			Step{Turn{deg_to_rad(-33)}},
-			Executive{Chain{
-				Step{Drive_straight{6}},
-				Executive{Chain{
-					Step{Score_gear()},
-					Executive{Teleop()}
-				}}
-			}}
-		}}
-	}};
+			Step{Drive_straight{6}},
+			Step{Score_gear()}
+		},
+		Executive{Teleop()}
+	)};
 	
 	//Gear Loading Extended
-	Executive auto_score_gear_loading_station_side_extended{Chain{
-		Step{Drive_straight{FIRST_DRIVE_DIST_LOADING}},
-		Executive{Chain{
+	Executive auto_score_gear_loading_station_side_extended{Chain2(
+		vector<Step>{
+			Step{Drive_straight{FIRST_DRIVE_DIST_LOADING}},
 			Step{Turn{deg_to_rad(-31)}},
-			Executive{Chain{
-				Step{Score_gear()},
-				Executive{Chain{
-					Step{Drive_straight{-12}},
-					Executive{Chain{
-						Step{Turn{deg_to_rad(40)}},
-						dash
-					}}
-				}}
-			}}
-		}}
-	}};
+			Step{Score_gear()},
+			Step{Drive_straight{-12}},
+			Step{Turn{deg_to_rad(40)}}
+		},
+		dash
+	)};
 	
 	//Gear mid Extended right (goes around the airship to the right)
-	Executive auto_score_gear_middle_extended_right{Chain{
-		Step{Drive_straight{10*12}},
-		Executive{Chain{
+	Executive auto_score_gear_middle_extended_right{Chain2(
+		vector<Step>{
+			Step{Drive_straight{10*12}},
 			Step{Score_gear()},
-			Executive{Chain{
-				Step{Drive_straight{-12}},
-				Executive{Chain{
-					Step{Turn{deg_to_rad(-45)}},
-					Executive{Chain{
-						Step{Drive_straight{3*12}},
-						Executive{Chain{
-							Step{Turn{deg_to_rad(45)}},
-							dash
-						}}
-					}}
-				}}
-			}}
-		}}
-	}};
+			Step{Drive_straight{-12}},
+			Step{Turn{deg_to_rad(-45)}},
+			Step{Drive_straight{3*12}},
+			Step{Turn{deg_to_rad(45)}}
+		},
+		dash
+	)};
 
 	//Gear mid Extended left (goes around airship to the left)
-	Executive auto_score_gear_middle_extended_left{Chain{
-		Step{Drive_straight{10*12}},
-		Executive{Chain{
+	Executive auto_score_gear_middle_extended_left{Chain2(
+		vector<Step>{
+			Step{Drive_straight{10*12}},
 			Step{Score_gear()},
-			Executive{Chain{
-				Step{Drive_straight{-12}},
-				Executive{Chain{
-					Step{Turn{deg_to_rad(45)}},
-					Executive{Chain{
-						Step{Drive_straight{3*12}},
-						Executive{Chain{
-							Step{Turn{deg_to_rad(-45)}},
-							dash
-						}}
-					}}
-				}}	
-			}}
-		}}
-	}};
-
-	vector<Step> nice_test_steps={
-		Step{Drive_straight{10*12}},
-		Step{Score_gear()},
-		Step{Drive_straight{-12}},
-		Step{Turn{deg_to_rad(45)}},
-		Step{Drive_straight{3*12}},
-		Step{Turn{deg_to_rad(-45)}}
-	};
-	Executive nice_test{Chain2(nice_test_steps, dash)};
-
+			Step{Drive_straight{-12}},
+			Step{Turn{deg_to_rad(45)}},
+			Step{Drive_straight{3*12}},
+			Step{Turn{deg_to_rad(-45)}}
+		},
+		dash
+	)};
+	
 	if(info.panel.in_use){
 		switch(info.panel.auto_select){ 
 			case 0: 

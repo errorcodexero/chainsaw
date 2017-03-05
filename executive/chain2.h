@@ -11,6 +11,7 @@ struct Chain2:Executive_impl<Chain2>{
 	Executive next;
 
 	Chain2(std::vector<Step>, Executive);
+	Chain2(Step, Executive);
 
 	Toplevel::Goal run(Run_info);
 	Executive next_mode(Next_mode_info);
