@@ -2,6 +2,7 @@
 
 #include "teleop.h" 
 #include "chain.h"
+#include "chain2.h"
 #include "step.h"
 
 using namespace std; 
@@ -190,6 +191,16 @@ Executive get_auto_mode(Next_mode_info info){
 			}}
 		}}
 	}};
+
+	vector<Step> nice_test_steps={
+		Step{Drive_straight{10*12}},
+		Step{Score_gear()},
+		Step{Drive_straight{-12}},
+		Step{Turn{deg_to_rad(45)}},
+		Step{Drive_straight{3*12}},
+		Step{Turn{deg_to_rad(-45)}}
+	};
+	Executive nice_test{Chain2(nice_test_steps, dash)};
 
 	if(info.panel.in_use){
 		switch(info.panel.auto_select){ 
