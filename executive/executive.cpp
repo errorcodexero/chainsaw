@@ -96,8 +96,12 @@ Run_info rand(Run_info*){
 	};
 }
 
+Run_info example(Run_info *a){
+	return rand(a);
+}
+
 vector<Run_info> examples(Run_info *a){
-	return mapf([=](int){ return rand(a); },range(100));
+	return mapf([=](int){ return example(a); },range(100));
 }
 
 bool operator==(Next_mode_info const& a,Next_mode_info const& b){
