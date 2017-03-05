@@ -58,8 +58,8 @@ Toplevel::Goal Turn::run(Run_info info,Toplevel::Goal goals){
 	
 	//ignoring right encoder because it's proven hard to get meaningful data from it
 	double power = motion_profile.target_speed(distance_travelled.l); 
-	goals.drive.left = clip(target_to_out_power(power,.15));
-	goals.drive.right = -clip(target_to_out_power(power - RIGHT_SPEED_CORRECTION * power,.15));
+	goals.drive.left = clip(target_to_out_power(power,.2));//TODO: move .2 to the constructor of Turn and set an instance variable
+	goals.drive.right = -clip(target_to_out_power(power - RIGHT_SPEED_CORRECTION * power,.2));
 	goals.shifter = Gear_shifter::Goal::LOW;
 	return goals;
 }
@@ -166,7 +166,7 @@ Toplevel::Goal Drive_straight::run(Run_info info,Toplevel::Goal goals){
 
 	double power = motion_profile.target_speed(distance_travelled.l); //ignoring right encoder because it's proven hard to get meaningful data from it
 
-	goals.drive.left = clip(target_to_out_power(power,.11));
+	goals.drive.left = clip(target_to_out_power(power,.11));//TODO: move .11 to the constructor of Drive_straight and set an instance variable
 	goals.drive.right = clip(target_to_out_power(power + power * RIGHT_SPEED_CORRECTION,.11)); //right side would go faster than the left without error correction
 	goals.shifter = gear;
 	return goals;
@@ -182,9 +182,9 @@ bool Drive_straight::operator==(Drive_straight const& b)const{
 
 ostream& operator<<(ostream& o,Align::Mode a){
 	switch(a){
-		case(Align::Mode::VISION):
+		case Align::Mode::VISION:
 			return o << "VISION";	
-		case(Align::Mode::NONVISION):	
+		case Align::Mode::NONVISION:	
 			return o << "NON-VISION";
 		default:
 			assert(0);
@@ -208,7 +208,7 @@ void Align::update(Camera camera){
 		//TODO: check for two largest blocks that are in the expected y range
 		if(blocks.size()>=2) current = mean(blocks[0].x,blocks[1].x);
 		else if((blocks.size()==1) & (blocks.size()<1)) current = blocks[0].x;
-		else blocks= {};
+		//else current = CENTER; //TODO: should search for vision target instead
 
 }
 
@@ -218,7 +218,7 @@ Step::Status Align::done(Next_mode_info info){
 		case Mode::VISION:
 			{
 				const int TOLERANCE= 4;
-				if((current > center - TOLERANCE && current < center + TOLERANCE) || (info.since_switch > 6)){
+				if((current > center - TOLERANCE && current < center + TOLERANCE)/* || (info.since_switch > 6)*/){//TODO: add time limit back in?
 					in_range.update(info.in.now,info.in.robot_mode.enabled);
 				} else {
 					static const Time FINISH_TIME = 1.0;
@@ -228,9 +228,8 @@ Step::Status Align::done(Next_mode_info info){
 			}
 		case Mode::NONVISION:
 			{
-				if(!in_range.done()){
-					in_range.update(info.in.now,info.in.robot_mode.enabled);
-				}else{
+				in_range.update(info.in.now,info.in.robot_mode.enabled);
+				if(in_range.done()){
 					static const Time FINISH_TIME = 1.0;
 					in_range.set(FINISH_TIME);
 				}
@@ -256,7 +255,7 @@ Toplevel::Goal Align::run(Run_info info,Toplevel::Goal goals){
 	switch(mode){
 		case Mode::VISION:
 			{
-				const double power = .25;
+				const double power = .2;//TODO: make a motion profile somehow?
 				const int TOLERANCE = 4;
 				if(current < center - TOLERANCE){
 					goals.drive.left = -power;
