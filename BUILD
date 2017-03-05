@@ -705,13 +705,11 @@ cc_library(
 		"executive/autonomous.cpp",
 		"executive/teleop.cpp",
 		"executive/chain.cpp",
-		"executive/chain2.cpp"
 	],
 	hdrs=[
 		"executive/autonomous.h",
 		"executive/teleop.h",
 		"executive/chain.h",
-		"executive/chain2.h"
 	],
 	deps=[":executive",":posedge_trigger_debounce",":posedge_toggle",":motion_profile",":step"]
 )
@@ -775,14 +773,6 @@ cc_test(
 	name="chain_test",
 	srcs=["executive/chain.cpp","executive/chain.h"],
 	copts=["-DCHAIN_TEST"],
-	deps=[":step",":executive_impl"],
-	timeout="short"
-)
-
-cc_test(
-	name="chain2_test",
-	srcs=["executive/chain2.cpp","executive/chain2.h"],
-	copts=["-DCHAIN2_TEST"],
 	deps=[":step",":executive_impl"],
 	timeout="short"
 )

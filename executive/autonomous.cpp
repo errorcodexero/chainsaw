@@ -2,7 +2,6 @@
 
 #include "teleop.h" 
 #include "chain.h"
-#include "chain2.h"
 #include "step.h"
 
 using namespace std; 
@@ -16,10 +15,10 @@ const Inch BUMPER_LENGTH = 3.0;//inches thickness of one bumper
 const Inch ROBOT_LENGTH = 28.0 + 1 * BUMPER_LENGTH; //inches from front to back //TODO: change to match number of sides with bumpers
 
 Executive make_test_step(auto a){
-	return Executive{Chain{
+	return Executive{Chain(
 		Step{a},
 		Executive{Teleop{}}
-	}};
+	)};
 }
 
 Executive get_auto_mode(Next_mode_info info){
@@ -32,7 +31,7 @@ Executive get_auto_mode(Next_mode_info info){
 
 	//for when just want to run across the field at the end of autonomous
 	static const Inch DASH_DIST = 20*12;
-	Executive dash{Chain2(
+	Executive dash{Chain(
 		Step{Drive_straight{DASH_DIST}},
 		Executive{Teleop{}}
 	)};
@@ -49,14 +48,14 @@ Executive get_auto_mode(Next_mode_info info){
 
 	//Auto mode for crossing the baseline
 	static const Inch BASELINE_DIST = 7 * 12 + 9.25;//distance from baseline to alliance wall // from testing
-	Executive auto_baseline{Chain2(
+	Executive auto_baseline{Chain(
 		Step{Drive_straight{BASELINE_DIST + 12}},//move a little farther to give us some room for error
 		Executive{Teleop{}}
 	)};
 
 	//Scores a gear on the middle peg and then stops
 	static const Inch DIST_TO_MIDDLE_PEG = 114;//distance from alliance wall to the middle peg //TODO: find out correct distance
-	Executive auto_score_gear_middle{Chain2(
+	Executive auto_score_gear_middle{Chain(
 		vector<Step>{
 			Step{Combo{
 				Step{Drive_straight{DIST_TO_MIDDLE_PEG - SCORE_GEAR_APPROACH_DIST - ROBOT_LENGTH - EXTENDED_GEAR_LENGTH}},
@@ -69,7 +68,7 @@ Executive get_auto_mode(Next_mode_info info){
 
 	//Score a gear on the boiler-side peg
 	static const Inch FIRST_DRIVE_DIST_BOILER = (133 - ROBOT_LENGTH) + .5 * ROBOT_LENGTH;//centers the robot on the turning point to align with gear peg //from testing
-	Executive auto_score_gear_boiler_side{Chain2(
+	Executive auto_score_gear_boiler_side{Chain(
 		vector<Step>{
 			Step{Combo{
 				Step{Drive_straight{FIRST_DRIVE_DIST_BOILER}},
@@ -89,13 +88,13 @@ Executive get_auto_mode(Next_mode_info info){
 	)};
 
 	//Crosses the baseline and continues driving to the other side of the field
-	Executive auto_baseline_extended{Chain2(
+	Executive auto_baseline_extended{Chain(
 		Step{Drive_straight{12*12}},
 		dash
 	)};
 	
 	//scores gear on the boilder-side of the field and then drives towards the other side of the field
-	Executive auto_score_gear_boiler_side_extended{Chain2(
+	Executive auto_score_gear_boiler_side_extended{Chain(
 		vector<Step>{
 			Step{Drive_straight{5*12}},
 			Step{Turn{deg_to_rad(40)}},
@@ -108,7 +107,7 @@ Executive get_auto_mode(Next_mode_info info){
 
 	//scores a gear on the loading station-side peg
 	static const Inch FIRST_DRIVE_DIST_LOADING = (127 - ROBOT_LENGTH) + .5 * ROBOT_LENGTH;
-	Executive auto_score_gear_loading_station_side{Chain2(
+	Executive auto_score_gear_loading_station_side{Chain(
 		vector<Step>{
 			Step{Drive_straight{FIRST_DRIVE_DIST_LOADING}},
 			Step{Turn{deg_to_rad(-33)}},
@@ -119,7 +118,7 @@ Executive get_auto_mode(Next_mode_info info){
 	)};
 	
 	//Gear Loading Extended
-	Executive auto_score_gear_loading_station_side_extended{Chain2(
+	Executive auto_score_gear_loading_station_side_extended{Chain(
 		vector<Step>{
 			Step{Drive_straight{FIRST_DRIVE_DIST_LOADING}},
 			Step{Turn{deg_to_rad(-31)}},
@@ -131,7 +130,7 @@ Executive get_auto_mode(Next_mode_info info){
 	)};
 	
 	//Gear mid Extended right (goes around the airship to the right)
-	Executive auto_score_gear_middle_extended_right{Chain2(
+	Executive auto_score_gear_middle_extended_right{Chain(
 		vector<Step>{
 			Step{Drive_straight{10*12}},
 			Step{Score_gear()},
@@ -144,7 +143,7 @@ Executive get_auto_mode(Next_mode_info info){
 	)};
 
 	//Gear mid Extended left (goes around airship to the left)
-	Executive auto_score_gear_middle_extended_left{Chain2(
+	Executive auto_score_gear_middle_extended_left{Chain(
 		vector<Step>{
 			Step{Drive_straight{10*12}},
 			Step{Score_gear()},
