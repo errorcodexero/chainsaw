@@ -192,26 +192,4 @@ struct Score_gear: Step_impl_inner<Score_gear>{
 	bool operator==(Score_gear const&)const;
 };
 
-struct Align: public Step_impl_inner<Align>{
-	enum class Mode{VISION,NONVISION};
-	Mode mode;
-	std::vector<Pixy::Block> blocks;
-	int current;
-	int center;
-	Countdown_timer in_range;
-	Step nonvision_align;
-		
-	void update(Camera);
-
-	public:
-	explicit Align();
-	explicit Align(Turn);
-
-	Toplevel::Goal run(Run_info,Toplevel::Goal);
-	Toplevel::Goal run(Run_info);
-	Step::Status done(Next_mode_info);
-	std::unique_ptr<Step_impl> clone()const;
-	bool operator==(Align const&)const;
-};
-
 #endif

@@ -3,7 +3,7 @@
 #include "teleop.h" 
 #include "chain.h"
 #include "step.h"
-
+#include "align.h"
 using namespace std; 
 
 double deg_to_rad(double deg){
@@ -79,18 +79,24 @@ Executive get_auto_mode(Next_mode_info info){
 	}};
 
 	//Score a gear on the boiler-side peg
-	static const Inch FIRST_DRIVE_DIST_BOILER = (128 - ROBOT_LENGTH) + .5 * ROBOT_LENGTH;//centers the robot on the turning point to align with gear peg //from testing
+	static const Inch FIRST_DRIVE_DIST_BOILER = (133 - ROBOT_LENGTH) + .5 * ROBOT_LENGTH;//centers the robot on the turning point to align with gear peg //from testing
 	Executive auto_score_gear_boiler_side{Chain{
-			Step{Drive_straight{FIRST_DRIVE_DIST_BOILER}},
+		Step{Drive_straight{FIRST_DRIVE_DIST_BOILER}},
+		Executive{Chain{
+			Step{Turn{deg_to_rad(40)}},//from testing
+			Executive{Chain{
+				Step{Align()},
 				Executive{Chain{
-					Step{Turn{deg_to_rad(40)}},//from testing
+					Step{Lift_gear()},
 					Executive{Chain{
-						Step{Align()},
+						Step{Combo{
+							Step{Drive_straight{6}},//drive forward a bit so score_gear can take over
+							Step{Lift_gear()}
+						}},
 						Executive{Chain{
-							Step{Drive_straight{10}},//drive forward a bit so score_gear can take over
-							Executive{Chain{
-								Step{Score_gear()},
-								Executive{Teleop()}
+							Step{Score_gear()},
+							Executive{Teleop()}
+						}}
 					}}
 				}}
 			}}
@@ -126,20 +132,20 @@ Executive get_auto_mode(Next_mode_info info){
 	Executive auto_score_gear_loading_station_side{Chain{
 		Step{Drive_straight{FIRST_DRIVE_DIST_LOADING}},
 		Executive{Chain{
-			Step{Combo{	
-				Step{Turn{deg_to_rad(-33)}},	
-				Step{Drop_collector()}
-			}},
+			Step{Turn{deg_to_rad(-33)}},
 			Executive{Chain{
-				Step{Combo{
-					Step{Align()},
-					Step{Lift_gear()}
-			}},
+				Step{Align()},
 				Executive{Chain{
-					Step{Drive_straight{6}},
+					Step{Lift_gear()},
 					Executive{Chain{
-						Step{Score_gear()},
-						Executive{Teleop()}
+						Step{Combo{
+							Step{Drive_straight{6}},
+							Step{Lift_gear()}
+						}},
+						Executive{Chain{
+							Step{Score_gear()},
+							Executive{Teleop()}
+						}}
 					}}
 				}}
 			}}

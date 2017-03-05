@@ -92,7 +92,7 @@ void Gear_lifter::Estimator::update(Time time,Gear_lifter::Input input,Gear_lift
 			if(last == Status::GOING_UP){
 				state_timer.update(time,input.enabled);
 			} else if(last != Status::UP){ 
-				const Time UP_TIME = 1.2;//seconds. tested
+				const Time UP_TIME = 1.0;//seconds. tested
 				last = Status::GOING_UP;
 				state_timer.set(UP_TIME);
 			}
@@ -104,7 +104,7 @@ void Gear_lifter::Estimator::update(Time time,Gear_lifter::Input input,Gear_lift
 			if(last == Status::GOING_DOWN){
 				state_timer.update(time,input.enabled);
 			} else if(last != Status::DOWN){ 
-				const Time DOWN_TIME = 1.4;//seconds. tested
+				const Time DOWN_TIME = 1.5;//seconds. tested
 				last = Status::GOING_DOWN;
 				state_timer.set(DOWN_TIME);
 			}
