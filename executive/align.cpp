@@ -1,6 +1,9 @@
 #include "align.h"
 #include <iostream>
-std::ostream& operator<<(std::ostream& o,Align::Mode a){
+
+using namespace std;
+
+ostream& operator<<(ostream& o,Align::Mode a){
 	switch(a){
 		case Align::Mode::VISION:
 			return o << "VISION";
@@ -35,17 +38,18 @@ Step::Status Align::done(Next_mode_info info){
 	switch(mode){
 		case Mode::VISION:
 			{
-				const int TOLERANCE= 4;
+				if(info.since_switch>10){ //time is seince begining of auto period
+					return Step::Status::FINISHED_SUCCESS;
+				}
+				const int TOLERANCE = 4;
 				if(current > center - TOLERANCE && current < center + TOLERANCE){
 					in_range.update(info.in.now,info.in.robot_mode.enabled);
-				}else if(info.since_switch>10){ //time is seince begining of auto period
-					return Step::Status::FINISHED_SUCCESS;
-				}else {
+				} else {
 					static const Time FINISH_TIME = 1.0;
 					in_range.set(FINISH_TIME);
 				}
 				return in_range.done() ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;
-				}
+			}
 		case Mode::NONVISION:
 			{
 				in_range.update(info.in.now,info.in.robot_mode.enabled);
@@ -67,9 +71,7 @@ Toplevel::Goal Align::run(Run_info info){
 Toplevel::Goal Align::run(Run_info info,Toplevel::Goal goals){
 	goals.lights.camera_light=1;
 	update(info.in.camera);
-	std::cout << "Align:    " << blocks << "   " << current << "   " << center << "\n";
-	std::cout << mode << "\n";
-	std::cout<<"A mode: "<<mode<<"\n";
+	cout<<"Align:    mode:"<<mode<<" blocks:"<<blocks<<"   current:"<<current<<"   center:"<<center<<"\n";
 	goals.shifter = Gear_shifter::Goal::LOW;
 	switch(mode){
 		case Mode::VISION:
@@ -87,7 +89,7 @@ Toplevel::Goal Align::run(Run_info info,Toplevel::Goal goals){
 					goals.drive.right = 0;
 				}
 				return goals;
-				}
+			}
 		case Mode::NONVISION:
 			return nonvision_align.run(info,goals);
 		default:
@@ -95,8 +97,8 @@ Toplevel::Goal Align::run(Run_info info,Toplevel::Goal goals){
 	}
 }
 
-std::unique_ptr<Step_impl> Align::clone()const{
-	return std::unique_ptr<Step_impl>(new Align());
+unique_ptr<Step_impl> Align::clone()const{
+	return unique_ptr<Step_impl>(new Align());
 }
 
 bool Align::operator==(Align const& b)const{
