@@ -34,6 +34,15 @@ struct Bound_tracker{
 			bounds = {v,v};
 		}
 	}
+
+	bool has_data()const{
+		return (bool)bounds;
+	}
+	
+	Bounds get()const{
+		return *bounds;
+	}
+
 	/*
 	T min,max;
 	bool data;
