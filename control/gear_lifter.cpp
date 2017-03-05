@@ -12,7 +12,26 @@ Gear_lifter::Estimator::Estimator(){
 }
 
 std::set<Gear_lifter::Goal> examples(Gear_lifter::Goal*){
-	return {Gear_lifter::Goal::DOWN, Gear_lifter::Goal::UP};
+	return {
+		#define X(NAME) Gear_lifter::Goal::NAME,
+		GEAR_LIFTER_GOALS(X)
+		#undef X
+	};
+}
+
+std::set<Gear_lifter::Output> examples(Gear_lifter::Output*){
+	return {
+		#define X(NAME) Gear_lifter::Output::NAME,
+		GEAR_LIFTER_OUTPUTS(X)
+		#undef X
+	};
+}
+
+ostream& operator<<(ostream& o,Gear_lifter::Output a){
+	#define X(A) if(a==Gear_lifter::Output::A) return o<<""#A;
+	GEAR_LIFTER_OUTPUTS(X)
+	#undef X
+	assert(0);
 }
 
 std::set<Gear_lifter::Input> examples(Gear_lifter::Input*){
@@ -28,7 +47,7 @@ std::set<Gear_lifter::Status_detail> examples(Gear_lifter::Status_detail*){
 
 std::ostream& operator<<(std::ostream& o,Gear_lifter::Goal g){
 	#define X(name) if(g==Gear_lifter::Goal::name) return o<<""#name;
-	X(DOWN) X(UP)
+	GEAR_LIFTER_GOALS(X)
 	#undef X
 	assert(0);
 }
@@ -121,8 +140,26 @@ Gear_lifter::Status Gear_lifter::Estimator::get()const{
 	return last;
 }
 
-Gear_lifter::Output control(Gear_lifter::Status,Gear_lifter::Goal goal){
-	return goal;
+Gear_lifter::Output control(Gear_lifter::Status status,Gear_lifter::Goal goal){
+	switch(goal){
+		case Gear_lifter::Goal::UP:
+			return Gear_lifter::Output::UP;
+		case Gear_lifter::Goal::DOWN:
+			return Gear_lifter::Output::DOWN;
+		case Gear_lifter::Goal::X:
+			switch(status){
+				case Gear_lifter::Status::DOWN:
+				case Gear_lifter::Status::GOING_DOWN:
+					return Gear_lifter::Output::DOWN;
+				case Gear_lifter::Status::GOING_UP:
+				case Gear_lifter::Status::UP:
+					return Gear_lifter::Output::UP;
+				default:
+					assert(0);
+			}
+		default:
+			assert(0);
+	}
 }
 
 Gear_lifter::Status status(Gear_lifter::Status s){
@@ -135,6 +172,8 @@ bool ready(Gear_lifter::Status status,Gear_lifter::Goal goal){
 			return status == Gear_lifter::Status::DOWN;
 		case Gear_lifter::Goal::UP:
 			return status == Gear_lifter::Status::UP;
+		case Gear_lifter::Goal::X:
+			return 1;
 		default:
 			assert(0);
 	}

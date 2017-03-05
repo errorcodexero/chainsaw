@@ -19,7 +19,7 @@ for l in console():
 """
 
 known_beginnings=["mode: ", "panel:", "main: ", "out: "]
-in_beginning = "in: Robot_inputs("
+no_record_beginnings = ["in: Robot_inputs(", "CLEAR_SCREEN"]
 in_beginnings = ["mode=", "now=", "ds_info:", "0:", "1:", "2:", "dio:"]
 row_titles = ["mode", "panel", "main", "out",  "robot_mode", "now", "ds_info", "Joystick 0", "Joystick 1", "Joystick 2", "dio"]
 
@@ -101,14 +101,18 @@ for l in console():
 				update_row(row_titles[i], l[len(known_beginnings[i]):].decode("utf-8")) 
 				found = True
 				break
-		for i in range(len(in_beginnings)):
-			if l[:len(in_beginnings[i])].decode("utf-8") == in_beginnings[i]:
-				update_row("  " + row_titles[i + len(known_beginnings)], l[len(in_beginnings[i]):].decode("utf-8"))
-				found = True
-				break
-		if l[:len(in_beginning)].decode("utf-8") == in_beginning:
-			found = True
-		elif not found and len(l) >= misc_begin_length:
+		if not found:
+			for i in range(len(in_beginnings)):
+				if l[:len(in_beginnings[i])].decode("utf-8") == in_beginnings[i]:
+					update_row("  " + row_titles[i + len(known_beginnings)], l[len(in_beginnings[i]):].decode("utf-8"))
+					found = True
+					break
+		if not found:
+			for i in range(len(no_record_beginnings)):
+				if l[:len(no_record_beginnings[i])].decode("utf-8") == no_record_beginnings[i]:
+					found = True
+					break
+		if not found and len(l) >= misc_begin_length:
 			l_begin = l[:misc_begin_length]
 			if misc_beginnings.count(l_begin) > 0:
 				update_row(l_begin, l)
