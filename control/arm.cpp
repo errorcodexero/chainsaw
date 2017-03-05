@@ -7,12 +7,30 @@ using namespace std;
 Arm::Input::Input():enabled(false){}
 Arm::Input::Input(bool a):enabled(a){}
 
-Arm::Estimator::Estimator(){
-	last = Status_detail::STOW;
+Arm::Estimator::Estimator():last(Status_detail::STOW){
+}
+
+std::set<Arm::Output> examples(Arm::Output*){
+	return {
+		#define X(NAME) Arm::Output::NAME,
+		ARM_OUTPUTS(X)
+		#undef X
+	};
+}
+
+ostream& operator<<(ostream& o,Arm::Output a){
+	#define X(A) if(a==Arm::Output::A) return o<<""#A;
+	ARM_OUTPUTS(X)
+	#undef X
+	assert(0);
 }
 
 std::set<Arm::Goal> examples(Arm::Goal*){
-	return {Arm::Goal::STOW, Arm::Goal::LOW};
+	return {
+		#define X(NAME) Arm::Goal::NAME,
+		ARM_GOALS(X)
+		#undef X
+	};
 }
 
 std::set<Arm::Input> examples(Arm::Input*){
@@ -28,7 +46,7 @@ std::set<Arm::Status_detail> examples(Arm::Status_detail*){
 
 std::ostream& operator<<(std::ostream& o,Arm::Goal g){
 	#define X(name) if(g==Arm::Goal::name) return o<<""#name;
-	X(STOW) X(LOW)
+	ARM_GOALS(X)
 	#undef X
 	assert(0);
 }
@@ -121,8 +139,26 @@ Arm::Status Arm::Estimator::get()const{
 	return last;
 }
 
-Arm::Output control(Arm::Status,Arm::Goal goal){
-	return goal;
+Arm::Output control(Arm::Status status,Arm::Goal goal){
+	switch(goal){
+		case Arm::Goal::STOW:
+			return Arm::Output::STOW;
+		case Arm::Goal::LOW:
+			return Arm::Output::LOW;
+		case Arm::Goal::X:
+			switch(status){
+				case Arm::Status::STOW:
+				case Arm::Status::STOWING:
+					return Arm::Output::STOW;
+				case Arm::Status::LOWERING:
+				case Arm::Status::LOW:
+					return Arm::Output::LOW;
+				default:
+					assert(0);
+			}
+		default:
+			assert(0);
+	}
 }
 
 Arm::Status status(Arm::Status s){
@@ -135,6 +171,8 @@ bool ready(Arm::Status status,Arm::Goal goal){
 			return status == Arm::Status::STOW;
 		case Arm::Goal::LOW:
 			return status == Arm::Status::LOW;
+		case Arm::Goal::X:
+			return 1;
 		default:
 			assert(0);
 	}
