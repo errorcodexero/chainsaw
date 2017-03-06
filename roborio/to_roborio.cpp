@@ -272,19 +272,12 @@ public:
 
 	Camera read_camera(Robot_inputs /*r*/){
 		Camera c;
-		/*if(r.now<.5&&!cam_data_recieved) {
-			c.enabled=false;
-			camera.enable();
-			if(camera.isNewData()) cam_data_recieved=true;
-		} else */{
-			camera.enable();
-			c.enabled=1;
-			if (camera.isNewData()) c.blocks=camera.getBlocks();
-			//if (camera.isNewData() && ) ;
-			/*c.enabled=true;//cam_data_recieved&&camera.enable()&&r.robot_mode.enabled;
-			if(c.enabled && camera.isNewData()) c.blocks=camera.getBlocks();
-			else camera.disable();*/
+		camera.enable();
+		if(camera.isNewData()) {
+			cam_data_recieved=true;
+			c.blocks=camera.getBlocks();
 		}
+		c.enabled=cam_data_recieved;
 		return c;
 	}
 
