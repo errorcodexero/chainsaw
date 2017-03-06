@@ -56,23 +56,20 @@ Executive get_auto_mode(Next_mode_info info){
 	//Scores a gear on the middle peg and then stops
 	static const Inch DIST_TO_MIDDLE_PEG = 114;//distance from alliance wall to the middle peg //TODO: find out correct distance
 	Executive auto_score_gear_middle{Chain{
-		Step{Combo{
-			Step{Drive_straight{DIST_TO_MIDDLE_PEG - SCORE_GEAR_APPROACH_DIST - ROBOT_LENGTH - EXTENDED_GEAR_LENGTH - ALIGN_DIST}},
-			Step{Lift_gear()}
-		}},
+		Step{Drive_straight{DIST_TO_MIDDLE_PEG - SCORE_GEAR_APPROACH_DIST - ROBOT_LENGTH - EXTENDED_GEAR_LENGTH - ALIGN_DIST}},
 		Executive{Chain{
-			Step{Combo{
-				Step{Align()},
-				Step{Drop_collector()} //TODO: make sure the collectors are out of the way in Align?
-			}},
+			Step{Align()},
 			Executive{Chain{
-				Step{Combo{
-					Step{Drive_straight{ALIGN_DIST}},
-					Step{Lift_gear()},
-				}},
+				Step{Lift_gear()},
 				Executive{Chain{
-					Step{Score_gear()},
-					Executive{Teleop()}
+					Step{Combo{
+						Step{Drive_straight{ALIGN_DIST}},
+						Step{Lift_gear()},
+					}},
+					Executive{Chain{
+						Step{Score_gear()},
+						Executive{Teleop()}
+					}}
 				}}
 			}}
 		}}
@@ -215,7 +212,7 @@ Executive get_auto_mode(Next_mode_info info){
 	if(info.panel.in_use){
 		switch(info.panel.auto_select){ 
 			case 0: 
-			//	return auto_null;//TODO: make sure this is un-commented for competition
+				//return auto_null;//TODO: make sure this is un-commented for competition
 
 				////////////////////////////
 				//
@@ -224,7 +221,7 @@ Executive get_auto_mode(Next_mode_info info){
 				//return make_test_step(Drive_straight{9*12});
 				//return make_test_step(Step{Score_gear()});
 				//return make_test_step(Turn{PI*2});
-				return make_test_step(Align());
+				return make_test_step(Align{PI/2});
 			case 1: 
 				return auto_baseline;
 			case 2: 
@@ -244,8 +241,6 @@ Executive get_auto_mode(Next_mode_info info){
 			case 9: 
 				return auto_score_gear_middle_extended_left;
 			case 10:
-				//Vision test (TEMP)
-				return make_test_step(Align());
 			case 11:
 			case 12:
 			case 13:
@@ -259,7 +254,7 @@ Executive get_auto_mode(Next_mode_info info){
 				return auto_null;
 		}
 	}
-	return Executive{Teleop()};//Default Executive if no panel exists (normally Teleop)
+	return Executive{Teleop()};//Default Executive if no panel exists (noramlly Teleop)
 }
 
 Executive Autonomous::next_mode(Next_mode_info info){

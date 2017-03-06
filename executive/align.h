@@ -5,7 +5,6 @@
 #include "../util/motion_profile.h"
 #include "step.h"
 
-
 struct Align: public Step_impl_inner<Align>{
 	enum class Mode{VISION,NONVISION};
 	Mode mode;
@@ -13,14 +12,16 @@ struct Align: public Step_impl_inner<Align>{
 	int current;
 	int center;
 	Countdown_timer in_range;	
+	Countdown_timer initial_search;
 	
+	Rad estimated_angle;
 	Step nonvision_align;
 	
 	void update(Camera);
 
 	public:
+	explicit Align(Rad);
 	explicit Align();
-	explicit Align(Turn);
 
 	Toplevel::Goal run(Run_info,Toplevel::Goal);
 	Toplevel::Goal run(Run_info);
