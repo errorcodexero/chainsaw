@@ -6,10 +6,21 @@
 #include "../util/countdown_timer.h"
 
 struct Gear_grabber{
-	enum class Goal{OPEN,CLOSE};
-	
+	#define GEAR_GRABBER_GOALS(X) X(OPEN) X(CLOSE) X(X)
+	enum class Goal{
+		#define X(A) A,
+		GEAR_GRABBER_GOALS(X)
+		#undef X
+	};
+
 	struct Output{
-		using Piston = Goal;
+		#define GEAR_GRABBER_PISTON_OUTPUTS(X) X(OPEN) X(CLOSE)
+		enum class Piston{
+			#define X(A) A,
+			GEAR_GRABBER_PISTON_OUTPUTS(X)
+			#undef X
+		};
+	
 		Piston piston;
 		bool gear_light;//indicator light on the OI which shows if the robot has a gear or not
 		Output();
@@ -70,6 +81,7 @@ std::ostream& operator<<(std::ostream&,const Gear_grabber::Input);
 std::ostream& operator<<(std::ostream&,Gear_grabber::Goal);
 std::ostream& operator<<(std::ostream&,Gear_grabber::Output const&);
 std::ostream& operator<<(std::ostream&,const Gear_grabber::Status_detail);
+std::ostream& operator<<(std::ostream&,Gear_grabber::Output::Piston);
 
 bool operator==(const Gear_grabber::Input,const Gear_grabber::Input);
 bool operator!=(const Gear_grabber::Input,const Gear_grabber::Input);

@@ -311,7 +311,7 @@ Executive get_auto_mode(Next_mode_info info){
 				return auto_null;
 		}
 	}
-	return Executive{Teleop()};//Default Executive if no panel exists (noramlly Teleop)
+	return Executive{Teleop()};//Default Executive if no panel exists (normally Teleop)
 }
 
 Executive Autonomous::next_mode(Next_mode_info info){
