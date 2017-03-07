@@ -20,7 +20,7 @@ struct Align: public Step_impl_inner<Align>{
 	void update(Camera);
 
 	public:
-	explicit Align(Rad);
+	explicit Align(Rad); //TODO: pass in initial encoders or find some way to set them inside of the Turn step
 	explicit Align();
 
 	Toplevel::Goal run(Run_info,Toplevel::Goal);
