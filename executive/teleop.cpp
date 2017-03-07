@@ -75,7 +75,7 @@ void Teleop::collect_protocol(Toplevel::Status_detail const& status,Toplevel::Go
 		case Collect_step::GEAR_COLLECTOR_DOWN:
 			goals.gear_collector=Gear_collector::Goal{Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::DOWN};
 			goals.collector=Collector::Goal{Intake::Goal::OFF, Arm::Goal::STOW, Ball_lifter::Goal::OFF};
-			if(status.gear_collector.gear_lifter==Gear_lifter::Status_detail::DOWN) collect_step = Collect_step::COLLECT;
+			if(status.gear_collector.gear_lifter==Gear_lifter::Status_detail::DOWN) collect_step = Collect_step::COLLECT; //TODO: replace with ready?
 			break;	
 		case Collect_step::COLLECT:
 			goals.gear_collector=Gear_collector::Goal{Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::DOWN};
@@ -91,7 +91,7 @@ void Teleop::no_collect_protocol(Toplevel::Status_detail const& status,const boo
 		case No_collect_step::BALL_COLLECTOR_IN:
 			goals.gear_collector=Gear_collector::Goal{Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::DOWN};
 			goals.collector=Collector::Goal{Intake::Goal::OFF, Arm::Goal::STOW, Ball_lifter::Goal::OFF};
-			if(status.collector.arm==Arm::Status_detail::STOW) {
+			if(status.collector.arm==Arm::Status_detail::STOW) { //TODO replace with ready?
 				no_collect_step=No_collect_step::CLEAR_BALLS;
 				clear_ball_timer.set(CLEAR_BALL_TIME);
 			}
@@ -219,7 +219,7 @@ Toplevel::Goal Teleop::run(Run_info info) {
 
 	if(info.panel.ball_arm==Panel::Ball_arm::STOW) goals.collector.arm=Arm::Goal::STOW;
 	if(info.panel.ball_arm==Panel::Ball_arm::LOW) goals.collector.arm=Arm::Goal::LOW;
-	if(false){//info.panel.ball_collector==Panel::Ball_collector::DISABLED){
+	if(false){//info.panel.ball_collector==Panel::Ball_collector::DISABLED){ //switch fell off of OI
 		if(info.panel.ball_intake!=Panel::Ball_intake::AUTO) goals.collector.intake=Intake::Goal::OFF;
 		if(info.panel.ball_lift!=Panel::Ball_lift::AUTO) goals.collector.ball_lifter=Ball_lifter::Goal::OFF;
 	}else{
@@ -240,7 +240,6 @@ Toplevel::Goal Teleop::run(Run_info info) {
 		}
 	}
 	*info.print_stream<<"\nstalled:"<<info.status.drive.stall<<"\n";
-	//*info.print_stream<<"\nUltrasonic sensor:"<<info.status.drive.ultrasonic<<"\n";
 	
 	*info.print_stream<<"\n";
 		

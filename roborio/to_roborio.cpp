@@ -272,17 +272,12 @@ public:
 
 	Camera read_camera(Robot_inputs /*r*/){
 		Camera c;
-		/*if(r.now<.5&&!cam_data_recieved) {
-			c.enabled=false;
-			camera.enable();
-			if(camera.isNewData()) cam_data_recieved=true;
-		} else */{
-			camera.enable();
-			//if (camera.isNewData() && ) ;
-			/*c.enabled=true;//cam_data_recieved&&camera.enable()&&r.robot_mode.enabled;
-			if(c.enabled && camera.isNewData()) c.blocks=camera.getBlocks();
-			else camera.disable();*/
+		camera.enable();
+		if(camera.isNewData()) {
+			cam_data_recieved=true;
+			c.blocks=camera.getBlocks();
 		}
+		c.enabled=cam_data_recieved;
 		return c;
 	}
 
@@ -380,11 +375,11 @@ public:
 		print_stream<<"in: "<<in<<"\n";
 		print_stream<<"main: "<<main<<"\n";
 		print_stream<<"out: "<<out<<"\n";
-		if(camera.isNewData()) {
+		/*if(camera.isNewData()) {
 			vector<Pixy::Block> blocks=camera.getBlocks();
 			print_stream<<"size: "<<blocks.size()<<" blocks: "<<blocks<<"\n";
 		}
-		else print_stream<<"No new data."<<in.now<<"\n";
+		else print_stream<<"No new data."<<in.now<<"\n";*/
 		print_stream<<"cam_data_recieved: "<<cam_data_recieved<<"\n";
 		print_stream<<"CLEAR_SCREEN\n";
 		int x=set_outputs(out,in.robot_mode.enabled);

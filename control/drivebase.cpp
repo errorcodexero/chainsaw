@@ -294,7 +294,7 @@ double get_output(Drivebase::Output out,Drivebase::Motor m){
 	assert(0);
 }
 
-void Drivebase::Estimator::update(Time now,Drivebase::Input in,Drivebase::Output out,ostream& print_stream){
+void Drivebase::Estimator::update(Time now,Drivebase::Input in,Drivebase::Output out,ostream&){
 	speed_timer.update(now,true);
 	static const double POLL_TIME = .05;//seconds
 	if(speed_timer.done()){
@@ -312,11 +312,14 @@ void Drivebase::Estimator::update(Time now,Drivebase::Input in,Drivebase::Output
 		auto set_power_level=get_output(out,m);
 		motor_check[i].update(now,current,set_power_level);
 	}
-
+	/*
 	static const double STALL_CURRENT = .30;//from testing with autonomous
 	static const double STALL_SPEED = .10;//ft/s speed at which we assume robot is stalled when current spikes
-	last.stall = mean(in.current) > STALL_CURRENT && fabs(mean(last.speeds.l,last.speeds.r)) < STALL_SPEED;
+	last.stall = mean(in.current) > STALL_CURRENT && mean(fabs(last.speeds.l),fabs(last.speeds.r)) < STALL_SPEED;
 	print_stream<<"curr:"<<mean(in.current)<<" "<<mean(last.speeds.l,last.speeds.r)<<"\n";
+	*/
+	stall_monitor.update(mean(in.current),mean(fabs(last.speeds.l),fabs(last.speeds.r)));
+	if(stall_monitor.get()) last.stall = *(stall_monitor.get());
 }
 
 Robot_outputs Drivebase::Output_applicator::operator()(Robot_outputs robot,Drivebase::Output b)const{

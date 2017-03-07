@@ -19,6 +19,7 @@ class Motion_profile{
 };
 
 double target_to_out_power(double);
+double target_to_out_power(double,double);
 
 bool operator==(Motion_profile const& a,Motion_profile const& b);
 std::ostream& operator<<(std::ostream&,Motion_profile const&);

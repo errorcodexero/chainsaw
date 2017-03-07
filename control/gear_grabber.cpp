@@ -18,6 +18,21 @@ Gear_grabber::Estimator::Estimator():last(){
 	close_timer.set(CLOSE_TIME);
 }
 
+ostream& operator<<(ostream& o,Gear_grabber::Output::Piston a){
+	#define X(A) if(a==Gear_grabber::Output::Piston::A) return o<<""#A;
+	GEAR_GRABBER_PISTON_OUTPUTS(X)
+	#undef X
+	assert(0);
+}
+
+std::set<Gear_grabber::Output::Piston> examples(Gear_grabber::Output::Piston*){
+	return {
+		#define X(A) Gear_grabber::Output::Piston::A,
+		GEAR_GRABBER_PISTON_OUTPUTS(X)
+		#undef X
+	};
+}
+
 bool operator==(const Gear_grabber::Input a,const Gear_grabber::Input b){
 	if(a.has_gear != b.has_gear) return false;
 	return a.enabled == b.enabled;
@@ -116,7 +131,7 @@ set<Gear_grabber::Goal> examples(Gear_grabber::Goal*){
 
 set<Gear_grabber::Output> examples(Gear_grabber::Output*){
 	set<Gear_grabber::Output> outs;
-	for(Gear_grabber::Output::Piston a: examples((Gear_grabber::Goal*)nullptr)){
+	for(Gear_grabber::Output::Piston a: examples((Gear_grabber::Output::Piston*)nullptr)){
 		outs.insert({a,true});
 		outs.insert({a,false});
 	}
@@ -180,7 +195,27 @@ void Gear_grabber::Estimator::update(Time time,Input input,Output output,ostream
 
 Gear_grabber::Output control(Gear_grabber::Status status, Gear_grabber::Goal goal){
 	Gear_grabber::Output out;
-	out.piston = goal;
+	out.piston = [=](){
+		switch(goal){
+			case Gear_grabber::Goal::OPEN:
+				return Gear_grabber::Output::Piston::OPEN;
+			case Gear_grabber::Goal::CLOSE:
+				return Gear_grabber::Output::Piston::CLOSE;
+			case Gear_grabber::Goal::X:
+				switch(status.state){
+					case Gear_grabber::Status::State::OPEN:
+					case Gear_grabber::Status::State::OPENING:
+						return Gear_grabber::Output::Piston::OPEN;
+					case Gear_grabber::Status::State::CLOSING:
+					case Gear_grabber::Status::State::CLOSED:
+						return Gear_grabber::Output::Piston::CLOSE;
+					default:
+						assert(0);
+				}
+			default:
+				assert(0);
+		}
+	}();
 	out.gear_light = status.has_gear;
 	return out;
 }

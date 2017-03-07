@@ -3,7 +3,7 @@
 #include "teleop.h" 
 #include "chain.h"
 #include "step.h"
-
+#include "align.h"
 using namespace std; 
 
 double deg_to_rad(double deg){
@@ -37,7 +37,7 @@ Executive get_auto_mode(Next_mode_info info){
 	}};
 
 	static const Inch EXTENDED_GEAR_LENGTH = 7.6;//how far the gear extends out of the robot when deployed outward
-
+	static const Inch ALIGN_DIST = 12;//decreases distance from the drive distance to compinsate for the fact that vision doesnt work well at close distances
 	//////////////////////////
 	//
 	// Full autonomous modes
@@ -56,26 +56,58 @@ Executive get_auto_mode(Next_mode_info info){
 	//Scores a gear on the middle peg and then stops
 	static const Inch DIST_TO_MIDDLE_PEG = 114;//distance from alliance wall to the middle peg //TODO: find out correct distance
 	Executive auto_score_gear_middle{Chain{
-		Step{Combo{
-			Step{Drive_straight{DIST_TO_MIDDLE_PEG - SCORE_GEAR_APPROACH_DIST - ROBOT_LENGTH - EXTENDED_GEAR_LENGTH}},
-			Step{Lift_gear()}
-		}},
+		Step{Drive_straight{DIST_TO_MIDDLE_PEG - SCORE_GEAR_APPROACH_DIST - ROBOT_LENGTH - EXTENDED_GEAR_LENGTH - ALIGN_DIST}},
 		Executive{Chain{
-			Step{Score_gear()},
-			Executive{Teleop()}
+			Step{Align()},
+			Executive{Chain{
+				Step{Lift_gear()},
+				Executive{Chain{
+					Step{Combo{
+						Step{Drive_straight{ALIGN_DIST}},
+						Step{Lift_gear()},
+					}},
+					Executive{Chain{
+						Step{Score_gear()},
+						Executive{Teleop()}
+					}}
+				}}
+			}}
 		}}
 	}};
 
 	//Score a gear on the boiler-side peg
 	static const Inch FIRST_DRIVE_DIST_BOILER = (133 - ROBOT_LENGTH) + .5 * ROBOT_LENGTH;//centers the robot on the turning point to align with gear peg //from testing
-	Executive auto_score_gear_boiler_side{Chain{
+	Executive auto_score_gear_boiler_side_blue{Chain{
+		Step{Drive_straight{FIRST_DRIVE_DIST_BOILER}},
+		Executive{Chain{
+			Step{Turn{deg_to_rad(40)}},//from testing
+			Executive{Chain{
+				Step{Align()},
+				Executive{Chain{
+					Step{Lift_gear()},
+					Executive{Chain{
+						Step{Combo{
+							Step{Drive_straight{6}},//drive forward a bit so score_gear can take over
+							Step{Lift_gear()}
+						}},
+						Executive{Chain{
+							Step{Score_gear()},
+							Executive{Teleop()}
+						}}
+					}}
+				}}
+			}}
+		}}
+	}};
+	
+	Executive auto_score_gear_boiler_side_red{Chain{
 		Step{Combo{
 			Step{Drive_straight{FIRST_DRIVE_DIST_BOILER}},
 			Step{Lift_gear()}
 		}},
 		Executive{Chain{
 			Step{Combo{
-				Step{Turn{deg_to_rad(40)}},//from testing
+				Step{Turn{deg_to_rad(-40)}},//from testing
 				Step{Lift_gear()}
 			}},
 			Executive{Chain{
@@ -90,7 +122,7 @@ Executive get_auto_mode(Next_mode_info info){
 			}}
 		}}
 	}};
-
+	
 	//Crosses the baseline and continues driving to the other side of the field
 	Executive auto_baseline_extended{Chain{
 		Step{Drive_straight{12*12}},
@@ -98,7 +130,7 @@ Executive get_auto_mode(Next_mode_info info){
 	}};
 	
 	//scores gear on the boilder-side of the field and then drives towards the other side of the field
-	Executive auto_score_gear_boiler_side_extended{Chain{
+	Executive auto_score_gear_boiler_side_extended_blue{Chain{
 		Step{Drive_straight{5*12}},
 		Executive{Chain{
 			Step{Turn{deg_to_rad(40)}},
@@ -115,21 +147,64 @@ Executive get_auto_mode(Next_mode_info info){
 		}}
 	}};
 
-	//scores a gear on the loading station-side peg
-	static const Inch FIRST_DRIVE_DIST_LOADING = (127 - ROBOT_LENGTH) + .5 * ROBOT_LENGTH;
-	Executive auto_score_gear_loading_station_side{Chain{
-		Step{Drive_straight{FIRST_DRIVE_DIST_LOADING}},
+	Executive auto_score_gear_boiler_side_extended_red{Chain{
+		Step{Drive_straight{5*12}},
 		Executive{Chain{
-			Step{Turn{deg_to_rad(-35)}},
+			Step{Turn{deg_to_rad(40)}},
 			Executive{Chain{
 				Step{Score_gear()},
-				Executive{Teleop()}
+				Executive{Chain{
+					Step{Drive_straight{-2 * 12}},
+					Executive{Chain{
+						Step{Turn{deg_to_rad(-40)}},
+						dash
+					}}
+				}}
+			}}
+		}}
+	}};
+
+		
+	//scores a gear on the loading station-side peg
+	static const Inch FIRST_DRIVE_DIST_LOADING = (127 - ROBOT_LENGTH) + .5 * ROBOT_LENGTH;
+	Executive auto_score_gear_loading_station_side_blue{Chain{
+		Step{Drive_straight{FIRST_DRIVE_DIST_LOADING}},
+		Executive{Chain{
+			Step{Turn{deg_to_rad(-33)}},
+			Executive{Chain{
+				Step{Align()},
+				Executive{Chain{
+					Step{Lift_gear()},
+					Executive{Chain{
+						Step{Combo{
+							Step{Drive_straight{6}},
+							Step{Lift_gear()}
+						}},
+						Executive{Chain{
+							Step{Score_gear()},
+							Executive{Teleop()}
+						}}
+					}}
+				}}
 			}}
 		}}
 	}};
 	
+	Executive auto_score_gear_loading_station_side_red{Chain{
+		Step{Drive_straight{FIRST_DRIVE_DIST_LOADING}},
+		Executive{Chain{
+			Step{Turn{deg_to_rad(33)}},
+			Executive{Chain{
+				Step{Drive_straight{6}},
+				Executive{Chain{
+					Step{Score_gear()},
+					Executive{Teleop()}
+				}}
+			}}
+		}}
+	}};	
 	//Gear Loading Extended
-	Executive auto_score_gear_loading_station_side_extended{Chain{
+	Executive auto_score_gear_loading_station_side_extended_blue{Chain{
 		Step{Drive_straight{FIRST_DRIVE_DIST_LOADING}},
 		Executive{Chain{
 			Step{Turn{deg_to_rad(-31)}},
@@ -145,7 +220,24 @@ Executive get_auto_mode(Next_mode_info info){
 			}}
 		}}
 	}};
-	
+
+	Executive auto_score_gear_loading_station_side_extended_red{Chain{
+		Step{Drive_straight{FIRST_DRIVE_DIST_LOADING}},
+		Executive{Chain{
+			Step{Turn{deg_to_rad(-31)}},
+			Executive{Chain{
+				Step{Score_gear()},
+				Executive{Chain{
+					Step{Drive_straight{-12}},
+					Executive{Chain{
+						Step{Turn{deg_to_rad(40)}},
+						dash
+					}}
+				}}
+			}}
+		}}
+	}};
+		
 	//Gear mid Extended right (goes around the airship to the right)
 	Executive auto_score_gear_middle_extended_right{Chain{
 		Step{Drive_straight{10*12}},
@@ -192,27 +284,32 @@ Executive get_auto_mode(Next_mode_info info){
 		switch(info.panel.auto_select){ 
 			case 0: 
 				//return auto_null;//TODO: make sure this is un-commented for competition
-				
+
 				////////////////////////////
 				//
 				// Tests for different steps
 				//
 				//return make_test_step(Drive_straight{9*12});
-				return make_test_step(Step{Score_gear()});
+				//return make_test_step(Step{Score_gear()});
 				//return make_test_step(Turn{PI*2});
-				//return make_test_step(Align());
+				return make_test_step(Align{PI/2});
 			case 1: 
 				return auto_baseline;
 			case 2: 
 				return auto_baseline_extended;		
-			case 3: 
-				return auto_score_gear_boiler_side;
+			case 3:
+				if(info.in.ds_info.alliance == Alliance::BLUE) return auto_score_gear_boiler_side_blue;
+				else if(info.in.ds_info.alliance == Alliance::RED) return auto_score_gear_boiler_side_red;
+				//TODO: cover INVALID
 			case 4: 
-				return auto_score_gear_boiler_side_extended;
+				if(info.in.ds_info.alliance == Alliance::BLUE) return auto_score_gear_boiler_side_extended_blue;
+				if(info.in.ds_info.alliance == Alliance::RED) return auto_score_gear_boiler_side_extended_red;
 			case 5: 
-				return auto_score_gear_loading_station_side;
-			case 6: 
-				return auto_score_gear_loading_station_side_extended;
+				if(info.in.ds_info.alliance == Alliance::BLUE) return auto_score_gear_loading_station_side_blue;
+				if(info.in.ds_info.alliance == Alliance::RED) return auto_score_gear_loading_station_side_red;
+			case 6:
+				if(info.in.ds_info.alliance == Alliance::BLUE) return auto_score_gear_loading_station_side_extended_blue;
+				if(info.in.ds_info.alliance == Alliance::RED) return auto_score_gear_loading_station_side_extended_red; 
 			case 7: 
 				return auto_score_gear_middle;
 			case 8: 

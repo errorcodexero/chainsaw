@@ -2,15 +2,9 @@
 #define MAIN_H
 
 #include "force_interface.h"
-#include "../util/posedge_toggle.h"
 #include "../util/perf_tracker.h"
-#include "../util/countdown_timer.h"
 #include "../util/countup_timer.h"
-#include "toplevel.h"
-#include "../input/panel.h"
 #include "log.h"
-#include "../util/posedge_trigger_debounce.h"
-#include "../util/motion_profile.h"
 #include "../executive/executive.h"
 
 struct Main{

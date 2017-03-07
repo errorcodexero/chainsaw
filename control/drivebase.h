@@ -7,6 +7,7 @@
 #include "motor_check.h"
 #include "../util/quick.h"
 #include "../util/countdown_timer.h"
+#include "../util/stall_monitor.h"
 
 struct Drivebase{
 	enum Motor{LEFT1,LEFT2,LEFT3,RIGHT1,RIGHT2,RIGHT3,MOTORS};
@@ -45,7 +46,7 @@ struct Drivebase{
 	#define SPEEDS_ITEMS(X) \
 		X(double,l) \
 		X(double,r) 
-	DECLARE_STRUCT(Speeds,SPEEDS_ITEMS)
+	DECLARE_STRUCT(Speeds,SPEEDS_ITEMS) //consider renaming to Velocities
 
 	#define DRIVEBASE_STATUS(X) \
 		X(SINGLE_ARG(std::array<Motor_check::Status,MOTORS>),motor)\
@@ -61,6 +62,7 @@ struct Drivebase{
 		std::array<Motor_check,MOTORS> motor_check;
 		Status_detail last;
 		Countdown_timer speed_timer;
+		Stall_monitor stall_monitor;
 
 		void update(Time,Input,Output,std::ostream& = std::cerr);
 		Status_detail get()const;

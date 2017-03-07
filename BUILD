@@ -221,6 +221,21 @@ cc_test(
 )
 
 cc_library(
+	name="stall_monitor",
+	srcs=["util/stall_monitor.cpp"],
+	hdrs=["util/stall_monitor.h"],
+	deps=[":interface"]
+)
+
+cc_test(
+	name="stall_monitor_test",
+	srcs=["util/stall_monitor.cpp","util/stall_monitor.h"],
+	copts=["-DSTALL_MONITOR_TEST"],
+	deps=[":stall_monitor"],
+	timeout="short"
+)
+
+cc_library(
 	name="fixVictor",
 	srcs=["util/fixVictor.cpp"],
 	hdrs=["util/fixVictor.h"]
@@ -418,14 +433,14 @@ cc_library(
 	name="drivebase",
 	srcs=["control/drivebase.cpp"],
 	hdrs=["control/drivebase.h","util/quick.h"],
-	deps=[":interface",":motor_check",":countdown_timer",":debounce"]
+	deps=[":interface",":motor_check",":countdown_timer",":stall_monitor"]
 )
 
 cc_test(
 	name="drivebase_test",
 	srcs=["control/drivebase.cpp","control/drivebase.h","util/quick.h","control/formal.h"],
 	copts=["-DDRIVEBASE_TEST"],
-	deps=[":interface",":motor_check",":countdown_timer",":debounce"],
+	deps=[":interface",":motor_check",":countdown_timer",":stall_monitor"],
 	timeout="short"
 )
 
@@ -689,12 +704,14 @@ cc_library(
 	srcs=[
 		"executive/autonomous.cpp",
 		"executive/teleop.cpp",
-		"executive/chain.cpp"
+		"executive/chain.cpp",
+		"executive/align.cpp"
 	],
 	hdrs=[
 		"executive/autonomous.h",
 		"executive/teleop.h",
-		"executive/chain.h"
+		"executive/chain.h",
+		"executive/align.h"
 	],
 	deps=[":executive",":posedge_trigger_debounce",":posedge_toggle",":motion_profile",":step"]
 )
@@ -713,7 +730,7 @@ cc_test(
 	copts=["-DAUTONOMOUS_TEST"],
 	deps=[
 		":executive",":executive_impl",
-		":test"
+		":test",":align"
 	],
 	timeout="short"
 )
@@ -744,6 +761,12 @@ cc_library(
 	srcs=["executive/step.cpp"],
 	hdrs=["executive/step.h"],
 	deps=[":executive",":motion_profile"]
+)
+cc_library(
+	name="align",
+	srcs=["executive/align.cpp"],
+	hdrs=["executive/align.h"],
+	deps=[":executive",":motion_profile",":step"]
 )
 
 cc_test(
