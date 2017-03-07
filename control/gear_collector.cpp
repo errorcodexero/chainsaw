@@ -177,7 +177,7 @@ Gear_collector::Output control(Gear_collector::Status_detail const& st,Gear_coll
 	};
 }
 
-void Gear_collector::Estimator::update(Time a,Input b,Output c){
+void Gear_collector::Estimator::update(Time a,Input b,Output c,ostream&){
 	#define X(A,B) B.update(a,b.B,c.B);
 	GEAR_COLLECTOR_ITEMS(X)
 	#undef X

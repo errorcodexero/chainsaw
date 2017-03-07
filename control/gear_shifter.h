@@ -46,7 +46,7 @@ struct Gear_shifter{
 		
 		Estimator();
 		Status_detail get()const;
-		void update(Time,Input,Output);
+		void update(Time,Input,Output,std::ostream& = std::cerr);
 	};
 
 	Input_reader input_reader;

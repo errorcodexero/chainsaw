@@ -29,7 +29,7 @@ bool ready(Pump::Status,Pump::Goal){ return 1; }
 
 Pump::Estimator::Estimator():status(Pump::Input::FULL){}
 
-void Pump::Estimator::update(Time,Pump::Input in,Pump::Output){
+void Pump::Estimator::update(Time,Pump::Input in,Pump::Output,ostream&){
 	status=in;
 }
 

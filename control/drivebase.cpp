@@ -294,7 +294,7 @@ double get_output(Drivebase::Output out,Drivebase::Motor m){
 	assert(0);
 }
 
-void Drivebase::Estimator::update(Time now,Drivebase::Input in,Drivebase::Output out){
+void Drivebase::Estimator::update(Time now,Drivebase::Input in,Drivebase::Output out,ostream& print_stream){
 	speed_timer.update(now,true);
 	static const double POLL_TIME = .05;//seconds
 	if(speed_timer.done()){
@@ -316,7 +316,7 @@ void Drivebase::Estimator::update(Time now,Drivebase::Input in,Drivebase::Output
 	static const double STALL_CURRENT = .30;//from testing with autonomous
 	static const double STALL_SPEED = .10;//ft/s speed at which we assume robot is stalled when current spikes
 	last.stall = mean(in.current) > STALL_CURRENT && fabs(mean(last.speeds.l,last.speeds.r)) < STALL_SPEED;
-	cout<<"curr:"<<mean(in.current)<<" "<<mean(last.speeds.l,last.speeds.r)<<"\n";
+	print_stream<<"curr:"<<mean(in.current)<<" "<<mean(last.speeds.l,last.speeds.r)<<"\n";
 }
 
 Robot_outputs Drivebase::Output_applicator::operator()(Robot_outputs robot,Drivebase::Output b)const{

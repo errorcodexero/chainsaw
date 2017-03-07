@@ -20,7 +20,7 @@ Gear_shifter::Status_detail Gear_shifter::Estimator::get()const{
 	return recommended;
 }
 
-void Gear_shifter::Estimator::update(Time now,Input in,Output out){
+void Gear_shifter::Estimator::update(Time now,Input in,Output out,ostream&){
 	print_count++;
 	//cout<<"distance:"<<ticks_to_inches(in.ticks.l)<<" "<<ticks_to_inches(in.ticks.r)<<"\n";
 	//if(print_count % 10 == 0) cout<<"Shift Reason:";

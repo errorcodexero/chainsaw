@@ -20,7 +20,7 @@
 	X(Gear_collector,gear_collector,) \
 	X(Shooter,shooter,) \
 	X(Lights,lights,)
-	
+
 class Toplevel{
 	public:
 
@@ -78,7 +78,7 @@ class Toplevel{
 		#undef X
 
 		public:
-		void update(Time,Input,Output);
+		void update(Time,Input,Output,std::ostream& = std::cerr);
 		Status_detail get()const;
 		void out(std::ostream&)const;
 

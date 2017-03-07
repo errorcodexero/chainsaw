@@ -232,15 +232,15 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	if(info.status.collector.arm!=Arm::Status::STOW) goals.gear_collector.gear_lifter=Gear_lifter::Goal::DOWN;
 	if(info.status.gear_collector.gear_lifter!=Gear_lifter::Status::DOWN) goals.collector.arm=Arm::Goal::STOW;	
 	
-	cout<<"\nUltrasonic sensor:"<<info.status.drive.ultrasonic<<"\n";
+	*info.print_stream<<"\nUltrasonic sensor:"<<info.status.drive.ultrasonic<<"\n";
 	if(info.in.camera.enabled){
 		*info.print_stream<<"size: "<<info.in.camera.blocks.size()<<" blocks:\n";
 		for (vector<Pixy::Block>::const_iterator it=info.in.camera.blocks.begin();it!=info.in.camera.blocks.end();it++){
 			*info.print_stream<<"\tarea: "<<(it->width * it->height)<<"\n";
 		}
 	}
-	cout<<"\nstalled:"<<info.status.drive.stall<<"\n";
-	//cout<<"\nUltrasonic sensor:"<<info.status.drive.ultrasonic<<"\n";
+	*info.print_stream<<"\nstalled:"<<info.status.drive.stall<<"\n";
+	//*info.print_stream<<"\nUltrasonic sensor:"<<info.status.drive.ultrasonic<<"\n";
 	
 	*info.print_stream<<"\n";
 		

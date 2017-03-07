@@ -1,23 +1,26 @@
 #include "shooter.h"
 #include <cmath>
 #include <cassert>
+#include <iostream>
 
 #define SHOOTER_LOC 1
+
+using namespace std;
 
 Shooter::Estimator::Estimator():last({}){}
 
 Shooter::Goal::Goal():value(0){}
 Shooter::Goal::Goal(double p):value(p){}
 
-std::ostream& operator<<(std::ostream& o,Shooter::Goal goal){
+ostream& operator<<(ostream& o,Shooter::Goal goal){
 	o<<"Shooter::Goal(";
 	o<<" value:"<<goal.value;
 	return o<<")";
 }
 
-std::ostream& operator<<(std::ostream& o,Shooter::Estimator a){ return o<<"Shooter::Estimator( last:"<<a.get()<<" last_output:"<<a.last_output<<")"; }
-std::ostream& operator<<(std::ostream& o,Shooter::Input a){ return o<<"Shooter::Input(enabled:"<<a.enabled<<")"; }
-std::ostream& operator<<(std::ostream& o,Shooter a){ return o<<"Shooter("<<a.estimator<<")"; }
+ostream& operator<<(ostream& o,Shooter::Estimator a){ return o<<"Shooter::Estimator( last:"<<a.get()<<" last_output:"<<a.last_output<<")"; }
+ostream& operator<<(ostream& o,Shooter::Input a){ return o<<"Shooter::Input(enabled:"<<a.enabled<<")"; }
+ostream& operator<<(ostream& o,Shooter a){ return o<<"Shooter("<<a.estimator<<")"; }
 
 bool operator==(Shooter::Input a,Shooter::Input b){ return a.enabled==b.enabled; }
 bool operator!=(Shooter::Input a,Shooter::Input b){ return !(a==b); }
@@ -71,18 +74,18 @@ Shooter::Status_detail Shooter::Estimator::get()const{
 	return last;
 }
 
-void Shooter::Estimator::update(Time,Shooter::Input,Shooter::Output output){
+void Shooter::Estimator::update(Time,Shooter::Input,Shooter::Output output,ostream&){
 	//TODO
 	last_output=output;
 } 
 
-std::set<Shooter::Input> examples(Shooter::Input*){
+set<Shooter::Input> examples(Shooter::Input*){
 	return {
 		{true},
 		{false}
 	}; 
 }
-std::set<Shooter::Goal> examples(Shooter::Goal*){
+set<Shooter::Goal> examples(Shooter::Goal*){
 	return {{0},{1}};
 }
 

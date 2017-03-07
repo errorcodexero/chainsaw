@@ -86,7 +86,7 @@ Arm::Output Arm::Output_applicator::operator()(Robot_outputs const& r)const{
 	return r.solenoid[PISTON_LOC] ? Output::LOW : Output::STOW;
 }
 
-void Arm::Estimator::update(Time time,Arm::Input input,Arm::Output output){
+void Arm::Estimator::update(Time time,Arm::Input input,Arm::Output output,ostream&){
 	switch(output){
 		case Arm::Output::LOW:
 			if(last == Status::LOWERING){

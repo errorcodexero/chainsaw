@@ -209,8 +209,8 @@ string remove_till_colon(string s){
 	return Maybe<Status>(r);
 }*/
 
-void Toplevel::Estimator::update(Time time,Input in,Output out){
-	#define X(A,B,C) B.update(time,in.B,out.B);
+void Toplevel::Estimator::update(Time time,Input in,Output out,ostream& print_stream){
+	#define X(A,B,C) B.update(time,in.B,out.B,print_stream);
 	TOPLEVEL_ITEMS
 	#undef X
 }

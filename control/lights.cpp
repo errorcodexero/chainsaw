@@ -85,7 +85,7 @@ Robot_outputs Lights::Output_applicator::operator()(Robot_outputs r, Lights::Out
 
 Lights::Estimator::Estimator():time(0){}
 
-void Lights::Estimator::update(Time now,Input,Output){
+void Lights::Estimator::update(Time now,Input,Output,ostream&){
 	time=now;
 }
 

@@ -146,7 +146,7 @@ Gear_grabber::Status_detail Gear_grabber::Estimator::get()const{
 	return last;
 }
 
-void Gear_grabber::Estimator::update(Time time,Input input,Output output){
+void Gear_grabber::Estimator::update(Time time,Input input,Output output,ostream&){
 	switch(output.piston){
 		case Gear_grabber::Output::Piston::OPEN:
 			if(last.state == Gear_grabber::Status_detail::State::OPENING){

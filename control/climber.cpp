@@ -115,7 +115,7 @@ Climber::Output Climber::Output_applicator::operator()(Robot_outputs const& r)co
 	return Climber::Output::STOP;
 }
 
-void Climber::Estimator::update(Time now,Climber::Input /*input*/,Climber::Output output){
+void Climber::Estimator::update(Time now,Climber::Input /*input*/,Climber::Output output,ostream&){
 	static const Time FULL_STATE_SWITCH_TIME = 2.0;//seconds, assumed
 	if(output != last_output){
 		state_timer.set(FULL_STATE_SWITCH_TIME);

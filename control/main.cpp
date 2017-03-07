@@ -55,7 +55,8 @@ Robot_outputs Main::operator()(const Robot_inputs in,ostream& print_stream){
 	toplevel.estimator.update(
 		in.now,
 		input,
-		toplevel.output_applicator(r)
+		toplevel.output_applicator(r),
+		print_stream
 	);
 	
 	log(in,status,r);

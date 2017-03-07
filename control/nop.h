@@ -22,7 +22,7 @@ struct Nop{
 
 	struct Estimator{
 		template<typename Input,typename Output>
-		void update(Time,Input,Output){}
+		void update(Time,Input,Output,std::ostream& = std::cerr){}
 
 		Status_detail get()const;
 	};

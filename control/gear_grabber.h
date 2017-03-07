@@ -48,7 +48,7 @@ struct Gear_grabber{
 		Countdown_timer open_timer;
 		Countdown_timer close_timer;
 	
-		void update(Time,Input,Output);
+		void update(Time,Input,Output,std::ostream& = std::cerr);
 		Status_detail get()const;
 	
 		Estimator();

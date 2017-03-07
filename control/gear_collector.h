@@ -62,7 +62,7 @@ struct Gear_collector{
 		GEAR_COLLECTOR_ITEMS(X)
 		#undef X
 
-		void update(Time,Input,Output);
+		void update(Time,Input,Output,std::ostream& = std::cerr);
 		Status_detail get()const;
 	};
 

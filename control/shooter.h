@@ -45,7 +45,7 @@ struct Shooter{
 		Shooter::Output last_output;
 	
 		Shooter::Status_detail get()const;
-		void update(Time,Shooter::Input,Shooter::Output);
+		void update(Time,Shooter::Input,Shooter::Output,std::ostream& = std::cerr);
 		Estimator();
 	};
 

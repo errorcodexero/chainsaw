@@ -176,7 +176,7 @@ Collector::Output control(Collector::Status_detail const& st,Collector::Goal con
 	};
 }
 
-void Collector::Estimator::update(Time a,Input b,Output c){
+void Collector::Estimator::update(Time a,Input b,Output c,ostream&){
 	#define X(A,B) B.update(a,b.B,c.B);
 	COLLECTOR_ITEMS(X)
 	#undef X

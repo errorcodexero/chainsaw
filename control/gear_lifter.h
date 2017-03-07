@@ -34,7 +34,7 @@ struct Gear_lifter{
 		Status_detail last;
 		Countdown_timer state_timer;		
 
-		void update(Time,Input,Output);
+		void update(Time,Input,Output,std::ostream& = std::cerr);
 		Status_detail get()const;
 		Estimator();
 	};

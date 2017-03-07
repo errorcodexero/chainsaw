@@ -86,7 +86,7 @@ Gear_lifter::Output Gear_lifter::Output_applicator::operator()(Robot_outputs con
 	return r.solenoid[PISTON_LOC] ? Output::UP : Output::DOWN;
 }
 
-void Gear_lifter::Estimator::update(Time time,Gear_lifter::Input input,Gear_lifter::Output output){
+void Gear_lifter::Estimator::update(Time time,Gear_lifter::Input input,Gear_lifter::Output output,ostream&){
 	switch(output){
 		case Gear_lifter::Output::UP:
 			if(last == Status::GOING_UP){

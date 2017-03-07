@@ -27,7 +27,7 @@ struct Pump{
 		Pump::Status status;
 
 		Estimator();
-		void update(Time,Pump::Input,Pump::Output);
+		void update(Time,Pump::Input,Pump::Output,std::ostream& = std::cerr);
 		Status_detail get()const;
 	};
 	Estimator estimator;
