@@ -4,7 +4,7 @@
 using namespace std;
 
 #define BALL_LIFTER_ADDRESS 6
-#define BALL_LIFTER_SPEED -.40 //TODO: tune this //TODO make this nicer
+#define BALL_LIFTER_SPEED .40 //TODO: tune this 
 
 ostream& operator<<(ostream& o, Ball_lifter::Goal a){
 	#define X(name) if(a==Ball_lifter::Goal::name)return o<<"Ball_lifter::Goal("#name")";
@@ -24,13 +24,13 @@ bool operator!=(Ball_lifter a, Ball_lifter b){ return !(a==b);}
 Robot_outputs Ball_lifter::Output_applicator::operator()(Robot_outputs r, Ball_lifter::Output out)const{
 	switch(out){
 		case Ball_lifter::Output::DOWN:
-			r.pwm[BALL_LIFTER_ADDRESS]=-BALL_LIFTER_SPEED;
+			r.pwm[BALL_LIFTER_ADDRESS]=BALL_LIFTER_SPEED;
 			break;
 		case Ball_lifter::Output::OFF:
 			r.pwm[BALL_LIFTER_ADDRESS]=0.0;	
 			break;
 		case Ball_lifter::Output::UP:
-			r.pwm[BALL_LIFTER_ADDRESS]=BALL_LIFTER_SPEED;
+			r.pwm[BALL_LIFTER_ADDRESS]=-BALL_LIFTER_SPEED;
 			break;
 		default:
 			assert(0);
@@ -39,9 +39,9 @@ Robot_outputs Ball_lifter::Output_applicator::operator()(Robot_outputs r, Ball_l
 }
 
 Ball_lifter::Output Ball_lifter::Output_applicator::operator()(Robot_outputs r)const{
-	if(r.pwm[BALL_LIFTER_ADDRESS] < 0.0) return Ball_lifter::Output::DOWN;
+	if(r.pwm[BALL_LIFTER_ADDRESS] > 0.0) return Ball_lifter::Output::DOWN;
 	if(r.pwm[BALL_LIFTER_ADDRESS] == 0.0) return Ball_lifter::Output::OFF;
-	if(r.pwm[BALL_LIFTER_ADDRESS] > 0.0) return Ball_lifter::Output::UP;
+	if(r.pwm[BALL_LIFTER_ADDRESS] < 0.0) return Ball_lifter::Output::UP;
 	assert(0);
 }
 	
