@@ -77,7 +77,7 @@ Executive get_auto_mode(Next_mode_info info){
 
 	//Score a gear on the boiler-side peg
 	static const Inch FIRST_DRIVE_DIST_BOILER = (133 - ROBOT_LENGTH) + .5 * ROBOT_LENGTH;//centers the robot on the turning point to align with gear peg //from testing
-	Executive auto_score_gear_boiler_side{Chain{
+	Executive auto_score_gear_boiler_side_blue{Chain{
 		Step{Drive_straight{FIRST_DRIVE_DIST_BOILER}},
 		Executive{Chain{
 			Step{Turn{deg_to_rad(40)}},//from testing
@@ -99,7 +99,30 @@ Executive get_auto_mode(Next_mode_info info){
 			}}
 		}}
 	}};
-
+	
+	Executive auto_score_gear_boiler_side_red{Chain{
+		Step{Combo{
+			Step{Drive_straight{FIRST_DRIVE_DIST_BOILER}},
+			Step{Lift_gear()}
+		}},
+		Executive{Chain{
+			Step{Combo{
+				Step{Turn{deg_to_rad(-40)}},//from testing
+				Step{Lift_gear()}
+			}},
+			Executive{Chain{
+				Step{Combo{
+					Step{Drive_straight{7}},//drive forward a bit so score_gear can take over
+					Step{Lift_gear()}
+				}},
+				Executive{Chain{
+					Step{Score_gear()},
+					Executive{Teleop()}
+				}}
+			}}
+		}}
+	}};
+	
 	//Crosses the baseline and continues driving to the other side of the field
 	Executive auto_baseline_extended{Chain{
 		Step{Drive_straight{12*12}},
@@ -107,7 +130,7 @@ Executive get_auto_mode(Next_mode_info info){
 	}};
 	
 	//scores gear on the boilder-side of the field and then drives towards the other side of the field
-	Executive auto_score_gear_boiler_side_extended{Chain{
+	Executive auto_score_gear_boiler_side_extended_blue{Chain{
 		Step{Drive_straight{5*12}},
 		Executive{Chain{
 			Step{Turn{deg_to_rad(40)}},
@@ -124,9 +147,27 @@ Executive get_auto_mode(Next_mode_info info){
 		}}
 	}};
 
+	Executive auto_score_gear_boiler_side_extended_red{Chain{
+		Step{Drive_straight{5*12}},
+		Executive{Chain{
+			Step{Turn{deg_to_rad(40)}},
+			Executive{Chain{
+				Step{Score_gear()},
+				Executive{Chain{
+					Step{Drive_straight{-2 * 12}},
+					Executive{Chain{
+						Step{Turn{deg_to_rad(-40)}},
+						dash
+					}}
+				}}
+			}}
+		}}
+	}};
+
+		
 	//scores a gear on the loading station-side peg
 	static const Inch FIRST_DRIVE_DIST_LOADING = (127 - ROBOT_LENGTH) + .5 * ROBOT_LENGTH;
-	Executive auto_score_gear_loading_station_side{Chain{
+	Executive auto_score_gear_loading_station_side_blue{Chain{
 		Step{Drive_straight{FIRST_DRIVE_DIST_LOADING}},
 		Executive{Chain{
 			Step{Turn{deg_to_rad(-33)}},
@@ -149,8 +190,21 @@ Executive get_auto_mode(Next_mode_info info){
 		}}
 	}};
 	
+	Executive auto_score_gear_loading_station_side_red{Chain{
+		Step{Drive_straight{FIRST_DRIVE_DIST_LOADING}},
+		Executive{Chain{
+			Step{Turn{deg_to_rad(33)}},
+			Executive{Chain{
+				Step{Drive_straight{6}},
+				Executive{Chain{
+					Step{Score_gear()},
+					Executive{Teleop()}
+				}}
+			}}
+		}}
+	}};	
 	//Gear Loading Extended
-	Executive auto_score_gear_loading_station_side_extended{Chain{
+	Executive auto_score_gear_loading_station_side_extended_blue{Chain{
 		Step{Drive_straight{FIRST_DRIVE_DIST_LOADING}},
 		Executive{Chain{
 			Step{Turn{deg_to_rad(-31)}},
@@ -166,7 +220,24 @@ Executive get_auto_mode(Next_mode_info info){
 			}}
 		}}
 	}};
-	
+
+	Executive auto_score_gear_loading_station_side_extended_red{Chain{
+		Step{Drive_straight{FIRST_DRIVE_DIST_LOADING}},
+		Executive{Chain{
+			Step{Turn{deg_to_rad(-31)}},
+			Executive{Chain{
+				Step{Score_gear()},
+				Executive{Chain{
+					Step{Drive_straight{-12}},
+					Executive{Chain{
+						Step{Turn{deg_to_rad(40)}},
+						dash
+					}}
+				}}
+			}}
+		}}
+	}};
+		
 	//Gear mid Extended right (goes around the airship to the right)
 	Executive auto_score_gear_middle_extended_right{Chain{
 		Step{Drive_straight{10*12}},
@@ -226,14 +297,19 @@ Executive get_auto_mode(Next_mode_info info){
 				return auto_baseline;
 			case 2: 
 				return auto_baseline_extended;		
-			case 3: 
-				return auto_score_gear_boiler_side;
+			case 3:
+				if(info.in.ds_info.alliance == Alliance::BLUE) return auto_score_gear_boiler_side_blue;
+				else if(info.in.ds_info.alliance == Alliance::RED) return auto_score_gear_boiler_side_red;
+				//TODO: cover INVALID
 			case 4: 
-				return auto_score_gear_boiler_side_extended;
+				if(info.in.ds_info.alliance == Alliance::BLUE) return auto_score_gear_boiler_side_extended_blue;
+				if(info.in.ds_info.alliance == Alliance::RED) return auto_score_gear_boiler_side_extended_red;
 			case 5: 
-				return auto_score_gear_loading_station_side;
-			case 6: 
-				return auto_score_gear_loading_station_side_extended;
+				if(info.in.ds_info.alliance == Alliance::BLUE) return auto_score_gear_loading_station_side_blue;
+				if(info.in.ds_info.alliance == Alliance::RED) return auto_score_gear_loading_station_side_red;
+			case 6:
+				if(info.in.ds_info.alliance == Alliance::BLUE) return auto_score_gear_loading_station_side_extended_blue;
+				if(info.in.ds_info.alliance == Alliance::RED) return auto_score_gear_loading_station_side_extended_red; 
 			case 7: 
 				return auto_score_gear_middle;
 			case 8: 
