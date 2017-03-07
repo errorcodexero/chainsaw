@@ -237,7 +237,6 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	
 	if(info.in.ds_info.connected && (print_number%10)==0){
 		cout<<"\nstalled:"<<info.status.drive.stall<<"\n";
-		//cout<<"\nUltrasonic sensor:"<<info.status.drive.ultrasonic<<"\n";
 		if(info.in.camera.enabled){
 			cout<<"size: "<<info.in.camera.blocks.size()<<" blocks: "<<info.in.camera.blocks<<"\n";
 			/*for (vector<Pixy::Block>::const_iterator it=info.in.camera.blocks.begin();it!=info.in.camera.blocks.end();it++){
