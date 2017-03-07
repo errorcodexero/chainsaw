@@ -10,11 +10,7 @@
 #include "nop.h"
 
 struct Shooter{
-	struct Goal{
-		double value;//percent power
-		Goal();
-		Goal(double);
-	};
+	enum class Goal{FORWARD,OFF,REVERSE};
 	
 	using Status_detail = Nop::Status_detail;
 	
@@ -40,10 +36,6 @@ struct Shooter{
 
 std::ostream& operator<<(std::ostream&,Shooter::Goal);
 std::ostream& operator<<(std::ostream&,Shooter);
-
-bool operator==(Shooter::Goal,Shooter::Goal);
-bool operator!=(Shooter::Goal,Shooter::Goal);
-bool operator<(Shooter::Goal,Shooter::Goal);
 
 bool operator==(Shooter::Output_applicator,Shooter::Output_applicator);
 
