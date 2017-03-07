@@ -4,7 +4,6 @@
 
 #define SHOOTER_LOC 1
 
-Shooter::Estimator::Estimator():last({}){}
 
 Shooter::Goal::Goal():value(0){}
 Shooter::Goal::Goal(double p):value(p){}
@@ -15,15 +14,7 @@ std::ostream& operator<<(std::ostream& o,Shooter::Goal goal){
 	return o<<")";
 }
 
-std::ostream& operator<<(std::ostream& o,Shooter::Estimator a){ return o<<"Shooter::Estimator( last:"<<a.get()<<" last_output:"<<a.last_output<<")"; }
-std::ostream& operator<<(std::ostream& o,Shooter::Input a){ return o<<"Shooter::Input(enabled:"<<a.enabled<<")"; }
-std::ostream& operator<<(std::ostream& o,Shooter a){ return o<<"Shooter("<<a.estimator<<")"; }
-
-bool operator==(Shooter::Input a,Shooter::Input b){ return a.enabled==b.enabled; }
-bool operator!=(Shooter::Input a,Shooter::Input b){ return !(a==b); }
-bool operator<(Shooter::Input a,Shooter::Input b){
-	return !a.enabled && b.enabled;
-} 
+std::ostream& operator<<(std::ostream& o,Shooter){ return o<<"Shooter()"; }
 
 bool operator==(Shooter::Goal a,Shooter::Goal b){
 	 return a.value==b.value;
@@ -37,25 +28,10 @@ bool operator<(Shooter::Goal a,Shooter::Goal b){
 	return 0;
 }
 
-bool operator<(Shooter::Input_reader,Shooter::Input_reader){ return false; }
-bool operator==(Shooter::Input_reader,Shooter::Input_reader){ return true; }
-
-bool operator==(Shooter::Estimator a,Shooter::Estimator b){ return a.last==b.last && a.last_output==b.last_output; }
-bool operator!=(Shooter::Estimator a,Shooter::Estimator b){ return !(a==b); }
-
 bool operator==(Shooter::Output_applicator,Shooter::Output_applicator){ return true; }
 
 bool operator==(Shooter a,Shooter b){ return (a.input_reader==b.input_reader && a.estimator==b.estimator && a.output_applicator==b.output_applicator); }
 bool operator!=(Shooter a,Shooter b){ return !(a==b); }
-
-Shooter::Input Shooter::Input_reader::operator()(Robot_inputs const& r)const{
-	return {r.robot_mode.enabled};
-}
-
-Robot_inputs Shooter::Input_reader::operator()(Robot_inputs r,Shooter::Input in)const{
-	r.robot_mode.enabled=in.enabled;
-	return r;
-}
 
 Shooter::Output Shooter::Output_applicator::operator()(Robot_outputs const& r)const{
 	return r.talon_srx[SHOOTER_LOC].power_level;
@@ -67,21 +43,6 @@ Robot_outputs Shooter::Output_applicator::operator()(Robot_outputs r,Shooter::Ou
 	return r;
 }
 
-Shooter::Status_detail Shooter::Estimator::get()const{
-	return last;
-}
-
-void Shooter::Estimator::update(Time,Shooter::Input,Shooter::Output output){
-	//TODO
-	last_output=output;
-} 
-
-std::set<Shooter::Input> examples(Shooter::Input*){
-	return {
-		{true},
-		{false}
-	}; 
-}
 std::set<Shooter::Goal> examples(Shooter::Goal*){
 	return {{0},{1}};
 }
