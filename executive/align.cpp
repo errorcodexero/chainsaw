@@ -44,7 +44,7 @@ Step::Status Align::done(Next_mode_info info){
 				if(info.since_switch>10){ //time is seince begining of auto period
 					return Step::Status::FINISHED_SUCCESS;
 				}
-				const int TOLERANCE = 4;
+				const int TOLERANCE = 2;
 				if(current > center - TOLERANCE && current < center + TOLERANCE){
 					in_range.update(info.in.now,info.in.robot_mode.enabled);
 				} else {
@@ -100,8 +100,8 @@ Toplevel::Goal Align::run(Run_info info,Toplevel::Goal goals){
 				goals.drive.left = power;
 				goals.drive.right = -power;
 				*/
-				const double power = .2;//TODO: make a motion profile somehow?
-				const int TOLERANCE = 4;
+				const double power = .15;//TODO: make a motion profile somehow?
+				const int TOLERANCE = 2;
 				if(current < center - TOLERANCE){
 					goals.drive.left = -power;
 					goals.drive.right = power;
