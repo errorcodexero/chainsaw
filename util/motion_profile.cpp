@@ -7,9 +7,12 @@
 
 using namespace std;
 
-double target_to_out_power(double target_power,double k){//tries to account for the fact that small out powers to the motors will not move them
+double target_to_out_power(double target_power){//tries to account for the fact that small out powers to the motors will not move them
+	return target_to_out_power(target_power,0.11); //.11 from testing with driving straight with 2017 practice robot
+}
+
+double target_to_out_power(double target_power,const double K){//tries to account for the fact that small out powers to the motors will not move them
 	if(fabs(target_power) - .01 < 0) return 0.0;
-	static const double K = k;//from testing, robot doesn't move at .1 power but moves at .11 power
 	double slope = 1.0 - K;
 	return target_power * slope + copysign(K,target_power);//copysign returns magnitude of the first and the sign of second
 }

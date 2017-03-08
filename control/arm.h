@@ -6,9 +6,19 @@
 #include "../util/countdown_timer.h"
 
 struct Arm{
-	enum class Goal{STOW,LOW};
+	#define ARM_GOALS(F) F(STOW) F(LOW) F(X)
+	enum class Goal{
+		#define X(A) A,
+		ARM_GOALS(X)
+		#undef X
+	};
 	
-	typedef Goal Output;
+	#define ARM_OUTPUTS(X) X(STOW) X(LOW)
+	enum class Output{
+		#define X(A) A,
+		ARM_OUTPUTS(X)
+		#undef X
+	};
 
 	struct Input{
 		bool enabled;
@@ -46,10 +56,12 @@ struct Arm{
 
 std::set<Arm::Goal> examples(Arm::Goal*);
 std::set<Arm::Input> examples(Arm::Input*);
+std::set<Arm::Output> examples(Arm::Output*);
 std::set<Arm::Status_detail> examples(Arm::Status_detail*);
 
 std::ostream& operator<<(std::ostream&,Arm::Goal);
 std::ostream& operator<<(std::ostream&,Arm::Input);
+std::ostream& operator<<(std::ostream&,Arm::Output);
 std::ostream& operator<<(std::ostream&,Arm::Status_detail);
 std::ostream& operator<<(std::ostream&,Arm const&);
 

@@ -4,8 +4,6 @@
 #include "executive.h"
 #include "../util/motion_profile.h"
 
-enum class Camera_con{ENABLE,DISABLED,NONVISION};
-
 struct Step_impl;
 
 class Step{
@@ -192,24 +190,6 @@ struct Score_gear: Step_impl_inner<Score_gear>{
 	Step::Status done(Next_mode_info);
 	std::unique_ptr<Step_impl> clone()const;
 	bool operator==(Score_gear const&)const;
-};
-
-struct Align: public Step_impl_inner<Align>{
-	std::vector<Pixy::Block> blocks;
-	int current;
-	int center;
-	bool manualflag;
-	bool firsttime;
-	Camera_con camera_con;
-	Countdown_timer in_range; 
-	public:
-	explicit Align();
-
-	Toplevel::Goal run(Run_info,Toplevel::Goal);//TODO
-	Toplevel::Goal run(Run_info);
-	Step::Status done(Next_mode_info);
-	std::unique_ptr<Step_impl> clone()const;
-	bool operator==(Align const&)const;
 };
 
 #endif

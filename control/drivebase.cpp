@@ -57,7 +57,6 @@ int inches_to_ticks(const double inches){
 #define R_ENCODER_PORTS 2,3
 #define L_ENCODER_LOC 0
 #define R_ENCODER_LOC 1
-#define ULTRA_SONIC_LOC 0
 
 Robot_inputs Drivebase::Input_reader::operator()(Robot_inputs all,Input in)const{
 	for(unsigned i=0;i<MOTORS;i++){
@@ -74,7 +73,6 @@ Robot_inputs Drivebase::Input_reader::operator()(Robot_inputs all,Input in)const
 	encoder(R_ENCODER_PORTS,in.right);
 	all.digital_io.encoder[L_ENCODER_LOC] = -inches_to_ticks(in.distances.l);
 	all.digital_io.encoder[R_ENCODER_LOC] = inches_to_ticks(in.distances.r);
-	all.analog[ULTRA_SONIC_LOC] = in.ultrasonic;
 	return all;
 }
 
@@ -96,8 +94,7 @@ Drivebase::Input Drivebase::Input_reader::operator()(Robot_inputs const& in)cons
 		{
 			-ticks_to_inches(encoderconv(in.digital_io.encoder[L_ENCODER_LOC])),
 			ticks_to_inches(encoderconv(in.digital_io.encoder[R_ENCODER_LOC]))
-		},
-		in.analog[ULTRA_SONIC_LOC]
+		}
 	};
 }
 
@@ -304,7 +301,6 @@ void Drivebase::Estimator::update(Time now,Drivebase::Input in,Drivebase::Output
 	}
 	
 	last.distances = in.distances;
-	last.ultrasonic = in.ultrasonic;
 	
 	for(unsigned i=0;i<MOTORS;i++){
 		Drivebase::Motor m=(Drivebase::Motor)i;
