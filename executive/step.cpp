@@ -27,7 +27,7 @@ Toplevel::Goal Step::run(Run_info info){
 	return impl->run(info,{});
 }
 
-const double RIGHT_SPEED_CORRECTION = -0.07;//left and right sides of the robot drive at different speeds given the same power, adjust this to make the robot drive straight
+const double RIGHT_SPEED_CORRECTION = -0.045;//left and right sides of the robot drive at different speeds given the same power, adjust this to make the robot drive straight
 
 static const Inch ROBOT_WIDTH = 28; //inches, ignores bumpers //TODO: finds some way of dealing with constants like this and wheel diameter
 
@@ -58,8 +58,8 @@ Toplevel::Goal Turn::run(Run_info info,Toplevel::Goal goals){
 	
 	//ignoring right encoder because it's proven hard to get meaningful data from it
 	double power = motion_profile.target_speed(distance_travelled.l); 
-	goals.drive.left = clip(target_to_out_power(power,.2));//TODO: move .2 to the constructor of Turn and set an instance variable
-	goals.drive.right = -clip(target_to_out_power(power - RIGHT_SPEED_CORRECTION * power,.2));
+	goals.drive.left = clip(target_to_out_power(power));//TODO: move .2 to the constructor of Turn and set an instance variable
+	goals.drive.right = -clip(target_to_out_power(power - RIGHT_SPEED_CORRECTION * power));
 	goals.shifter = Gear_shifter::Goal::LOW;
 	return goals;
 }
@@ -71,7 +71,7 @@ Step::Status Turn::done(Next_mode_info info){
 	if(fabs(distance_left.l) < TOLERANCE){
 		 in_range.update(info.in.now,info.in.robot_mode.enabled);
 	} else {
-		static const Time FINISH_TIME = 1.0;//seconds
+		static const Time FINISH_TIME = .50;//seconds
 		in_range.set(FINISH_TIME);
 	}
 	return in_range.done() ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;
@@ -136,10 +136,11 @@ Step::Status Drive_straight::done(Next_mode_info info){
 	if(fabs(distance_left.l) < TOLERANCE){
 		in_range.update(info.in.now,info.in.robot_mode.enabled);
 	} else {
-		static const Time FINISH_TIME = 1.0;
+		static const Time FINISH_TIME = .50;
 		in_range.set(FINISH_TIME);
 	}
 	
+	/*
 	if(info.status.drive.stall){
 		stall_timer.update(info.in.now,info.in.robot_mode.enabled);
 	} else{
@@ -147,8 +148,9 @@ Step::Status Drive_straight::done(Next_mode_info info){
 		stall_timer.set(STALL_TIME);
 	}
 	if(stall_timer.done()) return Step::Status::FINISHED_FAILURE;
+	*/
 	
-	cout<<"stall:"<<info.status.drive.stall<<"\n";
+	//cout<<"stall:"<<info.status.drive.stall<<"\n";
 
 	return in_range.done() ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;
 }
@@ -166,8 +168,8 @@ Toplevel::Goal Drive_straight::run(Run_info info,Toplevel::Goal goals){
 
 	double power = motion_profile.target_speed(distance_travelled.l); //ignoring right encoder because it's proven hard to get meaningful data from it
 
-	goals.drive.left = clip(target_to_out_power(power,.11));//TODO: move .11 to the constructor of Drive_straight and set an instance variable
-	goals.drive.right = clip(target_to_out_power(power + power * RIGHT_SPEED_CORRECTION,.11)); //right side would go faster than the left without error correction
+	goals.drive.left = clip(target_to_out_power(power));//TODO: move .11 to the constructor of Drive_straight and set an instance variable
+	goals.drive.right = clip(target_to_out_power(power + power * RIGHT_SPEED_CORRECTION)); //right side would go faster than the left without error correction
 	goals.shifter = gear;
 	return goals;
 }
@@ -316,6 +318,38 @@ unique_ptr<Step_impl> Combo::clone()const{
 
 bool Combo::operator==(Combo const& b)const{
 	return step_a == b.step_a && step_b == b.step_b;
+}
+
+///
+
+Turn_on_light::Turn_on_light(){
+	lights_goal = [=]{
+		Lights::Goal a;
+		a.camera_light = true;
+		return a;
+	}();
+}
+
+Step::Status Turn_on_light::done(Next_mode_info info){
+	return (ready(status(info.status.lights),lights_goal)) ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;
+}
+
+Toplevel::Goal Turn_on_light::run(Run_info info){
+	return run(info,{});
+}
+
+Toplevel::Goal Turn_on_light::run(Run_info info,Toplevel::Goal goals){
+	(void)info;
+	goals.lights = lights_goal;
+	return goals;
+}
+
+unique_ptr<Step_impl> Turn_on_light::clone()const{
+	return unique_ptr<Step_impl>(new Turn_on_light(*this));
+}
+
+bool Turn_on_light::operator==(Turn_on_light const& b)const{
+	return lights_goal == b.lights_goal;
 }
 
 Score_gear::Score_gear():

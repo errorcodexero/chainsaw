@@ -10,7 +10,6 @@ struct Align: public Step_impl_inner<Align>{
 	Mode mode;
 	std::vector<Pixy::Block> blocks;
 	int current;
-	int center;
 	Countdown_timer in_range;	
 	Countdown_timer initial_search;
 	

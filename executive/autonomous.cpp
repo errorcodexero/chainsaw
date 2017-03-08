@@ -56,7 +56,10 @@ Executive get_auto_mode(Next_mode_info info){
 	//Scores a gear on the middle peg and then stops
 	static const Inch DIST_TO_MIDDLE_PEG = 114;//distance from alliance wall to the middle peg //TODO: find out correct distance
 	Executive auto_score_gear_middle{Chain{
-		Step{Drive_straight{DIST_TO_MIDDLE_PEG - SCORE_GEAR_APPROACH_DIST - ROBOT_LENGTH - EXTENDED_GEAR_LENGTH - ALIGN_DIST}},
+		Step{Combo{
+			Step{Drive_straight{DIST_TO_MIDDLE_PEG - SCORE_GEAR_APPROACH_DIST - ROBOT_LENGTH - EXTENDED_GEAR_LENGTH - ALIGN_DIST}},
+			Step{Turn_on_light()}
+		}},
 		Executive{Chain{
 			Step{Align()},
 			Executive{Chain{
@@ -78,9 +81,12 @@ Executive get_auto_mode(Next_mode_info info){
 	//Score a gear on the boiler-side peg
 	static const Inch FIRST_DRIVE_DIST_BOILER = (133 - ROBOT_LENGTH) + .5 * ROBOT_LENGTH;//centers the robot on the turning point to align with gear peg //from testing
 	Executive auto_score_gear_boiler_side_blue{Chain{
-		Step{Drive_straight{FIRST_DRIVE_DIST_BOILER}},
+		Step{Drive_straight{FIRST_DRIVE_DIST_BOILER,0.02,1.0}},//NOTE: 0.02 must match that in step.cpp
 		Executive{Chain{
-			Step{Turn{deg_to_rad(40)}},//from testing
+			Step{Combo{
+				Step{Turn{deg_to_rad(40)}},//from testing
+				Step{Turn_on_light()},
+			}},
 			Executive{Chain{
 				Step{Align()},
 				Executive{Chain{
@@ -170,7 +176,10 @@ Executive get_auto_mode(Next_mode_info info){
 	Executive auto_score_gear_loading_station_side_blue{Chain{
 		Step{Drive_straight{FIRST_DRIVE_DIST_LOADING}},
 		Executive{Chain{
-			Step{Turn{deg_to_rad(-33)}},
+			Step{Combo{
+				Step{Turn{deg_to_rad(-33)}},
+				Step{Turn_on_light()},
+			}},
 			Executive{Chain{
 				Step{Align()},
 				Executive{Chain{
@@ -283,16 +292,16 @@ Executive get_auto_mode(Next_mode_info info){
 	if(info.panel.in_use){
 		switch(info.panel.auto_select){ 
 			case 0: 
-				//return auto_null;//TODO: make sure this is un-commented for competition
+				return auto_null;//TODO: make sure this is un-commented for competition
 
 				////////////////////////////
 				//
 				// Tests for different steps
 				//
-				//return make_test_step(Drive_straight{9*12});
+				//return make_test_step(Drive_straight{8*12});
 				//return make_test_step(Step{Score_gear()});
-				//return make_test_step(Turn{PI*2});
-				return make_test_step(Align{PI/2});
+				//return make_test_step(Turn{PI/2});
+				//return make_test_step(Align{PI/2});
 			case 1: 
 				return auto_baseline;
 			case 2: 
