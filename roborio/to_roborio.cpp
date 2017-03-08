@@ -172,7 +172,7 @@ class To_roborio
 	AnalogInput *analog_in[Robot_inputs::ANALOG_INPUTS];
 	int error_code;
 	USER_CODE main;
-	//Talon_srx_controls talon_srx_controls;
+	Talon_srx_controls talon_srx_controls;
 	//DriverStationLCD *lcd;
 	//NetworkTable *table;
 	//Gyro *gyro;
@@ -194,7 +194,7 @@ public:
 			solenoid[i]=new Solenoid(i);//don't know of any way to determine module number, so just take the default one.
 			if(!solenoid[i]) error_code|=8;
 		}
-		//talon_srx_controls.init();
+		talon_srx_controls.init();
 		
 		for(unsigned i=0;i<Robot_outputs::PWMS;i++){
 			pwm[i]=new VictorSP(i);
@@ -361,7 +361,7 @@ public:
 			for(unsigned int i=0; i<Robot_outputs::TALON_SRX_OUTPUTS; i++){
 				enable_all[i]=true;
 			}
-			//talon_srx_controls.set(out.talon_srx,enable_all); 
+			talon_srx_controls.set(out.talon_srx,enable_all); 
 		}
 		return error_code;
 	}
@@ -394,7 +394,7 @@ public:
 		Robot_inputs in=in1.first;
 		error_code|=in1.second;
 		in.digital_io=digital_io.get();
-		//in.talon_srx=talon_srx_controls.get();
+		in.talon_srx=talon_srx_controls.get();
 		/*if(gyro){
 			in.orientation=gyro->GetAngle();
 		}*/

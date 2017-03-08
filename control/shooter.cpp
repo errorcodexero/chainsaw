@@ -2,7 +2,7 @@
 #include <cmath>
 #include <cassert>
 
-#define SHOOTER_LOC 1
+#define SHOOTER_LOC 0
 
 #define SHOOTER_POWER 1.0 //TODO: find the actual value for this
 
