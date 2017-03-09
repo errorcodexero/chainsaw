@@ -105,29 +105,32 @@ Executive get_auto_mode(Next_mode_info info){
 			}}
 		}}
 	}};
-	
+
 	Executive auto_score_gear_boiler_side_red{Chain{
-		Step{Combo{
-			Step{Drive_straight{FIRST_DRIVE_DIST_BOILER}},
-			Step{Lift_gear()}
-		}},
+		Step{Drive_straight{FIRST_DRIVE_DIST_BOILER,0.02,1.0}},//NOTE: 0.02 must match that in step.cpp
 		Executive{Chain{
 			Step{Combo{
 				Step{Turn{deg_to_rad(-40)}},//from testing
-				Step{Lift_gear()}
+				Step{Turn_on_light()},
 			}},
 			Executive{Chain{
-				Step{Combo{
-					Step{Drive_straight{7}},//drive forward a bit so score_gear can take over
-					Step{Lift_gear()}
-				}},
+				Step{Align()},
 				Executive{Chain{
-					Step{Score_gear()},
-					Executive{Teleop()}
+					Step{Lift_gear()},
+					Executive{Chain{
+						Step{Combo{
+							Step{Drive_straight{6}},//drive forward a bit so score_gear can take over
+							Step{Lift_gear()}
+						}},
+						Executive{Chain{
+							Step{Score_gear()},
+							Executive{Teleop()}
+						}}
+					}}
 				}}
 			}}
 		}}
-	}};
+	}};	
 	
 	//Crosses the baseline and continues driving to the other side of the field
 	Executive auto_baseline_extended{Chain{
@@ -156,13 +159,13 @@ Executive get_auto_mode(Next_mode_info info){
 	Executive auto_score_gear_boiler_side_extended_red{Chain{
 		Step{Drive_straight{5*12}},
 		Executive{Chain{
-			Step{Turn{deg_to_rad(40)}},
+			Step{Turn{deg_to_rad(-40)}},
 			Executive{Chain{
 				Step{Score_gear()},
 				Executive{Chain{
 					Step{Drive_straight{-2 * 12}},
 					Executive{Chain{
-						Step{Turn{deg_to_rad(-40)}},
+						Step{Turn{deg_to_rad(40)}},
 						dash
 					}}
 				}}
@@ -202,16 +205,30 @@ Executive get_auto_mode(Next_mode_info info){
 	Executive auto_score_gear_loading_station_side_red{Chain{
 		Step{Drive_straight{FIRST_DRIVE_DIST_LOADING}},
 		Executive{Chain{
-			Step{Turn{deg_to_rad(33)}},
+			Step{Combo{
+				Step{Turn{deg_to_rad(33)}},
+				Step{Turn_on_light()},
+			}},
 			Executive{Chain{
-				Step{Drive_straight{6}},
+				Step{Align()},
 				Executive{Chain{
-					Step{Score_gear()},
-					Executive{Teleop()}
+					Step{Lift_gear()},
+					Executive{Chain{
+						Step{Combo{
+							Step{Drive_straight{6}},
+							Step{Lift_gear()}
+						}},
+						Executive{Chain{
+							Step{Score_gear()},
+							Executive{Teleop()}
+						}}
+					}}
 				}}
 			}}
 		}}
-	}};	
+	}};
+
+	
 	//Gear Loading Extended
 	Executive auto_score_gear_loading_station_side_extended_blue{Chain{
 		Step{Drive_straight{FIRST_DRIVE_DIST_LOADING}},
@@ -233,13 +250,13 @@ Executive get_auto_mode(Next_mode_info info){
 	Executive auto_score_gear_loading_station_side_extended_red{Chain{
 		Step{Drive_straight{FIRST_DRIVE_DIST_LOADING}},
 		Executive{Chain{
-			Step{Turn{deg_to_rad(-31)}},
+			Step{Turn{deg_to_rad(31)}},
 			Executive{Chain{
 				Step{Score_gear()},
 				Executive{Chain{
 					Step{Drive_straight{-12}},
 					Executive{Chain{
-						Step{Turn{deg_to_rad(40)}},
+						Step{Turn{deg_to_rad(-40)}},
 						dash
 					}}
 				}}
@@ -290,6 +307,7 @@ Executive get_auto_mode(Next_mode_info info){
 	}};
 
 	if(info.panel.in_use){
+		if(info.in.ds_info.alliance == Alliance::INVALID) return auto_baseline;
 		switch(info.panel.auto_select){ 
 			case 0: 
 				return auto_null;//TODO: make sure this is un-commented for competition
