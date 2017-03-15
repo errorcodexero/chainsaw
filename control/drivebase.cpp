@@ -301,7 +301,7 @@ void Drivebase::Estimator::update(Time now,Drivebase::Input in,Drivebase::Output
 	}
 	
 	last.distances = in.distances;
-	
+
 	for(unsigned i=0;i<MOTORS;i++){
 		Drivebase::Motor m=(Drivebase::Motor)i;
 		auto current=in.current[i];

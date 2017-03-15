@@ -221,7 +221,7 @@ Toplevel::Goal Teleop::run(Run_info info) {
 
 	if(info.panel.ball_arm==Panel::Ball_arm::STOW) goals.collector.arm=Arm::Goal::STOW;
 	if(info.panel.ball_arm==Panel::Ball_arm::LOW) goals.collector.arm=Arm::Goal::LOW;
-	if(false){//info.panel.ball_collector==Panel::Ball_collector::DISABLED){ //switch fell off of OI
+	if(info.panel.ball_collector==Panel::Ball_collector::DISABLED){
 		if(info.panel.ball_intake!=Panel::Ball_intake::AUTO) goals.collector.intake=Intake::Goal::OFF;
 		if(info.panel.ball_lift!=Panel::Ball_lift::AUTO) goals.collector.ball_lifter=Ball_lifter::Goal::OFF;
 	}else{
@@ -236,7 +236,7 @@ Toplevel::Goal Teleop::run(Run_info info) {
 
 	if(info.status.collector.arm!=Arm::Status::STOW) goals.gear_collector.gear_lifter=Gear_lifter::Goal::DOWN;
 	if(info.status.gear_collector.gear_lifter!=Gear_lifter::Status::DOWN) goals.collector.arm=Arm::Goal::STOW;	
-
+	#if 0
 	if(info.in.ds_info.connected && (print_number%10)==0){
 		cout<<"\nstalled:"<<info.status.drive.stall<<"\n";
 		if(info.in.camera.enabled){
@@ -247,6 +247,7 @@ Toplevel::Goal Teleop::run(Run_info info) {
 		}
 		cout<<"\n";
 	}
+	#endif
 	print_number++;
 	
 	return goals;

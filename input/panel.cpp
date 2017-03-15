@@ -319,6 +319,8 @@ Panel interpret_gamepad(Joystick_data d){
 		p.ball_lift=Panel::Ball_lift::AUTO;
 		p.shooter_belt=Panel::Shooter_belt::AUTO;
 		p.ball_collector=Panel::Ball_collector::AUTO;
+
+		p.ball_arm=Panel::Ball_arm::STOW;
 	} else {
 		p.ball_collector = d.button[Gamepad_button::RB] ? Panel::Ball_collector::DISABLED:Panel::Ball_collector::AUTO;
 

@@ -1,4 +1,4 @@
-#include "WPILib.h"
+	#include "WPILib.h"
 #include "../control/main.h"
 #include "dio_control.h"
 #include "talon_srx_control.h"
@@ -368,10 +368,11 @@ public:
 	
 
 	void run(Robot_inputs in){
-		const int PRINT_SPEED=10;
+		//const int PRINT_SPEED=10;
 		static int print_num=0;
 		//std::ostream print_stream=cout;//(in.ds_info.connected && (print_num%PRINT_SPEED)==0)?cout:null_stream;
 		Robot_outputs out=main(in/*,print_stream*/);
+		#if 0
 		if(in.ds_info.connected && (print_num%PRINT_SPEED)==0){	
 			cout<<"in: "<<in<<"\n";
 			cout<<"main: "<<main<<"\n";
@@ -384,6 +385,7 @@ public:
 			cout<<"cam_data_recieved: "<<cam_data_recieved<<"\n";
 			cout<<"CLEAR_SCREEN\n";
 		}
+		#endif
 		int x=set_outputs(out,in.robot_mode.enabled);
 		if(x) cout<<"x was:"<<x<<"\n";
 		print_num++;

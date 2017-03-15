@@ -306,6 +306,11 @@ Executive get_auto_mode(Next_mode_info info){
 		}}
 	}};
 
+	Executive auto_forward{Chain{
+		Step{Drive_straight{7*12}},
+		Executive{Teleop()}
+	}};
+
 	if(info.panel.in_use){
 		if(info.in.ds_info.alliance == Alliance::INVALID) return auto_baseline;
 		switch(info.panel.auto_select){ 
@@ -344,6 +349,7 @@ Executive get_auto_mode(Next_mode_info info){
 			case 9: 
 				return auto_score_gear_middle_extended_left;
 			case 10:
+				return auto_forward;
 			case 11:
 			case 12:
 			case 13:

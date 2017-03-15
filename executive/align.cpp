@@ -68,7 +68,7 @@ Toplevel::Goal Align::run(Run_info info,Toplevel::Goal goals){
 	initial_search.update(info.in.now,info.in.robot_mode.enabled);
 	goals.lights.camera_light=1;
 	update(info.in.camera);
-	cout<<"Align:    mode:"<<mode<<" blocks:"<<blocks<<"   current:"<<current<<"   CENTER:"<<CENTER<<"    angle:"<<estimated_angle<<"\n";
+	//cout<<"Align:    mode:"<<mode<<" blocks:"<<blocks<<"   current:"<<current<<"   CENTER:"<<CENTER<<"    angle:"<<estimated_angle<<"\n";
 	goals.shifter = Gear_shifter::Goal::LOW;
 	switch(mode){
 		case Mode::VISION:
