@@ -18,7 +18,7 @@
 	X(Drivebase,drive,)\
 	X(Collector,collector,)\
 	X(Gear_collector,gear_collector,) \
-	X(Shooter,shooter,) \
+	X(Shooter,shooter,Shooter::Goal::OFF) \
 	X(Lights,lights,)
 
 class Toplevel{

@@ -33,6 +33,9 @@ ostream& operator<<(ostream& o, Lights){ return o<<"Lights()";}
 Lights::Output::Output():loading_indicator(0),camera_light(0){}
 Lights::Output::Output(bool li,bool cl):loading_indicator(li),camera_light(cl){}
 
+bool operator==(Lights::Goal a,Lights::Goal b){
+	return a.loading_indicator == b.loading_indicator && a.camera_light == b.camera_light;
+}
 bool operator<(Lights::Goal a,Lights::Goal b){
 	if(a.loading_indicator<b.loading_indicator) return 1;
 	if(b.loading_indicator<a.loading_indicator) return 0;

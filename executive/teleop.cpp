@@ -202,17 +202,16 @@ Toplevel::Goal Teleop::run(Run_info info) {
 		}();
 	}
 
-	goals.climber = info.panel.climb ? Climber::Goal::CLIMB : Climber::Goal::STOP;
+	goals.climber=info.panel.climb?Climber::Goal::CLIMB:Climber::Goal::STOP;
+
+	goals.shooter=info.panel.shoot?Shooter::Goal::FORWARD:Shooter::Goal::OFF;
 
 	indicator_toggle.update(info.panel.loading_indicator);
 	if(indicator_toggle.get()) goals.lights.loading_indicator=Lights::Loading_indicator::BALLS;
 	else goals.lights.loading_indicator=Lights::Loading_indicator::GEARS;
 
-	//camera_light_toggle.update(info.driver_joystick.button[Gamepad_button::START]);
-	//goals.lights.camera_light=camera_light_toggle.get();
-
-	climb_toggle.update(info.driver_joystick.button[Gamepad_button::START]);
-	goals.climber = climb_toggle.get() ? Climber::Goal::CLIMB : Climber::Goal::STOP;
+	camera_light_toggle.update(info.driver_joystick.button[Gamepad_button::START]);
+	goals.lights.camera_light=camera_light_toggle.get();//TODO
 
 	//Manual controls
 	if(info.panel.gear_grabber==Panel::Gear_grabber::OPEN) goals.gear_collector.gear_grabber=Gear_grabber::Goal::OPEN;
@@ -222,7 +221,7 @@ Toplevel::Goal Teleop::run(Run_info info) {
 
 	if(info.panel.ball_arm==Panel::Ball_arm::STOW) goals.collector.arm=Arm::Goal::STOW;
 	if(info.panel.ball_arm==Panel::Ball_arm::LOW) goals.collector.arm=Arm::Goal::LOW;
-	if(false){//info.panel.ball_collector==Panel::Ball_collector::DISABLED){ //switch fell off of OI
+	if(info.panel.ball_collector==Panel::Ball_collector::DISABLED){
 		if(info.panel.ball_intake!=Panel::Ball_intake::AUTO) goals.collector.intake=Intake::Goal::OFF;
 		if(info.panel.ball_lift!=Panel::Ball_lift::AUTO) goals.collector.ball_lifter=Ball_lifter::Goal::OFF;
 	}else{
@@ -232,18 +231,19 @@ Toplevel::Goal Teleop::run(Run_info info) {
 		if(info.panel.ball_lift==Panel::Ball_lift::IN) goals.collector.ball_lifter=Ball_lifter::Goal::UP;
 	}
 
+	if(info.panel.shooter==Panel::Shooter::ENABLED) goals.shooter=Shooter::Goal::FORWARD;
+	if(info.panel.shooter==Panel::Shooter::DISABLED) goals.shooter=Shooter::Goal::OFF;
+
 	if(info.status.collector.arm!=Arm::Status::STOW) goals.gear_collector.gear_lifter=Gear_lifter::Goal::DOWN;
 	if(info.status.gear_collector.gear_lifter!=Gear_lifter::Status::DOWN) goals.collector.arm=Arm::Goal::STOW;	
 	
-	*info.print_stream<<"\nUltrasonic sensor:"<<info.status.drive.ultrasonic<<"\n";
+	*info.print_stream<<"\nstalled:"<<info.status.drive.stall<<"\n";
 	if(info.in.camera.enabled){
 		*info.print_stream<<"size: "<<info.in.camera.blocks.size()<<" blocks:\n";
 		for (vector<Pixy::Block>::const_iterator it=info.in.camera.blocks.begin();it!=info.in.camera.blocks.end();it++){
 			*info.print_stream<<"\tarea: "<<(it->width * it->height)<<"\n";
 		}
 	}
-	*info.print_stream<<"\nstalled:"<<info.status.drive.stall<<"\n";
-	
 	*info.print_stream<<"\n";
 		
 	return goals;

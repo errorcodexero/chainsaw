@@ -167,7 +167,7 @@ void Gear_grabber::Estimator::update(Time time,Input input,Output output,ostream
 			if(last.state == Gear_grabber::Status_detail::State::OPENING){
 				open_timer.update(time,input.enabled);
 			} else if(last.state != Gear_grabber::Status_detail::State::OPEN){
-				const Time OPEN_TIME = .75;//seconds .tested 
+				const Time OPEN_TIME = .15;//seconds .tested 
 				open_timer.set(OPEN_TIME);
 				last.state = Status_detail::State::OPENING;
 			}
@@ -179,7 +179,7 @@ void Gear_grabber::Estimator::update(Time time,Input input,Output output,ostream
 			if(last.state == Gear_grabber::Status_detail::State::CLOSING){
 				close_timer.update(time,input.enabled);
 			} else if(last.state != Gear_grabber::Status_detail::State::CLOSED){
-				const Time CLOSE_TIME = .75;//seconds tested
+				const Time CLOSE_TIME = .15;//seconds tested
 				close_timer.set(CLOSE_TIME);
 				last.state = Status_detail::State::CLOSING;
 			}

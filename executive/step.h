@@ -177,6 +177,18 @@ struct Turn: Step_impl_inner<Turn>{//orients the robot to a certain angle relati
 
 const Inch SCORE_GEAR_APPROACH_DIST = 12.0;//inches
 
+
+struct Turn_on_light: Step_impl_inner<Turn_on_light>{
+	Lights::Goal lights_goal;
+
+	explicit Turn_on_light();
+	Toplevel::Goal run(Run_info,Toplevel::Goal);
+	Toplevel::Goal run(Run_info);
+	Step::Status done(Next_mode_info);
+	std::unique_ptr<Step_impl> clone()const;
+	bool operator==(Turn_on_light const&)const;
+};
+
 struct Score_gear: Step_impl_inner<Score_gear>{
 	enum Stage{LIFT,SCORE,RELEASE,BACK_OFF,STOW,DONE};
 	std::array<Step,Stage::DONE> steps;

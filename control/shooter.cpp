@@ -3,7 +3,7 @@
 #include <cassert>
 #include <iostream>
 
-#define SHOOTER_LOC 1
+#define SHOOTER_LOC 0 //actuall one, but we account for the fact that CAN doesn't start at zero in talon_srx_controls. this is in trello as a todo
 
 #define SHOOTER_POWER 1.0 //TODO: find the actual value for this
 
