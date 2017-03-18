@@ -230,10 +230,11 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	}
 
 	goals.shooter = [&]{
-		if(info.panel.shoot) return Shooter::Goal::FORWARD;
 		switch(info.panel.shooter){
 			case Panel::Shooter::ENABLED: return Shooter::Goal::FORWARD;
-			case Panel::Shooter::AUTO: return Shooter::Goal::OFF;
+			case Panel::Shooter::AUTO: 
+				if(info.panel.shoot) return Shooter::Goal::FORWARD;
+				return Shooter::Goal::OFF;
 			case Panel::Shooter::DISABLED: return Shooter::Goal::OFF;
 			default:
 				nyi
