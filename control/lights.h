@@ -11,7 +11,8 @@ struct Lights{
 	struct Goal{
 		Loading_indicator loading_indicator;
 		bool camera_light;
-		//TODO constructors
+		Goal();
+		Goal(Loading_indicator,bool);
 	};
 	
 	using Input=Nop::Input;

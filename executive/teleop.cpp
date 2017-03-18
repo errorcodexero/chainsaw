@@ -42,20 +42,6 @@ ostream& operator<<(ostream& o,Teleop::Gear_collector_mode const& a){
 	assert(0);
 }
 
-ostream& operator<<(ostream& o,Teleop::Collect_step const& a){
-	#define X(NAME) if(a==Teleop::Collect_step::NAME) return o<<""#NAME;
-	COLLECT_STEPS
-	#undef X
-	assert(0);
-}
-
-ostream& operator<<(ostream& o,Teleop::No_collect_step const& a){
-	#define X(NAME) if(a==Teleop::No_collect_step::NAME) return o<<""#NAME;
-	NO_COLLECT_STEPS
-	#undef X
-	assert(0);
-}
-
 Executive Teleop::next_mode(Next_mode_info info) {
 	if (info.autonomous_start) {
 		if (info.panel.in_use) {
@@ -68,50 +54,7 @@ Executive Teleop::next_mode(Next_mode_info info) {
 
 IMPL_STRUCT(Teleop::Teleop,TELEOP_ITEMS)
 
-Teleop::Teleop():gear_collector_mode(Gear_collector_mode::COLLECT),collect_step(Collect_step::GEAR_COLLECTOR_DOWN),no_collect_step(No_collect_step::BALL_COLLECTOR_IN),print_number(0){}
-
-void Teleop::collect_protocol(Toplevel::Status_detail const& status,Toplevel::Goal& goals){
-	switch(collect_step){
-		case Collect_step::GEAR_COLLECTOR_DOWN:
-			goals.gear_collector=Gear_collector::Goal{Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::DOWN,Roller::Goal::OFF,Roller_arm::Goal::STOW};
-			if(status.gear_collector.gear_lifter==Gear_lifter::Status_detail::DOWN) collect_step = Collect_step::COLLECT; //TODO: replace with ready?
-			break;	
-		case Collect_step::COLLECT:
-			goals.gear_collector=Gear_collector::Goal{Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::DOWN,Roller::Goal::OFF,Roller_arm::Goal::STOW};
-			break;
-		default:
-			assert(0);
-	}	
-}
-
-void Teleop::no_collect_protocol(Toplevel::Status_detail const& /*status*/,const bool enabled,const Time now,Toplevel::Goal& goals){
-	switch(no_collect_step){
-		case No_collect_step::BALL_COLLECTOR_IN:
-			goals.gear_collector=Gear_collector::Goal{Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::DOWN,Roller::Goal::OFF,Roller_arm::Goal::STOW};
-
-			no_collect_step=No_collect_step::CLEAR_BALLS;
-			clear_ball_timer.set(CLEAR_BALL_TIME);
-			break;
-		case No_collect_step::CLEAR_BALLS:
-			clear_ball_timer.update(now,enabled);
-			goals.gear_collector=Gear_collector::Goal{Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::DOWN,Roller::Goal::OFF,Roller_arm::Goal::STOW};
-			if(clear_ball_timer.done()) no_collect_step=No_collect_step::GEAR_COLLECTOR_ACTIVE;
-			break;
-		case No_collect_step::GEAR_COLLECTOR_ACTIVE:
-			goals.gear_collector=[&]{
-				switch(gear_collector_mode){
-					case Gear_collector_mode::PREP_COLLECT: return Gear_collector::Goal{Gear_grabber::Goal::OPEN,Gear_lifter::Goal::DOWN,Roller::Goal::OFF,Roller_arm::Goal::STOW};
-					case Gear_collector_mode::COLLECT: return Gear_collector::Goal{Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::DOWN,Roller::Goal::OFF,Roller_arm::Goal::STOW};
-					case Gear_collector_mode::PREP_SCORE: return Gear_collector::Goal{Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::UP,Roller::Goal::OFF,Roller_arm::Goal::STOW};
-					case Gear_collector_mode::SCORE: return Gear_collector::Goal{Gear_grabber::Goal::OPEN,Gear_lifter::Goal::UP,Roller::Goal::OFF,Roller_arm::Goal::STOW};
-					default: assert(0);
-				}
-			}();
-			break;
-		default:
-			assert(0);
-	}	
-}
+Teleop::Teleop():gear_collector_mode(Gear_collector_mode::COLLECT),print_number(0){}
 
 Toplevel::Goal Teleop::run(Run_info info) {
 	Toplevel::Goal goals;
@@ -158,34 +101,26 @@ Toplevel::Goal Teleop::run(Run_info info) {
 		return Gear_shifter::Goal::AUTO;
 	}();
 
+	//set the gear collector mode
 	if(info.panel.gear_prep_collect) gear_collector_mode=Gear_collector_mode::PREP_COLLECT;
 	if(info.panel.gear_collect) gear_collector_mode=Gear_collector_mode::COLLECT;
 	if(info.panel.gear_prep_score) gear_collector_mode=Gear_collector_mode::PREP_SCORE;
 	if(info.panel.gear_score) gear_collector_mode=Gear_collector_mode::SCORE;
 
-	collect.update(info.panel.ball_collect);
-	/*bool collect_t=collect_trigger(info.panel.ball_collect);
-	if(collect.get()) {
-		if(collect_t) collect_step=Collect_step::GEAR_COLLECTOR_DOWN;
-		collect_protocol(info.status,goals);
-	} else {
-		if(collect_t) no_collect_step=No_collect_step::BALL_COLLECTOR_IN;
-		no_collect_protocol(info.status,enabled,info.in.now,goals);
-	}*/
-
-	if (collect.get()){
-	} else {
-		goals.gear_collector=[&]{
-			switch(gear_collector_mode){
-				case Gear_collector_mode::PREP_COLLECT: 
-					return Gear_collector::Goal{Gear_grabber::Goal::OPEN,Gear_lifter::Goal::DOWN,Roller::Goal::OFF,Roller_arm::Goal::STOW};
-				case Gear_collector_mode::COLLECT: return Gear_collector::Goal{Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::DOWN,Roller::Goal::OFF,Roller_arm::Goal::STOW};
-				case Gear_collector_mode::PREP_SCORE: return Gear_collector::Goal{Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::UP,Roller::Goal::OFF,Roller_arm::Goal::STOW};
-				case Gear_collector_mode::SCORE: return Gear_collector::Goal{Gear_grabber::Goal::OPEN,Gear_lifter::Goal::UP,Roller::Goal::OFF,Roller_arm::Goal::STOW};
-				default: assert(0);
-			}
-		}();
-	}
+	goals.gear_collector=[&]{
+		switch(gear_collector_mode){
+			case Gear_collector_mode::PREP_COLLECT: 
+				return Gear_collector::Goal{Gear_grabber::Goal::OPEN,Gear_lifter::Goal::DOWN,Roller::Goal::OFF,Roller_arm::Goal::STOW};
+			case Gear_collector_mode::COLLECT: 
+				return Gear_collector::Goal{Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::DOWN,Roller::Goal::OFF,Roller_arm::Goal::STOW};
+			case Gear_collector_mode::PREP_SCORE: 
+				return Gear_collector::Goal{Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::UP,Roller::Goal::OFF,Roller_arm::Goal::STOW};
+			case Gear_collector_mode::SCORE: 
+				return Gear_collector::Goal{Gear_grabber::Goal::OPEN,Gear_lifter::Goal::UP,Roller::Goal::OFF,Roller_arm::Goal::STOW};
+			default: 
+				assert(0);
+		}
+	}();
 
 	goals.climber=info.panel.climb?Climber::Goal::CLIMB:Climber::Goal::STOP;
 
@@ -196,7 +131,7 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	camera_light_toggle.update(info.driver_joystick.button[Gamepad_button::START]);
 	goals.lights.camera_light=camera_light_toggle.get();//TODO
 
-	//Manual controls
+	//Manual gear collector controls
 	if(info.panel.gear_grabber==Panel::Gear_grabber::OPEN) goals.gear_collector.gear_grabber=Gear_grabber::Goal::OPEN;
 	if(info.panel.gear_grabber==Panel::Gear_grabber::CLOSED) goals.gear_collector.gear_grabber=Gear_grabber::Goal::CLOSE;
 	if(info.panel.gear_arm==Panel::Gear_arm::UP) goals.gear_collector.gear_lifter=Gear_lifter::Goal::UP;
@@ -225,8 +160,8 @@ Toplevel::Goal Teleop::run(Run_info info) {
 		}
 		cout<<"\n";
 	}
-	#endif
 	print_number++;
+	#endif
 	
 	return goals;
 }
