@@ -62,12 +62,12 @@ struct Talon_srx_output{
 	PID_values pid;
 	double power_level;
 	double speed;
-	enum class Mode{VOLTAGE,SPEED};
+	enum class Mode{PERCENT,SPEED};//percent means percent voltage on the in terminals on the talon
 	Mode mode;
 
-	Talon_srx_output():power_level(0),speed(0),mode(Talon_srx_output::Mode::VOLTAGE){}
+	Talon_srx_output():power_level(0),speed(0),mode(Talon_srx_output::Mode::PERCENT){}
 
-	static Talon_srx_output voltage(double);
+	static Talon_srx_output percent(double);
 	static Talon_srx_output closed_loop(double);
 };
 

@@ -26,7 +26,7 @@ bool operator==(Shooter a,Shooter b){ return (a.input_reader==b.input_reader && 
 bool operator!=(Shooter a,Shooter b){ return !(a==b); }
 
 Shooter::Output Shooter::Output_applicator::operator()(Robot_outputs const& r)const{
-	//assuming talon srx is in voltage mode
+	//assuming talon srx is in percent mode
 
 	double power = r.talon_srx[SHOOTER_LOC].power_level;
 	if(power == 0) return Shooter::Output::OFF;
@@ -35,8 +35,7 @@ Shooter::Output Shooter::Output_applicator::operator()(Robot_outputs const& r)co
 }
 
 Robot_outputs Shooter::Output_applicator::operator()(Robot_outputs r,Shooter::Output out)const{ 
-	r.talon_srx[SHOOTER_LOC].mode = Talon_srx_output::Mode::VOLTAGE;
-	r.talon_srx[SHOOTER_LOC].power_level = [=]{
+	r.talon_srx[SHOOTER_LOC] = Talon_srx_output::percent([=]{
 		switch(out){
 			case Shooter::Output::OFF:
 				return 0.0;
@@ -47,7 +46,7 @@ Robot_outputs Shooter::Output_applicator::operator()(Robot_outputs r,Shooter::Ou
 			default:
 				assert(0);
 		}
-	}();
+	}());
 	return r;
 }
 

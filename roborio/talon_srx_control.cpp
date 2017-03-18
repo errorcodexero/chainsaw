@@ -61,16 +61,16 @@ void Talon_srx_control::set(Talon_srx_output a, bool enable) {
 		return;
 	}
 	switch(a.mode){
-		case Talon_srx_output::Mode::VOLTAGE:
+		case Talon_srx_output::Mode::PERCENT:
 			assert(a.power_level==clip(a.power_level));
-			if(mode!=Talon_srx_control::Mode::VOLTAGE){
+			if(mode!=Talon_srx_control::Mode::PERCENT){
 				talon->SetControlMode(CANSpeedController::kPercentVbus);
 				talon->EnableControl();
 				talon->SetExpiration(EXPIRATION);
 				talon->SetSafetyEnabled(true);
 				talon->Set(a.power_level);
 				out=a;
-				mode=Talon_srx_control::Mode::VOLTAGE;
+				mode=Talon_srx_control::Mode::PERCENT;
 			} else if((a.power_level!=out.power_level || since_query > QUERY_LIM) /*&& out!=last_out*/){
 				talon->Set(a.power_level);
 				out.power_level=a.power_level;
@@ -81,7 +81,7 @@ void Talon_srx_control::set(Talon_srx_output a, bool enable) {
 				talon->SetControlMode(CANSpeedController::kSpeed);
 				talon->SetPID(a.pid.p,a.pid.i,a.pid.d,a.pid.f);	
 				talon->EnableControl();
-				talon->SetFeedbackDevice(CANTalon::QuadEncoder);
+				talon->SetFeedbackDevice(CANTalon::QuadEncoder); //TODO: change this so that we can use other feedback types
 				talon->ConfigEncoderCodesPerRev(200); //TODO: change this so it can be numbers other than 200. Maybe move it into the get function
 				talon->SetExpiration(EXPIRATION);
 				talon->SetSafetyEnabled(true);
@@ -101,12 +101,22 @@ void Talon_srx_control::set(Talon_srx_output a, bool enable) {
 Talon_srx_input Talon_srx_control::get(){
 	if(since_query > QUERY_LIM){
 		in.current=talon->GetBusVoltage(); //TODO: look into this again
-		in.velocity=talon->GetSpeed();
-		in.a=talon->GetPinStateQuadA();
-		in.b=talon->GetPinStateQuadB();
+		
+		switch(talon->IsSensorPresent(CANTalon::QuadEncoder)){
+			case CANTalon::FeedbackStatusPresent:
+				in.velocity=talon->GetSpeed();
+				in.a=talon->GetPinStateQuadA();
+				in.b=talon->GetPinStateQuadB();
+				in.encoder_position=talon->GetEncPosition();
+				break;
+			case CANTalon::FeedbackStatusUnknown:
+			case CANTalon::FeedbackStatusNotPresent:
+				break;
+			default:
+				nyi
+		}
 		in.fwd_limit_switch=talon->IsFwdLimitSwitchClosed();
 		in.rev_limit_switch=talon->IsRevLimitSwitchClosed();
-		in.encoder_position=talon->GetEncPosition();
 		since_query=0;
 	}
 	since_query++;

@@ -204,8 +204,6 @@ Toplevel::Goal Teleop::run(Run_info info) {
 
 	goals.climber=info.panel.climb?Climber::Goal::CLIMB:Climber::Goal::STOP;
 
-	goals.shooter=info.panel.shoot?Shooter::Goal::FORWARD:Shooter::Goal::OFF;
-
 	indicator_toggle.update(info.panel.loading_indicator);
 	if(indicator_toggle.get()) goals.lights.loading_indicator=Lights::Loading_indicator::BALLS;
 	else goals.lights.loading_indicator=Lights::Loading_indicator::GEARS;
@@ -231,12 +229,20 @@ Toplevel::Goal Teleop::run(Run_info info) {
 		if(info.panel.ball_lift==Panel::Ball_lift::IN) goals.collector.ball_lifter=Ball_lifter::Goal::UP;
 	}
 
-	if(info.panel.shooter==Panel::Shooter::ENABLED) goals.shooter=Shooter::Goal::FORWARD;
-	if(info.panel.shooter==Panel::Shooter::DISABLED) goals.shooter=Shooter::Goal::OFF;
+	goals.shooter = [&]{
+		if(info.panel.shoot) return Shooter::Goal::FORWARD;
+		switch(info.panel.shooter){
+			case Panel::Shooter::ENABLED: return Shooter::Goal::FORWARD;
+			case Panel::Shooter::AUTO: return Shooter::Goal::OFF;
+			case Panel::Shooter::DISABLED: return Shooter::Goal::OFF;
+			default:
+				nyi
+		}
+	}();
 
 	if(info.status.collector.arm!=Arm::Status::STOW) goals.gear_collector.gear_lifter=Gear_lifter::Goal::DOWN;
 	if(info.status.gear_collector.gear_lifter!=Gear_lifter::Status::DOWN) goals.collector.arm=Arm::Goal::STOW;	
-	#if 0
+	#if 1
 	if(info.in.ds_info.connected && (print_number%10)==0){
 		cout<<"\nstalled:"<<info.status.drive.stall<<"\n";
 		if(info.in.camera.enabled){
