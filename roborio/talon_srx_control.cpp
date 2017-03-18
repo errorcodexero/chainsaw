@@ -6,9 +6,8 @@
 
 using namespace std;
 
-Talon_srx_control::Talon_srx_control():talon(NULL),since_query(0),mode(Mode::INIT){}
-
-Talon_srx_control::Talon_srx_control(int CANBusAddress):talon(NULL),since_query(0),mode(Mode::INIT) {
+Talon_srx_control::Talon_srx_control():talon(NULL),out(),in(),since_query(0),mode(Mode::INIT){}
+Talon_srx_control::Talon_srx_control(int CANBusAddress):talon(NULL),out(),in(),since_query(0),mode(Mode::INIT) {
 	init(CANBusAddress);
 }
 

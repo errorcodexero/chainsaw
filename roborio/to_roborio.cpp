@@ -463,7 +463,7 @@ class Robot_adapter: public SampleRobot{
 			r.autonomous=IsAutonomous();
 			u.run(r);
 
-			Wait(0.005);
+			Wait(0.1);
 		}
 	}
 };
