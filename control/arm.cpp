@@ -122,7 +122,7 @@ void Arm::Estimator::update(Time time,Arm::Input input,Arm::Output output){
 			if(last == Status::STOWING){
 				state_timer.update(time,input.enabled);
 			} else if(last != Status::STOW){ 
-				const Time STOW_TIME = 2.2;//seconds. assumed
+				const Time STOW_TIME = 0;//2.2;//seconds. assumed
 				last = Status::STOWING;
 				state_timer.set(STOW_TIME);
 			}

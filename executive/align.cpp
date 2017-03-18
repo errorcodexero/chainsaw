@@ -44,10 +44,10 @@ Step::Status Align::done(Next_mode_info info){
 				if(info.since_switch>10){ //time is seince begining of auto period
 					return Step::Status::FINISHED_SUCCESS;
 				}
-				const int VISION_THRESHHOLD = 6;//needs to be larger than the correction threshhold
-				if(current > CENTER - VISION_THRESHHOLD && current < CENTER + VISION_THRESHHOLD){
-					in_range.update(info.in.now,info.in.robot_mode.enabled);
-				} else {
+				in_range.update(info.in.now,info.in.robot_mode.enabled);
+				const int VISION_THRESHHOLD = 24;//starting with something large; theoretically this could be as large at 30px and be ok.
+				const bool ok_now=(current > CENTER - VISION_THRESHHOLD && current < CENTER + VISION_THRESHHOLD);
+				if(!ok_now){
 					static const Time FINISH_TIME = .50;
 					in_range.set(FINISH_TIME);
 				}
@@ -74,43 +74,13 @@ Toplevel::Goal Align::run(Run_info info,Toplevel::Goal goals){
 		case Mode::VISION:
 			{
 				double power = target_to_out_power([&]{//power for left side, right side is opposite of this
-					const double SMALL_POWER = .06, LARGE_POWER = .11;//TODO: make it slow as it appraches the center
-					//if it needs to turn more, turn faster
-					const int FINE_TOLERANCE = 6;
-					const int COARSE_TOLERANCE = FINE_TOLERANCE * 3;
-					
-					if(current < CENTER - COARSE_TOLERANCE){
-						return -LARGE_POWER;
-					}
-					if(current > CENTER + COARSE_TOLERANCE){
-						return LARGE_POWER;
-					} 
-					
-					//if it needs to turn less, turn less
-					if(current < CENTER - FINE_TOLERANCE){
-						return -SMALL_POWER;
-					}
-					if(current > CENTER + FINE_TOLERANCE){
-						return SMALL_POWER;
-					} 
-					return 0.0;
+					double error=CENTER-current;
+					static const double P=.01;//not tuned!
+					static const double LIMIT=.3;//not tuned!
+					return clamp(error*P,-LIMIT,LIMIT);
 				}(),.05);
 				goals.drive.left = power;
 				goals.drive.right = -power;
-				/*
-				const double power = target_to_out_power(.10);
-				const int CORRECTION_THRESHHOLD = 2;
-				if(current < CENTER - CORRECTION_THRESHHOLD){
-					goals.drive.left = -power;
-					goals.drive.right = power;
-				} else if(current > CENTER + CORRECTION_THRESHHOLD){
-					goals.drive.left = power;
-					goals.drive.right = -power;
-				} else {
-					goals.drive.left = 0;
-					goals.drive.right = 0;
-				}
-				*/
 				return goals;
 			}
 		case Mode::NONVISION:
