@@ -6,7 +6,6 @@
 #include "drivebase.h"
 #include "climber.h"
 #include "gear_shifter.h"
-#include "collector.h"
 #include "gear_collector.h"
 #include "shooter.h"
 #include "lights.h"
@@ -16,7 +15,6 @@
 	X(Climber,climber,Climber::Goal::STOP)\
 	X(Gear_shifter,shifter,Gear_shifter::Goal::LOW)\
 	X(Drivebase,drive,)\
-	X(Collector,collector,)\
 	X(Gear_collector,gear_collector,) \
 	X(Shooter,shooter,Shooter::Goal::OFF) \
 	X(Lights,lights,)

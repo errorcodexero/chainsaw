@@ -36,12 +36,9 @@ ostream& operator<<(ostream& o,Nop_sim<T> const& a){
 
 using Pump_sim=Nop_sim<Pump::Input>;
 using Climber_sim=Nop_sim<Climber::Input>;
-using Intake_sim=Nop_sim<Intake::Input>;
 using Roller_arm_sim=Nop_sim<Roller_arm::Input>;
 using Roller_sim=Nop_sim<Roller::Input>;
 using Gear_shifter_sim=Nop_sim<Gear_shifter::Input>;
-using Arm_sim=Nop_sim<Arm::Input>;
-using Ball_lifter_sim=Nop_sim<Ball_lifter::Input>;
 using Gear_grabber_sim=Nop_sim<Gear_grabber::Input>;
 using Gear_lifter_sim=Nop_sim<Gear_lifter::Input>;
 using Shooter_sim=Nop_sim<Shooter::Input>;
@@ -89,29 +86,6 @@ struct Drivebase_sim{
 ostream& operator<<(ostream& o,Drivebase_sim const& a){
 	return o << "Drivebase_sim(" << a.x << a.y << a.x << a.theta << ")\n";
 }
-
-struct Collector_sim{
-	using Input=Collector::Input;
-	using Output=Collector::Output;
-
-	#define X(A,B) A##_sim B;
-	COLLECTOR_ITEMS(X)
-	 #undef X
-
-	 void update(Time t,bool enable,Output out){
-		#define X(A,B) B.update(t,enable,out.B);
-		COLLECTOR_ITEMS(X)
-		#undef X
-	}
-
-	Input get()const{
-		return Input{
-			#define X(A,B) B.get(),
-			COLLECTOR_ITEMS(X)
-			#undef X
-		};
-	}
-};
 
 struct Gear_collector_sim{
 	using Input=Gear_collector::Input;
@@ -168,13 +142,6 @@ void simulate(SIMULATOR sim,DEVICE device){
 		//device.estimator.update(
 		
 	}
-}
-
-template<typename F>
-void visit(F f,Collector_sim a){
-	#define X(A,B) f(""#B,a.B);
-	COLLECTOR_ITEMS(X)
-	#undef X
 }
 
 template<typename F>

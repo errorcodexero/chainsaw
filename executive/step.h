@@ -103,7 +103,6 @@ class Wait: public Step_impl_inner<Wait>{//Either stops all operation for a give
 
 class Lift_gear: public Step_impl_inner<Lift_gear>{//Closes the gear grabber and raises the gear collector to peg height
 	Gear_collector::Goal gear_goal;//is the same in every one
-	Collector::Goal ball_goal;//is the same in every one
 	public:
 	explicit Lift_gear();
 
@@ -116,7 +115,6 @@ class Lift_gear: public Step_impl_inner<Lift_gear>{//Closes the gear grabber and
 
 class Drop_gear: public Step_impl_inner<Drop_gear>{//Opens the gear grabber but keeps the manipulator at peg height
 	Gear_collector::Goal gear_goal;//is the same in every one
-	Collector::Goal ball_goal;//is the same in every one
 
 	public:
 	explicit Drop_gear();
@@ -130,7 +128,6 @@ class Drop_gear: public Step_impl_inner<Drop_gear>{//Opens the gear grabber but 
 
 class Drop_collector: public Step_impl_inner<Drop_collector>{//Lowers the gear manipulator to the floor
 	Gear_collector::Goal gear_goal;//is the same in every one
-	Collector::Goal ball_goal;//is the same in every one
 	
 	public:
 	explicit Drop_collector();

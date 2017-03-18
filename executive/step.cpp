@@ -207,10 +207,10 @@ bool Wait::operator==(Wait const& b)const{
 	return wait_timer == b.wait_timer;
 }
 
-Lift_gear::Lift_gear():gear_goal({Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::UP,Roller::Goal::OFF,Roller_arm::Goal::STOW}),ball_goal({Intake::Goal::OFF,Arm::Goal::STOW,Ball_lifter::Goal::OFF}){}
+Lift_gear::Lift_gear():gear_goal({Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::UP,Roller::Goal::OFF,Roller_arm::Goal::STOW}){}
 
 Step::Status Lift_gear::done(Next_mode_info info){
-	return (ready(status(info.status.gear_collector),gear_goal) && ready(status(info.status.collector),ball_goal)) ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;
+	return ready(status(info.status.gear_collector),gear_goal) ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;
 }
 
 Toplevel::Goal Lift_gear::run(Run_info info){
@@ -220,7 +220,6 @@ Toplevel::Goal Lift_gear::run(Run_info info){
 Toplevel::Goal Lift_gear::run(Run_info info, Toplevel::Goal goals){
 	(void)info;
 	goals.gear_collector = gear_goal;
-	goals.collector = ball_goal;
 	return goals;
 }
 
@@ -233,10 +232,10 @@ bool Lift_gear::operator==(Lift_gear const& b)const{
 	return true;
 }
 
-Drop_gear::Drop_gear():gear_goal({Gear_grabber::Goal::OPEN,Gear_lifter::Goal::UP,Roller::Goal::OFF,Roller_arm::Goal::STOW}),ball_goal({Intake::Goal::OFF,Arm::Goal::STOW,Ball_lifter::Goal::OFF}){}
+Drop_gear::Drop_gear():gear_goal({Gear_grabber::Goal::OPEN,Gear_lifter::Goal::UP,Roller::Goal::OFF,Roller_arm::Goal::STOW}){}
 
 Step::Status Drop_gear::done(Next_mode_info info){	
-	return (ready(status(info.status.gear_collector),gear_goal) && ready(status(info.status.collector),ball_goal)) ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;
+	return ready(status(info.status.gear_collector),gear_goal) ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;
 }
 
 Toplevel::Goal Drop_gear::run(Run_info info){
@@ -246,7 +245,6 @@ Toplevel::Goal Drop_gear::run(Run_info info){
 Toplevel::Goal Drop_gear::run(Run_info info,Toplevel::Goal goals){
 	(void)info;
 	goals.gear_collector = gear_goal;
-	goals.collector = ball_goal;
 	return goals;
 }
 
@@ -259,10 +257,10 @@ bool Drop_gear::operator==(Drop_gear const& b)const{
 	return true;
 }
 
-Drop_collector::Drop_collector():gear_goal({Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::DOWN,Roller::Goal::OFF,Roller_arm::Goal::STOW}),ball_goal({Intake::Goal::OFF,Arm::Goal::STOW,Ball_lifter::Goal::OFF}){}
+Drop_collector::Drop_collector():gear_goal({Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::DOWN,Roller::Goal::OFF,Roller_arm::Goal::STOW}){}
 
 Step::Status Drop_collector::done(Next_mode_info info){
-	return (ready(status(info.status.gear_collector),gear_goal) && ready(status(info.status.collector),ball_goal)) ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;
+	return ready(status(info.status.gear_collector),gear_goal) ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;
 }
 
 Toplevel::Goal Drop_collector::run(Run_info info){
@@ -272,7 +270,6 @@ Toplevel::Goal Drop_collector::run(Run_info info){
 Toplevel::Goal Drop_collector::run(Run_info info,Toplevel::Goal goals){
 	(void)info;
 	goals.gear_collector = gear_goal;
-	goals.collector = ball_goal;
 	return goals;
 }
 

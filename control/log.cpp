@@ -205,11 +205,6 @@ void visit(Func f,Roller_arm::Status const& a){
 }
 
 template<typename Func>
-void visit(Func f,Arm::Status const& a){
-	f.terminal(a);
-}
-
-template<typename Func>
 void visit(Func f,Gear_lifter::Status const& a){
 	f.terminal(a);
 }
@@ -218,11 +213,6 @@ void visit(Func f,Gear_lifter::Status const& a){
 template<typename Func>
 void visit(Func f,Gear_grabber::Status const& a){
 	f.terminal(a);
-}
-
-template<typename Func>
-void visit(Func f,Collector::Status_detail const& r){
-	COLLECTOR_ITEMS(VISIT_2ND)
 }
 
 template<typename Func>

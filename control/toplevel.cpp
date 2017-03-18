@@ -101,7 +101,6 @@ Toplevel::Output::Output():
 	climber(Climber::Output::STOP),
 	shifter(Gear_shifter::Output::LOW),
 	drive(0.0,0.0),
-	collector(),
 	gear_collector(),
 	shooter(Shooter::Output::OFF),
 	lights()
@@ -162,7 +161,6 @@ Toplevel::Status::Status():
 		{0.0,0.0},
 		0.0
 	),
-	collector(),
 	gear_collector(),
 	shooter(),
 	lights(0)
@@ -342,7 +340,6 @@ set<Toplevel::Status_detail> examples(Toplevel::Status_detail*){
 		*examples((Climber::Status_detail*)0).begin(),
 		*examples((Gear_shifter::Status_detail*)0).begin(),
 		*examples((Drivebase::Status_detail*)0).begin(),
-		*examples((Collector::Status_detail*)0).begin(),
 		*examples((Gear_collector::Status_detail*)0).begin(),
 		*examples((Shooter::Status_detail*)nullptr).begin(),
 		*examples((Lights::Status_detail*)nullptr).begin()
@@ -363,7 +360,6 @@ set<Toplevel::Input> examples(Toplevel::Input*){
 		*examples((Climber::Input*)0).begin(),
 		*examples((Gear_shifter::Input*)0).begin(),
 		*examples((Drivebase::Input*)0).begin(),
-		*examples((Collector::Input*)0).begin(),
 		*examples((Gear_collector::Input*)0).begin(),
 		*examples((Shooter::Input*)nullptr).begin(),
 		*examples((Lights::Input*)nullptr).begin()
