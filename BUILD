@@ -489,6 +489,34 @@ cc_test(
         timeout="short"
 )
 
+cc_library(
+	name="roller",
+	srcs=["control/roller.cpp","control/nop.cpp"],
+	hdrs=["control/roller.h","control/nop.h"],
+	deps=[":interface"]
+)
+
+cc_test(
+	name="roller_test",
+	srcs=["control/roller.cpp","control/roller.h","control/nop.h","control/nop.cpp","control/formal.h"],
+	copts=["-DROLLER_TEST"],
+	deps=[":interface"],
+	timeout="short"
+)
+cc_library(
+	name="roller_arm",
+	srcs=["control/roller_arm.cpp","control/nop.cpp"],
+	hdrs=["control/roller_arm.h","control/nop.h"],
+	deps=[":interface",":countdown_timer"]
+)
+
+cc_test(
+	name="roller_arm_test",
+	srcs=["control/roller_arm.cpp","control/roller_arm.h","control/nop.h","control/nop.cpp","control/formal.h"],
+	copts=["-DROLLER_ARM_TEST"],
+	deps=[":interface",":countdown_timer"],
+	timeout="short"
+)
 
 cc_library(
 	name="intake",
