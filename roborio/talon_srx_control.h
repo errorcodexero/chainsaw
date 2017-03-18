@@ -14,7 +14,7 @@ class Talon_srx_control{
 	//Talon_srx_output last_out;
 	Talon_srx_input in;
 	
-	int since_query;
+	unsigned since_query; //TODO: should this be time based instead or something?
 	
 	public:
 	#define TALON_SRX_MODES X(INIT) X(VOLTAGE) X(SPEED) X(DISABLE)

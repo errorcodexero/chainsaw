@@ -87,6 +87,8 @@ bool operator<(Digital_out,Digital_out);
 bool operator==(Digital_out,Digital_out);
 bool operator!=(Digital_out,Digital_out);
 
+static const unsigned TALON_SRXS = 1;
+
 struct Robot_outputs{
 	static const unsigned PWMS=10;//Number of ports on the digital sidecar; there can be up to 20 using the MXP on the roboRIO which we don't do
 	Checked_array<Pwm_output,PWMS> pwm;
@@ -100,7 +102,7 @@ struct Robot_outputs{
 	static const unsigned DIGITAL_IOS=11;//there are actually 26 on the roboRIO if you count the MXP, but that varies depending on whether they're set as dios or pwm
 	Checked_array<Digital_out,DIGITAL_IOS> digital_io;
 	
-	static const unsigned TALON_SRX_OUTPUTS=6;//FIXME: talon initializaitons
+	static const unsigned TALON_SRX_OUTPUTS=TALON_SRXS;//FIXME: talon initializaitons
 	Checked_array<Talon_srx_output, TALON_SRX_OUTPUTS> talon_srx;
 	
 	//could add in some setup for the analog inputs
@@ -209,7 +211,7 @@ struct Robot_inputs{
 	static const unsigned ANALOG_INPUTS=4;
 	Checked_array<Volt,ANALOG_INPUTS> analog;
 
-	static const unsigned TALON_SRX_INPUTS=3;
+	static const unsigned TALON_SRX_INPUTS=TALON_SRXS;
 	Checked_array<Talon_srx_input, TALON_SRX_INPUTS> talon_srx;
 	
 	Driver_station_input driver_station;
