@@ -6,9 +6,8 @@
 
 using namespace std;
 
-Talon_srx_control::Talon_srx_control():talon(NULL),since_query(0),mode(Mode::INIT){}
-
-Talon_srx_control::Talon_srx_control(int CANBusAddress):talon(NULL),since_query(0),mode(Mode::INIT) {
+Talon_srx_control::Talon_srx_control():talon(NULL),out(),in(),since_query(0),mode(Mode::INIT){}
+Talon_srx_control::Talon_srx_control(int CANBusAddress):talon(NULL),out(),in(),since_query(0),mode(Mode::INIT) {
 	init(CANBusAddress);
 }
 
@@ -22,7 +21,6 @@ void Talon_srx_control::init(int CANBusAddress){
 	talon = new CANTalon(CANBusAddress);
 	assert(talon);
 	talon->SetSafetyEnabled(false);
-	mode = Mode::VOLTAGE;
 }
 
 ostream& operator<<(ostream& o,Talon_srx_control::Mode a){
@@ -46,61 +44,78 @@ bool pid_approx(PID_values a,PID_values b){
 	return fabs(a.p-b.p)<TOLERANCE && fabs(a.i-b.i)<TOLERANCE && fabs(a.d-b.d)<TOLERANCE && fabs(a.f-b.f)<TOLERANCE;
 }
 
+static const unsigned QUERY_LIM = 0;
+
 void Talon_srx_control::set(Talon_srx_output a, bool enable) {
 	static const float EXPIRATION=2.0;
-	assert(mode!=Mode::INIT);
-	if(!enable){
+	if(!enable || mode == Mode::INIT){
 		if(mode!=Talon_srx_control::Mode::DISABLE){ 
 			talon->Set(0);
 			talon->SetSafetyEnabled(false);
 			talon->Disable();
 			mode=Talon_srx_control::Mode::DISABLE;
+		} else if (since_query > QUERY_LIM){
+			talon->Set(0);
 		}
 		return;
 	}
-	if(a.mode==Talon_srx_output::Mode::VOLTAGE){
-		assert(a.power_level==clip(a.power_level));
-		if(mode!=Talon_srx_control::Mode::VOLTAGE){
-			talon->SetControlMode(CANSpeedController::kPercentVbus);
-			talon->EnableControl();
-			talon->SetExpiration(EXPIRATION);
-			talon->SetSafetyEnabled(true);
-			talon->Set(a.power_level);
-			out=a;
-			mode=Talon_srx_control::Mode::VOLTAGE;
-		} else if((a.power_level!=out.power_level || since_query==1) /*&& out!=last_out*/){
-			talon->Set(a.power_level);
-			out.power_level=a.power_level;
-		}	
-	} else if(a.mode==Talon_srx_output::Mode::SPEED){
-		if(mode!=Talon_srx_control::Mode::SPEED || !pid_approx(out.pid,a.pid)){
-			talon->SetControlMode(CANSpeedController::kSpeed);
-			talon->SetPID(a.pid.p,a.pid.i,a.pid.d,a.pid.f);	
-			talon->EnableControl();
-			talon->SetFeedbackDevice(CANTalon::QuadEncoder);
-			talon->ConfigEncoderCodesPerRev(200);
-			talon->SetExpiration(EXPIRATION);
-			talon->SetSafetyEnabled(true);
-			talon->Set(a.speed);
-			out=a;
-			mode=Talon_srx_control::Mode::SPEED;
-		} else if((a.speed!=out.speed || since_query==1) /*&& out!=last_out*/){ 
-			talon->Set(a.speed);
-			out.speed=a.speed;
-		}
+	switch(a.mode){
+		case Talon_srx_output::Mode::PERCENT:
+			assert(a.power_level==clip(a.power_level));
+			if(mode!=Talon_srx_control::Mode::PERCENT){
+				talon->SetControlMode(CANSpeedController::kPercentVbus);
+				talon->EnableControl();
+				talon->SetExpiration(EXPIRATION);
+				talon->SetSafetyEnabled(true);
+				talon->Set(a.power_level);
+				out=a;
+				mode=Talon_srx_control::Mode::PERCENT;
+			} else if((a.power_level!=out.power_level || since_query > QUERY_LIM) /*&& out!=last_out*/){
+				talon->Set(a.power_level);
+				out.power_level=a.power_level;
+			}
+			break;
+		case Talon_srx_output::Mode::SPEED:
+			if(mode!=Talon_srx_control::Mode::SPEED || !pid_approx(out.pid,a.pid)){
+				talon->SetControlMode(CANSpeedController::kSpeed);
+				talon->SetPID(a.pid.p,a.pid.i,a.pid.d,a.pid.f);	
+				talon->EnableControl();
+				talon->SetFeedbackDevice(CANTalon::QuadEncoder); //TODO: change this so that we can use other feedback types
+				talon->ConfigEncoderCodesPerRev(200); //TODO: change this so it can be numbers other than 200. Maybe move it into the get function
+				talon->SetExpiration(EXPIRATION);
+				talon->SetSafetyEnabled(true);
+				talon->Set(a.speed);
+				out=a;
+				mode=Talon_srx_control::Mode::SPEED;
+			} else if((a.speed!=out.speed || since_query > QUERY_LIM) /*&& out!=last_out*/){ 
+				talon->Set(a.speed);
+				out.speed=a.speed;
+			}
+			break;
+		default:
+			nyi
 	}
-	//last_out=out;
 }
 
 Talon_srx_input Talon_srx_control::get(){
-	if(since_query>0){
-		in.current=talon->GetBusVoltage();
-		in.velocity=talon->GetSpeed();
-		in.a=talon->GetPinStateQuadA();
-		in.b=talon->GetPinStateQuadB();
+	if(since_query > QUERY_LIM){
+		in.current=talon->GetBusVoltage(); //TODO: look into this again
+		
+		switch(talon->IsSensorPresent(CANTalon::QuadEncoder)){
+			case CANTalon::FeedbackStatusPresent:
+				in.velocity=talon->GetSpeed();
+				in.a=talon->GetPinStateQuadA();
+				in.b=talon->GetPinStateQuadB();
+				in.encoder_position=talon->GetEncPosition();
+				break;
+			case CANTalon::FeedbackStatusUnknown:
+			case CANTalon::FeedbackStatusNotPresent:
+				break;
+			default:
+				nyi
+		}
 		in.fwd_limit_switch=talon->IsFwdLimitSwitchClosed();
 		in.rev_limit_switch=talon->IsRevLimitSwitchClosed();
-		in.encoder_position=talon->GetEncPosition();
 		since_query=0;
 	}
 	since_query++;
@@ -112,7 +127,7 @@ Talon_srx_controls::Talon_srx_controls():init_(false){}
 void Talon_srx_controls::init(){
 	if(!init_){
 		for(unsigned int i=0; i<talons.size(); i++){
-			talons[i].init(i+1);//2016 h-drive bunnybot, talons start at device ID 1
+			talons[i].init(i+1);//2017 comp talons start at device ID 1
 		}
 		init_=true;
 	}

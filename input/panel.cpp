@@ -285,7 +285,9 @@ Panel interpret_gamepad(Joystick_data d){
 		p.gear_collect = d.button[Gamepad_button::X];
 		p.gear_prep_collect = d.button[Gamepad_button::A];
 
-		switch(pov_section(d.axis[Gamepad_axis::DPAD])){
+		cout<<"\nPOV:"<<d.pov<<"\n";
+
+		switch(pov_section(d.pov)){
 			case POV_section::CENTER:
 				break;
 			case POV_section::UP:
@@ -334,7 +336,7 @@ Panel interpret_gamepad(Joystick_data d){
 
 		p.ball_lift=Panel::Ball_lift::AUTO;
 		p.ball_intake=Panel::Ball_intake::AUTO;
-		switch(pov_section(d.axis[Gamepad_axis::DPAD])){
+		switch(pov_section(d.pov)){
 			case POV_section::CENTER:
 				break;
 			case POV_section::UP:
