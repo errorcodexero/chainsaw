@@ -3,9 +3,11 @@
 
 #include "gear_grabber.h"
 #include "gear_lifter.h"
+#include "roller.h"
+#include "roller_arm.h"
 
 struct Gear_collector{
-	#define GEAR_COLLECTOR_ITEMS(X) X(Gear_grabber,gear_grabber) X(Gear_lifter,gear_lifter)
+	#define GEAR_COLLECTOR_ITEMS(X) X(Gear_grabber,gear_grabber) X(Gear_lifter,gear_lifter) X(Roller,roller) X(Roller_arm,roller_arm)
 
 	struct Input{
 		#define X(A,B) A::Input B;
@@ -24,7 +26,7 @@ struct Gear_collector{
 		GEAR_COLLECTOR_ITEMS(X)
 		#undef X
 		Goal();
-		Goal(Gear_grabber::Goal,Gear_lifter::Goal);
+		Goal(Gear_grabber::Goal,Gear_lifter::Goal,Roller::Goal,Roller_arm::Goal);
 	};
 
 	struct Input_reader{

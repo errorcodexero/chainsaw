@@ -2,9 +2,9 @@
 
 using namespace std;
 
-Gear_collector::Goal::Goal():gear_grabber(Gear_grabber::Goal::CLOSE),gear_lifter(Gear_lifter::Goal::DOWN){}
+Gear_collector::Goal::Goal():gear_grabber(Gear_grabber::Goal::CLOSE),gear_lifter(Gear_lifter::Goal::DOWN),roller(Roller::Goal::OFF),roller_arm(Roller_arm::Goal::STOW){}
 
-Gear_collector::Goal::Goal(Gear_grabber::Goal g,Gear_lifter::Goal l):gear_grabber(g),gear_lifter(l){}
+Gear_collector::Goal::Goal(Gear_grabber::Goal g,Gear_lifter::Goal l,Roller::Goal r,Roller_arm::Goal ra):gear_grabber(g),gear_lifter(l),roller(r),roller_arm(ra){}
 
 ostream& operator<<(ostream& o,Gear_collector const&){
 	return o<<"Gear_collector()";
@@ -168,6 +168,7 @@ Gear_collector::Status status(Gear_collector::Status_detail const& a){
 
 Gear_collector::Output control(Gear_collector::Status_detail const& st,Gear_collector::Goal const& goal){
 	Gear_collector::Goal g=goal;
+	//TODO
 	if((goal.gear_lifter==Gear_lifter::Goal::UP && st.gear_lifter!=Gear_lifter::Status_detail::UP) || (goal.gear_lifter==Gear_lifter::Goal::DOWN && st.gear_lifter!=Gear_lifter::Status_detail::DOWN))
 		g.gear_grabber=Gear_grabber::Goal::CLOSE;
 	return {
@@ -223,7 +224,11 @@ set<Gear_collector::Status_detail> examples(Gear_collector::Status_detail*){
 	set<Gear_collector::Status_detail> r;
 	for(auto a:examples((Gear_grabber::Status_detail*)0)){
 		for(auto b:examples((Gear_lifter::Status_detail*)0)){
-			r|=Gear_collector::Status_detail{a,b};
+			for(auto c:examples((Roller::Status_detail*)0)){
+				for(auto d:examples((Roller_arm::Status_detail*)0)){
+					r|=Gear_collector::Status_detail{a,b,c,d};
+				}
+			}
 		}
 	}
 	return r;
@@ -243,7 +248,11 @@ set<Gear_collector::Goal> examples(Gear_collector::Goal*){
 	set<Gear_collector::Goal> r;
 	for(auto a:examples((Gear_grabber::Goal*)0)){
 		for(auto b:examples((Gear_lifter::Goal*)0)){
-			r|=Gear_collector::Goal{a,b};
+			for(auto c:examples((Roller::Goal*)0)){
+				for(auto d:examples((Roller_arm::Goal*)0)){
+					r|=Gear_collector::Goal{a,b,c,d};
+				}
+			}
 		}
 	}
 	return r;
@@ -253,8 +262,12 @@ set<Gear_collector::Output> examples(Gear_collector::Output*){
 	set<Gear_collector::Output> r;
 	for(auto a:examples((Gear_grabber::Output*)0)){
 		for(auto b:examples((Gear_lifter::Output*)0)){
-			r|=Gear_collector::Output{a,b};
-		}
+			for(auto c:examples((Roller::Output*)0)){
+				for(auto d:examples((Roller_arm::Output*)0)){
+					r|=Gear_collector::Output{a,b,c,d};
+				}
+			}
+		}	
 	}
 	return r;
 	//return {{}};
@@ -268,7 +281,11 @@ set<Gear_collector::Status> examples(Gear_collector::Status*){
 	set<Gear_collector::Status> r;
 	for(auto a:examples((Gear_grabber::Status*)nullptr)){
 		for(auto b:examples((Gear_lifter::Status*)nullptr)){
-			r|=Gear_collector::Status{a,b};
+			for(auto c:examples((Roller::Status*)nullptr)){
+				for(auto d:examples((Roller_arm::Status*)nullptr)){
+					r|=Gear_collector::Status{a,b,c,d};
+				}
+			}
 		}
 	}
 	return r;

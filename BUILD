@@ -478,14 +478,14 @@ cc_library(
         name="gear_collector",
         srcs=["control/gear_collector.cpp"],
         hdrs=["control/gear_collector.h"],
-        deps=[":gear_grabber",":gear_lifter"]
+        deps=[":gear_grabber",":gear_lifter",":roller",":roller_arm"]
 )
 
 cc_test(
         name="gear_collector_test",
         srcs=["control/gear_collector.cpp","control/gear_collector.h","control/formal.h"],
         copts=["-DGEAR_COLLECTOR_TEST"],
-        deps=[":gear_grabber",":gear_lifter"],
+        deps=[":gear_grabber",":gear_lifter",":roller",":roller_arm"],
         timeout="short"
 )
 

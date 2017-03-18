@@ -4,7 +4,7 @@
 
 using namespace std;
 
-#define INTAKE_ADDRESS 7
+#define INTAKE_ADDRESS 9 //TODO REMOVE
 #define INTAKE_SPEED .40 //TODO tune this
 
 ostream& operator<<(ostream& o, Intake::Goal a){
