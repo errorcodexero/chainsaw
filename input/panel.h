@@ -8,7 +8,6 @@ struct Panel{
 	static const unsigned PORT = 2;
 	bool in_use;
 	//*Buttons:
-	bool ball_collect;
 	bool camera_light;
 	bool shoot;
 	bool gear_prep_collect;
@@ -19,22 +18,20 @@ struct Panel{
 	bool learn;
 	//2 position swicthes:
 	//3 position switches:
-	enum class Ball_arm{STOW,LOW,AUTO};
-	Ball_arm ball_arm;
-	enum class Gear_grabber{OPEN,CLOSED,AUTO};
-	Gear_grabber gear_grabber;//grasper;
-	enum class Gear_arm{UP,DOWN,AUTO};
-	Gear_arm gear_arm;//gear_collector;
+	enum class Roller_control{OFF,AUTO};
+	Roller_control roller_control;
+	enum class Roller{OUT,IN,AUTO};
+	Roller roller;
+	enum class Roller_arm{STOW,LOW,AUTO};
+	Roller_arm roller_arm;
 	enum class Shooter{ENABLED,DISABLED,AUTO};
 	Shooter shooter;
-	enum class Ball_intake{OUT,IN,AUTO};
-	Ball_intake ball_intake;
-	enum class Ball_lift{OUT,IN,AUTO};
-	Ball_lift ball_lift;
-	enum class Shooter_belt{ENABLED,DISABLED,AUTO};//TODO: no longer exists
-	Shooter_belt shooter_belt;
-	enum class Ball_collector{DISABLED,AUTO};//TODO: is this a button?
-	Ball_collector ball_collector;
+	enum class Gear_grabber{OPEN,CLOSED,AUTO};
+	Gear_grabber gear_grabber;
+	enum class Gear_arm{UP,DOWN,AUTO};
+	Gear_arm gear_arm;
+	enum class Gear_sensing{SEMI_AUTO,FULL_AUTO};
+	Gear_sensing gear_sensing;
 	//10 *position switches:
 	int auto_select;//0-19
 	//Dials:

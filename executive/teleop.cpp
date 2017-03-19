@@ -102,17 +102,17 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	}();
 
 	//set the gear collector mode
-	if(info.panel.gear_prep_collect) gear_collector_mode=Gear_collector_mode::PREP_COLLECT;
+	if(info.panel.gear_prep_collect) gear_collector_mode=Gear_collector_mode::STOW;
 	if(info.panel.gear_collect) gear_collector_mode=Gear_collector_mode::COLLECT;
 	if(info.panel.gear_prep_score) gear_collector_mode=Gear_collector_mode::PREP_SCORE;
 	if(info.panel.gear_score) gear_collector_mode=Gear_collector_mode::SCORE;
 
 	goals.gear_collector=[&]{
 		switch(gear_collector_mode){
-			case Gear_collector_mode::PREP_COLLECT: 
+			case Gear_collector_mode::STOW: 
 				return Gear_collector::Goal{Gear_grabber::Goal::OPEN,Gear_lifter::Goal::DOWN,Roller::Goal::OFF,Roller_arm::Goal::STOW};
 			case Gear_collector_mode::COLLECT: 
-				return Gear_collector::Goal{Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::DOWN,Roller::Goal::OFF,Roller_arm::Goal::STOW};
+				return Gear_collector::Goal{Gear_grabber::Goal::OPEN,Gear_lifter::Goal::DOWN,Roller::Goal::IN,Roller_arm::Goal::LOW};
 			case Gear_collector_mode::PREP_SCORE: 
 				return Gear_collector::Goal{Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::UP,Roller::Goal::OFF,Roller_arm::Goal::STOW};
 			case Gear_collector_mode::SCORE: 
@@ -134,11 +134,19 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	camera_light_toggle.update(info.driver_joystick.button[Gamepad_button::START] || info.panel.camera_light);
 	goals.lights.camera_light=camera_light_toggle.get();//TODO
 
-	//Manual gear collector controls
+	//Manual controls
 	if(info.panel.gear_grabber==Panel::Gear_grabber::OPEN) goals.gear_collector.gear_grabber=Gear_grabber::Goal::OPEN;
 	if(info.panel.gear_grabber==Panel::Gear_grabber::CLOSED) goals.gear_collector.gear_grabber=Gear_grabber::Goal::CLOSE;
 	if(info.panel.gear_arm==Panel::Gear_arm::UP) goals.gear_collector.gear_lifter=Gear_lifter::Goal::UP;
 	if(info.panel.gear_arm==Panel::Gear_arm::DOWN) goals.gear_collector.gear_lifter=Gear_lifter::Goal::DOWN;	
+
+	if(info.panel.roller_arm==Panel::Roller_arm::STOW) goals.gear_collector.roller_arm=Roller_arm::Goal::STOW;
+	if(info.panel.roller_arm==Panel::Roller_arm::LOW) goals.gear_collector.roller_arm=Roller_arm::Goal::LOW;
+	if(info.panel.roller_control==Panel::Roller_control::OFF) goals.gear_collector.roller=Roller::Goal::OFF;
+	else {
+		if(info.panel.roller==Panel::Roller::OUT) goals.gear_collector.roller=Roller::Goal::OUT;
+		if(info.panel.roller==Panel::Roller::IN) goals.gear_collector.roller=Roller::Goal::IN;
+	}
 
 	goals.shooter = [&]{
 		switch(info.panel.shooter){
@@ -150,7 +158,7 @@ Toplevel::Goal Teleop::run(Run_info info) {
 			default:
 				nyi
 		}
-	}();
+	}();	
 
 	#if 1
 	if(info.in.ds_info.connected && (print_number%10)==0){
