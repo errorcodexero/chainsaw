@@ -4,9 +4,7 @@ HIGH PRIORITY:
 			- Middle
 			- Boiler side
 			- Loading station side
-		- Vision
 	- Controls (OI and gamepad)
-	- Shooter
 
 
 NOT AS HIGH PRIORITY:
@@ -22,26 +20,24 @@ NICE THINGS TO HAVE:
 	- Log Analysis
 	- Fix talon srx initialization: separate address for CANs and accessing index for them in the talon_srx_controls array
 	- Clean-up stuff:
-		- Deploy script
 		- Use enum class more places
 		- Use std::array in place of C arrays in several places
-	- Clean up panel interpret more
 	- Meta IO information
 		- Add a function that will discover which IOs different parts use (and make a nice list)
 		- Make a data type to talk about different inputs
 	
 	
 LOG LIST:
-	-RIO Time			10chars 
-	-RIO mode			4chars
-	-OI inputs (panel)		50chars
-	-PDP currents			120chars
-	-Robot Outputs			130chars
-	-Robot Inputs			30chars
-	-Driver inputs			120chars
-	-RIO Connection status and ip	12chars
-	-DriverStation outputs		4chars
-					488 chars total
+	-RIO Time			X chars 
+	-RIO mode			X chars
+	-OI inputs (panel)		X chars
+	-PDP currents			X chars
+	-Robot Outputs			X chars
+	-Robot Inputs			X chars
+	-Driver inputs			X chars
+	-RIO Connection status and ip	X chars
+	-DriverStation outputs		X chars
+					X chars total
 
 
 Eric's random thoughts:

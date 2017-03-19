@@ -98,9 +98,9 @@ std::ostream& operator<<(std::ostream& o, Talon_srx_input in){
 	return o<<")";
 }
 
-Talon_srx_output Talon_srx_output::voltage(double a){
+Talon_srx_output Talon_srx_output::percent(double a){
 	Talon_srx_output r;
-	r.mode=Mode::VOLTAGE;
+	r.mode=Mode::PERCENT;
 	r.power_level=a;
 	return r;
 }
@@ -113,7 +113,7 @@ Talon_srx_output Talon_srx_output::closed_loop(double a){
 }
 
 std::ostream& operator<<(std::ostream& o, Talon_srx_output::Mode a){
-	if(a==Talon_srx_output::Mode::VOLTAGE) o<<"VOLTAGE";
+	if(a==Talon_srx_output::Mode::PERCENT) o<<"PERCENT";
 	else if(a==Talon_srx_output::Mode::SPEED) o<<"SPEED";
 	return o;
 }
@@ -121,7 +121,7 @@ std::ostream& operator<<(std::ostream& o, Talon_srx_output::Mode a){
 std::ostream& operator<<(std::ostream& o, Talon_srx_output a){
 	o<<"(mode: "<<a.mode;
 	o<<" pid:"<<a.pid;
-	if(a.mode==Talon_srx_output::Mode::VOLTAGE) o<<" power_level:"<<a.power_level;
+	if(a.mode==Talon_srx_output::Mode::PERCENT) o<<" power_level:"<<a.power_level;
 	else if(a.mode==Talon_srx_output::Mode::SPEED) o<<" speed:"<<a.speed;
 	return o<<")";
 }
@@ -209,7 +209,7 @@ bool operator<(Talon_srx_input a, Talon_srx_input b){
 
 bool operator==(Talon_srx_output a,Talon_srx_output b){
 	if(a.mode!=b.mode) return false;
-	if(a.mode==Talon_srx_output::Mode::VOLTAGE) return a.power_level==b.power_level;
+	if(a.mode==Talon_srx_output::Mode::PERCENT) return a.power_level==b.power_level;
 	if(a.mode==Talon_srx_output::Mode::SPEED) return a.speed==b.speed;
 	return false;
 }
@@ -220,7 +220,7 @@ bool operator!=(Talon_srx_output a,Talon_srx_output b){
 
 bool operator<(Talon_srx_output a, Talon_srx_output b){
 	if(a.mode!=b.mode) return a.mode<b.mode;
-	if(a.mode==Talon_srx_output::Mode::VOLTAGE) return a.power_level<b.power_level;
+	if(a.mode==Talon_srx_output::Mode::PERCENT) return a.power_level<b.power_level;
 	if(a.mode==Talon_srx_output::Mode::SPEED) return a.speed<b.speed;
 	return false;
 }

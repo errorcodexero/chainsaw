@@ -705,11 +705,13 @@ cc_library(
 		"executive/autonomous.cpp",
 		"executive/teleop.cpp",
 		"executive/chain.cpp",
+		"executive/align.cpp"
 	],
 	hdrs=[
 		"executive/autonomous.h",
 		"executive/teleop.h",
 		"executive/chain.h",
+		"executive/align.h"
 	],
 	deps=[":executive",":posedge_trigger_debounce",":posedge_toggle",":motion_profile",":step"]
 )
@@ -728,7 +730,7 @@ cc_test(
 	copts=["-DAUTONOMOUS_TEST"],
 	deps=[
 		":executive",":executive_impl",
-		":test"
+		":test",":align"
 	],
 	timeout="short"
 )
@@ -759,6 +761,12 @@ cc_library(
 	srcs=["executive/step.cpp"],
 	hdrs=["executive/step.h"],
 	deps=[":executive",":motion_profile"]
+)
+cc_library(
+	name="align",
+	srcs=["executive/align.cpp"],
+	hdrs=["executive/align.h"],
+	deps=[":executive",":motion_profile",":step"]
 )
 
 cc_test(

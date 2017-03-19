@@ -3,7 +3,9 @@
 
 using namespace std;
 
-Chain::Chain(vector<Step> s, Executive n):current_step(0),steps(s),next(n){}
+Chain::Chain(vector<Step> s, Executive n):current_step(0),steps(s),next(n){
+	if(steps.size()==0) steps.push_back(Step{Wait(0)});
+}
 Chain::Chain(Step s, Executive n):Chain(vector<Step>{s},n){}
 
 /*Chain::Chain(Chain const& a):step(a.step){
@@ -37,8 +39,8 @@ void Chain::display(ostream& o)const{
 	o<<")";
 }
 
-bool Chain::operator==(Chain const&)const{
-	return 1;
+bool Chain::operator==(Chain const& a)const{
+	return current_step==a.current_step && steps==a.steps && next==a.next;
 }
 
 unique_ptr<Executive_interface> Chain::clone()const{

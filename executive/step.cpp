@@ -27,7 +27,7 @@ Toplevel::Goal Step::run(Run_info info){
 	return impl->run(info,{});
 }
 
-const double RIGHT_SPEED_CORRECTION = -0.07;//left and right sides of the robot drive at different speeds given the same power, adjust this to make the robot drive straight
+const double RIGHT_SPEED_CORRECTION = -0.045; // 0.0;// 0 is for comp bot. //left and right sides of the practice robot drive at different speeds given the same power, adjust this to make the robot drive straight
 
 static const Inch ROBOT_WIDTH = 28; //inches, ignores bumpers //TODO: finds some way of dealing with constants like this and wheel diameter
 
@@ -58,8 +58,8 @@ Toplevel::Goal Turn::run(Run_info info,Toplevel::Goal goals){
 	
 	//ignoring right encoder because it's proven hard to get meaningful data from it
 	double power = motion_profile.target_speed(distance_travelled.l); 
-	goals.drive.left = clip(target_to_out_power(power,.15));
-	goals.drive.right = -clip(target_to_out_power(power - RIGHT_SPEED_CORRECTION * power,.15));
+	goals.drive.left = clip(target_to_out_power(power));//TODO: move .2 to the constructor of Turn and set an instance variable
+	goals.drive.right = -clip(target_to_out_power(power - RIGHT_SPEED_CORRECTION * power));
 	goals.shifter = Gear_shifter::Goal::LOW;
 	return goals;
 }
@@ -71,7 +71,7 @@ Step::Status Turn::done(Next_mode_info info){
 	if(fabs(distance_left.l) < TOLERANCE){
 		 in_range.update(info.in.now,info.in.robot_mode.enabled);
 	} else {
-		static const Time FINISH_TIME = 1.0;//seconds
+		static const Time FINISH_TIME = .50;//seconds
 		in_range.set(FINISH_TIME);
 	}
 	return in_range.done() ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;
@@ -136,10 +136,11 @@ Step::Status Drive_straight::done(Next_mode_info info){
 	if(fabs(distance_left.l) < TOLERANCE){
 		in_range.update(info.in.now,info.in.robot_mode.enabled);
 	} else {
-		static const Time FINISH_TIME = 1.0;
+		static const Time FINISH_TIME = .50;
 		in_range.set(FINISH_TIME);
 	}
 	
+	/*
 	if(info.status.drive.stall){
 		stall_timer.update(info.in.now,info.in.robot_mode.enabled);
 	} else{
@@ -147,8 +148,9 @@ Step::Status Drive_straight::done(Next_mode_info info){
 		stall_timer.set(STALL_TIME);
 	}
 	if(stall_timer.done()) return Step::Status::FINISHED_FAILURE;
+	*/
 	
-	cout<<"stall:"<<info.status.drive.stall<<"\n";
+	//cout<<"stall:"<<info.status.drive.stall<<"\n";
 
 	return in_range.done() ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;
 }
@@ -166,8 +168,8 @@ Toplevel::Goal Drive_straight::run(Run_info info,Toplevel::Goal goals){
 
 	double power = motion_profile.target_speed(distance_travelled.l); //ignoring right encoder because it's proven hard to get meaningful data from it
 
-	goals.drive.left = clip(target_to_out_power(power,.11));
-	goals.drive.right = clip(target_to_out_power(power + power * RIGHT_SPEED_CORRECTION,.11)); //right side would go faster than the left without error correction
+	goals.drive.left = clip(target_to_out_power(power));//TODO: move .11 to the constructor of Drive_straight and set an instance variable
+	goals.drive.right = clip(target_to_out_power(power + power * RIGHT_SPEED_CORRECTION)); //right side would go faster than the left without error correction
 	goals.shifter = gear;
 	return goals;
 }
@@ -178,102 +180,6 @@ unique_ptr<Step_impl> Drive_straight::clone()const{
 
 bool Drive_straight::operator==(Drive_straight const& b)const{
 	return target_dist == b.target_dist && initial_distances == b.initial_distances && init == b.init && motion_profile == b.motion_profile && in_range == b.in_range /*&& stall_timer == b.stall_timer*/ && gear == b.gear;
-}
-
-Align::Align():firsttime(0){}
-
-Step::Status Align::done(Next_mode_info info){
-	blocks=info.in.camera.blocks;
-	current=mean(blocks[0].x,blocks[1].x);
-	center=160;
-	int const  TOLERANCE= 2;
-	if(firsttime) return Step::Status::FINISHED_SUCCESS;
-	if(!info.in.camera.enabled){
-		camera_con = Camera_con::DISABLED;
-		manualflag=true;
-	}
-	else if(blocks.size() <=0){
-		camera_con = Camera_con::NONVISION;
-		manualflag=true;
-	}
-	else if((blocks.size() >0) & info.in.camera.enabled){
-		camera_con = Camera_con::ENABLE;
-		manualflag=false;
-	}
-	if(!manualflag){
-		if(current<= center-TOLERANCE && current >=center+TOLERANCE){
-			in_range.update(info.in.now,info.in.robot_mode.enabled);
-		} else {
-			static const Time FINISH_TIME = 1.0;
-			in_range.set(FINISH_TIME);
-		}
-	}
-	if(manualflag){
-		if(!in_range.done()){
-			 in_range.update(info.in.now,info.in.robot_mode.enabled);
-		}else if(in_range.done()){
-			firsttime=true;
-		}else{
-			static const Time FINISH_TIME = 1.0;
-			in_range.set(FINISH_TIME);
-		}
-	}
-	return in_range.done() ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED; 
-}
-
-Toplevel::Goal Align::run(Run_info info){
-	return run(info,{});
-}
-
-Toplevel::Goal Align::run(Run_info info,Toplevel::Goal goals){
-	blocks=info.in.camera.blocks;
-	current=mean(blocks[0].x,blocks[1].x);
-	center=mean(blocks[0].min_x,blocks[0].max_x);
-	cout << "Align:    " << blocks[0] << "," << blocks[1] << "   " << current << "   " << center << "\n";
-	const int TOLERANCE = 2;
-	double power = .2;
-	if(camera_con==Camera_con::ENABLE){
-		if(current<=center-TOLERANCE){
-			goals.drive.left = -power;
-			goals.drive.right = power;
-		} else if(current>=center+TOLERANCE) {
-			goals.drive.left = 0;
-			goals.drive.right = 0;
-		}
-		else{
-		goals.drive.left = power;
-		goals.drive.right = power;
-		}
-	}
-	else if(camera_con==Camera_con::DISABLED){
-		if(info.panel.auto_select == 3 || info.panel.auto_select == 4){
-			goals.drive.left = power;
-			goals.drive.right = -power;
-		}
-		else if(info.panel.auto_select == 5 || info.panel.auto_select == 6){
-			goals.drive.left = -power;
-			goals.drive.right = power;	
-		}else{
-			goals.drive.left =0;
-			goals.drive.right=0;
-		}
-	}
-	else if(camera_con==Camera_con::NONVISION){
-		goals.drive.left = -power;
-		goals.drive.right = power;
-	}
-	goals.shifter = Gear_shifter::Goal::LOW;
-	
-	return goals;
-	
-}
-
-unique_ptr<Step_impl> Align::clone()const{
-	return unique_ptr<Step_impl>(new Align());
-}
-
-bool Align::operator==(Align const& b)const{
-	return in_range == b.in_range;
 }
 
 Wait::Wait(Time wait_time){
@@ -414,6 +320,38 @@ bool Combo::operator==(Combo const& b)const{
 	return step_a == b.step_a && step_b == b.step_b;
 }
 
+///
+
+Turn_on_light::Turn_on_light(){
+	lights_goal = [=]{
+		Lights::Goal a;
+		a.camera_light = true;
+		return a;
+	}();
+}
+
+Step::Status Turn_on_light::done(Next_mode_info info){
+	return (ready(status(info.status.lights),lights_goal)) ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;
+}
+
+Toplevel::Goal Turn_on_light::run(Run_info info){
+	return run(info,{});
+}
+
+Toplevel::Goal Turn_on_light::run(Run_info info,Toplevel::Goal goals){
+	(void)info;
+	goals.lights = lights_goal;
+	return goals;
+}
+
+unique_ptr<Step_impl> Turn_on_light::clone()const{
+	return unique_ptr<Step_impl>(new Turn_on_light(*this));
+}
+
+bool Turn_on_light::operator==(Turn_on_light const& b)const{
+	return lights_goal == b.lights_goal;
+}
+
 Score_gear::Score_gear():
 	steps({
 			Step{Lift_gear()},//lift the gear
@@ -529,7 +467,6 @@ ostream& operator<<(ostream& o,Step_impl const& a){
 	a.display(o);
 	return o;
 }
-
 #ifdef STEP_TEST
 void test_step(Step a){
 	PRINT(a);
