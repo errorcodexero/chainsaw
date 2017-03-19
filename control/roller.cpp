@@ -5,7 +5,7 @@
 using namespace std;
 
 #define ROLLER_ADDRESS 7
-#define ROLLER_SPEED .40 //TODO tune this
+#define ROLLER_SPEED 1.0 //TODO tune this
 
 ostream& operator<<(ostream& o, Roller::Goal a){
 	#define X(name) if(a==Roller::Goal::name)return o<<"Roller::Goal("#name")";
