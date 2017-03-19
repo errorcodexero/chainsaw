@@ -10,7 +10,7 @@ static const unsigned int BALL_ARM_AXIS=2, BALL_INTAKE_AXIS=1, BALL_COLLECTOR_AX
 static const unsigned int BALL_COLLECT_LOC=0, LOADING_INDICATOR_LOC=1, SHOOT_LOC=2, PREP_COLLECT_GEAR_LOC=3, PREP_SCORE_GEAR_LOC=4, COLLECT_GEAR_LOC=5, SCORE_GEAR_LOC=6, CLIMB_LOC=7, LEARN_LOC=8, SHOOTER_BELT_AUTO_LOC=11, SHOOTER_BELT_ENABLED_LOC=12, BALL_LIFTER_IN_LOC=9, BALL_LIFTER_OUT_LOC=10;//TODO: rename constants 
 
 #define BUTTONS \
-	X(ball_collect) X(loading_indicator) X(shoot) X(gear_prep_collect) X(gear_prep_score) X(gear_collect) X(gear_score) X(climb) X(learn)
+	X(ball_collect) X(camera_light) X(shoot) X(gear_prep_collect) X(gear_prep_score) X(gear_collect) X(gear_score) X(climb) X(learn)
 #define THREE_POS_SWITCHES \
 	X(ball_arm) X(gear_grabber) X(gear_arm) X(shooter) X(ball_intake) X(ball_lift) X(shooter_belt) X(ball_collector)
 #define TEN_POS_SWITCHES \
@@ -219,7 +219,7 @@ Panel interpret_oi(Joystick_data d){
 	}	
 	{//buttons
 		p.ball_collect=d.button[BALL_COLLECT_LOC];
-		p.loading_indicator=d.button[LOADING_INDICATOR_LOC];
+		p.camera_light=d.button[LOADING_INDICATOR_LOC];
 		p.shoot=d.button[SHOOT_LOC];
 		p.gear_prep_collect=d.button[PREP_COLLECT_GEAR_LOC];
 		p.gear_prep_score=d.button[PREP_SCORE_GEAR_LOC];
@@ -277,7 +277,7 @@ Panel interpret_gamepad(Joystick_data d){
 	p.auto_select=0;
 	p.speed_dial = (d.axis[Gamepad_axis::LTRIGGER]-.5)*2;
 	p.learn = d.button[Gamepad_button::START];
-	p.loading_indicator = d.button[Gamepad_button::BACK];
+	p.camera_light = d.button[Gamepad_button::BACK];
 
 	if(!alternative_op){
 		p.gear_prep_score = d.button[Gamepad_button::Y];

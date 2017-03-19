@@ -9,7 +9,7 @@ struct Panel{
 	bool in_use;
 	//*Buttons:
 	bool ball_collect;
-	bool loading_indicator;
+	bool camera_light;
 	bool shoot;
 	bool gear_prep_collect;
 	bool gear_prep_score;
