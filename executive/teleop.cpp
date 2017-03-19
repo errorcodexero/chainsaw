@@ -204,11 +204,14 @@ Toplevel::Goal Teleop::run(Run_info info) {
 
 	goals.climber=info.panel.climb?Climber::Goal::CLIMB:Climber::Goal::STOP;
 
+	/*
 	indicator_toggle.update(info.panel.loading_indicator);
 	if(indicator_toggle.get()) goals.lights.loading_indicator=Lights::Loading_indicator::BALLS;
 	else goals.lights.loading_indicator=Lights::Loading_indicator::GEARS;
-
-	camera_light_toggle.update(info.driver_joystick.button[Gamepad_button::START]);
+	*/
+	
+	//set the camera light
+	camera_light_toggle.update(info.driver_joystick.button[Gamepad_button::START] || info.panel.camera_light);
 	goals.lights.camera_light=camera_light_toggle.get();//TODO
 
 	//Manual controls
