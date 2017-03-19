@@ -107,6 +107,8 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	if(info.panel.gear_prep_score) gear_collector_mode=Gear_collector_mode::PREP_SCORE;
 	if(info.panel.gear_score) gear_collector_mode=Gear_collector_mode::SCORE;
 
+	//TODO: as roller arm moves down, move roller out
+
 	goals.gear_collector=[&]{
 		switch(gear_collector_mode){
 			case Gear_collector_mode::STOW: 
