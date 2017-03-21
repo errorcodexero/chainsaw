@@ -169,8 +169,12 @@ Gear_collector::Status status(Gear_collector::Status_detail const& a){
 Gear_collector::Output control(Gear_collector::Status_detail const& st,Gear_collector::Goal const& goal){
 	Gear_collector::Goal g=goal;
 	//TODO
+	if(st.roller_arm!=Roller_arm::Status::STOW) g.gear_lifter=Gear_lifter::Goal::DOWN; //Keep gear grabber in if the roller is down
+	if(st.gear_lifter!=Gear_lifter::Status::DOWN) g.roller_arm=Roller_arm::Goal::STOW; //Keep roller stowed if gear grabber is out
 	if((goal.gear_lifter==Gear_lifter::Goal::UP && st.gear_lifter!=Gear_lifter::Status_detail::UP) || (goal.gear_lifter==Gear_lifter::Goal::DOWN && st.gear_lifter!=Gear_lifter::Status_detail::DOWN))
-		g.gear_grabber=Gear_grabber::Goal::CLOSE;
+		g.gear_grabber=Gear_grabber::Goal::CLOSE; //Keep gear grabber closed while the gear lifter is moving
+	if(goal.roller_arm==Roller_arm::Goal::LOW && st.roller_arm!=Roller_arm::Status::LOW)
+		g.roller=Roller::Goal::OUT; //Run roller backwards while the roller arm is going down
 	return {
 		#define X(A,B) control(st.B,g.B),
 		GEAR_COLLECTOR_ITEMS(X)
