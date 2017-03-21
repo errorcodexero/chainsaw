@@ -442,7 +442,7 @@ class Robot_adapter: public SampleRobot{
 			u.run(r);
 			
 			//should see what happpens when this wait is removed.
-			Wait(0.005);// wait for a motor update time
+			Wait(0.005);// Wait 5 ms so we don't hog CPU cycle time
 		}
 	}
 	
@@ -463,7 +463,7 @@ class Robot_adapter: public SampleRobot{
 			r.autonomous=IsAutonomous();
 			u.run(r);
 
-			Wait(0.1);
+			Wait(0.005);
 		}
 	}
 };
