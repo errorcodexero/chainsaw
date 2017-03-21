@@ -107,6 +107,9 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	if(info.panel.gear_prep_score) gear_collector_mode=Gear_collector_mode::PREP_SCORE;
 	if(info.panel.gear_score) gear_collector_mode=Gear_collector_mode::SCORE;
 
+	if(info.panel.gear_sensing==Panel::Gear_sensing::FULL_AUTO && gear_collector_mode==Gear_collector_mode::STOW && info.status.gear_collector.gear_grabber.has_gear)
+		gear_collector_mode=Gear_collector_mode::PREP_SCORE; //Go into PREP_SCORE mode from STOW if a gear is detected and the sensor-using mode is selected
+
 	//TODO: as roller arm moves down, move roller out
 
 	goals.gear_collector=[&]{
@@ -125,6 +128,7 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	}();
 
 	goals.climber=info.panel.climb?Climber::Goal::CLIMB:Climber::Goal::STOP;
+	if(info.panel.climb) gear_collector_mode=Gear_collector_mode::STOW; //Go into STOW if climbing
 
 	/*
 	indicator_toggle.update(info.panel.loading_indicator);
@@ -133,7 +137,7 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	*/
 	
 	/*
-	//set the camera light
+	//Set the camera light
 	camera_light_toggle.update(info.driver_joystick.button[Gamepad_button::START] || info.panel.camera_light);
 	goals.lights.camera_light=camera_light_toggle.get();//TODO
 	*/
