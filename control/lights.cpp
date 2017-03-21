@@ -8,7 +8,7 @@ using namespace std;
 #define CAMERA_ADDRESS 10
 
 Lights::Goal::Goal(Loading_indicator a,bool b):loading_indicator(a),camera_light(b){}
-Lights::Goal::Goal():Lights::Goal(Lights::Loading_indicator::BALLS,true){}
+Lights::Goal::Goal():Lights::Goal(Lights::Loading_indicator::GEARS,true){}
 
 ostream& operator<<(ostream& o, Lights::Loading_indicator a){
 	#define X(name) if(a==Lights::Loading_indicator::name)return o<<"Lights::Loading_indicator("#name")";

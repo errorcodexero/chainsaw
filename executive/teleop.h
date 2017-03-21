@@ -25,9 +25,10 @@ struct Teleop : Executive_impl<Teleop> {
 		X(SINGLE_ARG(std::array<Nudge,NUDGES>),nudges) \
 		X(Posedge_trigger,collect_trigger) \
 		X(Gear_collector_mode,gear_collector_mode) \
-		X(Countdown_timer,clear_ball_timer) \
 		X(Posedge_toggle,indicator_toggle) \
 		X(Posedge_toggle,camera_light_toggle) \
+		X(Posedge_trigger,has_gear_trigger) \
+		X(Countdown_timer,gear_light_timer) \
 		X(int,print_number)
 	STRUCT_MEMBERS(TELEOP_ITEMS)
 

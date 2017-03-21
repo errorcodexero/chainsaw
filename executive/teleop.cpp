@@ -54,7 +54,7 @@ Executive Teleop::next_mode(Next_mode_info info) {
 
 IMPL_STRUCT(Teleop::Teleop,TELEOP_ITEMS)
 
-Teleop::Teleop():gear_collector_mode(Gear_collector_mode::COLLECT),print_number(0){}
+Teleop::Teleop():gear_collector_mode(Gear_collector_mode::STOW),print_number(0){}
 
 Toplevel::Goal Teleop::run(Run_info info) {
 	Toplevel::Goal goals;
@@ -142,7 +142,10 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	goals.lights.camera_light=camera_light_toggle.get();//TODO
 	*/
 
-	goals.lights.camera_light=info.status.gear_collector.gear_grabber.has_gear && (int)floor(info.in.now)%2==0;
+	const Time GEAR_LIGHT_DURATION = 1;
+	gear_light_timer.update(info.in.now,enabled);
+	if(has_gear_trigger(info.status.gear_collector.gear_grabber.has_gear)) gear_light_timer.set(GEAR_LIGHT_DURATION);
+	goals.lights.camera_light=!gear_light_timer.done() && (int)floor(10*info.in.now)%2==0;
 
 	//Manual controls
 	if(info.panel.gear_grabber==Panel::Gear_grabber::OPEN) goals.gear_collector.gear_grabber=Gear_grabber::Goal::OPEN;
