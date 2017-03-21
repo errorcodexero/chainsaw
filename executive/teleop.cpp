@@ -132,9 +132,13 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	else goals.lights.loading_indicator=Lights::Loading_indicator::GEARS;
 	*/
 	
+	/*
 	//set the camera light
 	camera_light_toggle.update(info.driver_joystick.button[Gamepad_button::START] || info.panel.camera_light);
 	goals.lights.camera_light=camera_light_toggle.get();//TODO
+	*/
+
+	goals.lights.camera_light=info.status.gear_collector.gear_grabber.has_gear && (int)floor(info.in.now)%2==0;
 
 	//Manual controls
 	if(info.panel.gear_grabber==Panel::Gear_grabber::OPEN) goals.gear_collector.gear_grabber=Gear_grabber::Goal::OPEN;
