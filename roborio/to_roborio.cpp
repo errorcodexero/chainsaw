@@ -370,7 +370,7 @@ public:
 	void run(Robot_inputs in){
 		//std::ostream print_stream=cout;//(in.ds_info.connected && (print_num%PRINT_SPEED)==0)?cout:null_stream;
 		Robot_outputs out=main(in/*,print_stream*/);
-		#if 1
+		#if 0
 		const int PRINT_SPEED=10;
 		static int print_num=0;
 		if(in.ds_info.connected && (print_num%PRINT_SPEED)==0){	

@@ -24,13 +24,13 @@ bool operator!=(Roller a, Roller b){ return !(a==b);}
 Robot_outputs Roller::Output_applicator::operator()(Robot_outputs r, Roller::Output out)const{
 	switch(out){
 		case Roller::Output::OUT:
-			r.pwm[ROLLER_ADDRESS]=-ROLLER_SPEED;
+			r.pwm[ROLLER_ADDRESS]=ROLLER_SPEED;
 			break;
 		case Roller::Output::OFF:
 			r.pwm[ROLLER_ADDRESS]=0.0;	
 			break;
 		case Roller::Output::IN:
-			r.pwm[ROLLER_ADDRESS]=ROLLER_SPEED;//changed to match the practice bot
+			r.pwm[ROLLER_ADDRESS]=-ROLLER_SPEED;//changed to match the practice bot
 			break;
 		default:
 			assert(0);
@@ -40,9 +40,9 @@ Robot_outputs Roller::Output_applicator::operator()(Robot_outputs r, Roller::Out
 
 Roller::Output Roller::Output_applicator::operator()(Robot_outputs r)const{
 	double pwm = r.pwm[ROLLER_ADDRESS];
-	if(pwm > 0.0) return Roller::Output::IN;
+	if(pwm < 0.0) return Roller::Output::IN;
 	if(pwm == 0.0) return Roller::Output::OFF;
-	if(pwm < 0.0) return Roller::Output::OUT;
+	if(pwm > 0.0) return Roller::Output::OUT;
 	assert(0);
 }
 	

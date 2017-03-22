@@ -110,7 +110,7 @@ void Roller_arm::Estimator::update(Time time,Roller_arm::Input input,Roller_arm:
 			if(last == Status::LOWERING){
 				state_timer.update(time,input.enabled);
 			} else if(last != Status::LOW){ 
-				const Time LOW_TIME = 1.0;//seconds. assumed
+				const Time LOW_TIME = .6;//seconds. assumed
 				last = Status::LOWERING;
 				state_timer.set(LOW_TIME);
 			}
@@ -122,7 +122,7 @@ void Roller_arm::Estimator::update(Time time,Roller_arm::Input input,Roller_arm:
 			if(last == Status::STOWING){
 				state_timer.update(time,input.enabled);
 			} else if(last != Status::STOW){ 
-				const Time STOW_TIME = 2.2;//seconds. assumed
+				const Time STOW_TIME = 1;//seconds. assumed
 				last = Status::STOWING;
 				state_timer.set(STOW_TIME);
 			}

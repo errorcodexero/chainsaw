@@ -14,7 +14,7 @@ ostream& operator<<(ostream& o,Align::Mode a){
 	}
 }
 
-static const int CENTER = 115;
+static const int CENTER = 145;
 static const Time INITIAL_SEARCH = 0.1;
 
 Align::Align(Rad a):mode(Align::Mode::VISION),blocks({}),current(0),estimated_angle(a),nonvision_align(Step{Turn(a)}){
@@ -45,7 +45,7 @@ Step::Status Align::done(Next_mode_info info){
 					return Step::Status::FINISHED_SUCCESS;
 				}
 				in_range.update(info.in.now,info.in.robot_mode.enabled);
-				const int VISION_THRESHHOLD = 24;//starting with something large; theoretically this could be as large at 30px and be ok.
+				const int VISION_THRESHHOLD = 24*.75;//starting with something large; theoretically this could be as large at 30px and be ok.
 				const bool ok_now=(current > CENTER - VISION_THRESHHOLD && current < CENTER + VISION_THRESHHOLD);
 				if(!ok_now){
 					static const Time FINISH_TIME = .50;
@@ -75,12 +75,12 @@ Toplevel::Goal Align::run(Run_info info,Toplevel::Goal goals){
 			{
 				double power = target_to_out_power([&]{//power for left side, right side is opposite of this
 					double error=CENTER-current;
-					static const double P=.01;//not tuned!
-					static const double LIMIT=.3;//not tuned!
+					static const double P=.0025;//not tuned!
+					static const double LIMIT=.1;//not tuned!
 					return clamp(error*P,-LIMIT,LIMIT);
 				}(),.05);
-				goals.drive.left = power;
-				goals.drive.right = -power;
+				goals.drive.left = -power;
+				goals.drive.right = power;
 				return goals;
 			}
 		case Mode::NONVISION:

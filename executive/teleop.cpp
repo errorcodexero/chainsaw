@@ -107,7 +107,9 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	if(info.panel.gear_prep_score) gear_collector_mode=Gear_collector_mode::PREP_SCORE;
 	if(info.panel.gear_score) gear_collector_mode=Gear_collector_mode::SCORE;
 
-	if(info.panel.gear_sensing==Panel::Gear_sensing::FULL_AUTO && gear_collector_mode==Gear_collector_mode::STOW && info.status.gear_collector.gear_grabber.has_gear)
+	bool gear_detected=info.status.gear_collector.gear_grabber.has_gear && info.status.gear_collector.gear_lifter==Gear_lifter::Status::DOWN;
+
+	if(info.panel.gear_sensing==Panel::Gear_sensing::FULL_AUTO && gear_detected)
 		gear_collector_mode=Gear_collector_mode::PREP_SCORE; //Go into PREP_SCORE mode from STOW if a gear is detected and the sensor-using mode is selected
 
 	//TODO: as roller arm moves down, move roller out
@@ -136,16 +138,15 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	else goals.lights.loading_indicator=Lights::Loading_indicator::GEARS;
 	*/
 	
-	/*
 	//Set the camera light
 	camera_light_toggle.update(info.driver_joystick.button[Gamepad_button::START] || info.panel.camera_light);
-	goals.lights.camera_light=camera_light_toggle.get();//TODO
-	*/
+	goals.lights.camera_light=camera_light_toggle.get();
 
+	//Flash camera light when a gear enters the gear collector
 	const Time GEAR_LIGHT_DURATION = 1;
 	gear_light_timer.update(info.in.now,enabled);
-	if(has_gear_trigger(info.status.gear_collector.gear_grabber.has_gear)) gear_light_timer.set(GEAR_LIGHT_DURATION);
-	goals.lights.camera_light=!gear_light_timer.done() && (int)floor(10*info.in.now)%2==0;
+	if(has_gear_trigger(gear_detected)) gear_light_timer.set(GEAR_LIGHT_DURATION);
+	if(!gear_light_timer.done() && (int)floor(10*info.in.now)%2==0) goals.lights.camera_light=1;
 
 	//Manual controls
 	if(info.panel.gear_grabber==Panel::Gear_grabber::OPEN) goals.gear_collector.gear_grabber=Gear_grabber::Goal::OPEN;
@@ -173,7 +174,7 @@ Toplevel::Goal Teleop::run(Run_info info) {
 		}
 	}();	
 
-	#if 1
+	#if 0
 	if(info.in.ds_info.connected && (print_number%10)==0){
 		cout<<"\nstalled:"<<info.status.drive.stall<<"\n";
 		if(info.in.camera.enabled){

@@ -27,7 +27,7 @@ Toplevel::Goal Step::run(Run_info info){
 	return impl->run(info,{});
 }
 
-const double RIGHT_SPEED_CORRECTION = -0.045; // 0.0;// 0 is for comp bot. //left and right sides of the practice robot drive at different speeds given the same power, adjust this to make the robot drive straight
+const double RIGHT_SPEED_CORRECTION = 0.0;//-0.045; // 0.0;// 0 is for comp bot. //left and right sides of the practice robot drive at different speeds given the same power, adjust this to make the robot drive straight
 
 static const Inch ROBOT_WIDTH = 28; //inches, ignores bumpers //TODO: finds some way of dealing with constants like this and wheel diameter
 
