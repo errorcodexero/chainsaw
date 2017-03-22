@@ -263,7 +263,6 @@ Panel interpret_gamepad(Joystick_data d){
 	p.auto_select=0;
 	p.speed_dial = (d.axis[Gamepad_axis::LTRIGGER]-.5)*2;
 	p.learn = d.button[Gamepad_button::START];
-	p.camera_light = d.button[Gamepad_button::BACK];
 
 	if(!alternative_op){
 		p.gear_prep_score = d.button[Gamepad_button::Y];
@@ -277,21 +276,21 @@ Panel interpret_gamepad(Joystick_data d){
 			case POV_section::CENTER:
 				break;
 			case POV_section::UP:
-				p.shoot = true;
 				break;
 			case POV_section::UP_LEFT:
 				break;
 			case POV_section::LEFT:
-				p.climb = true;
+				p.camera_light=true;
 				break;
 			case POV_section::DOWN_LEFT:
 				break;
 			case POV_section::DOWN:
+				p.climb = true;
 				break;
 			case POV_section::DOWN_RIGHT:
 				break;
 			case POV_section::RIGHT:
-				//p.ball_collect=true;
+				p.shoot = true;
 				break;
 			case POV_section::UP_RIGHT:
 				break;
@@ -299,17 +298,15 @@ Panel interpret_gamepad(Joystick_data d){
 				assert(0);
 		}
 
-		//p.ball_arm=Panel::Ball_arm::AUTO;
+		p.roller_control=Panel::Roller_control::AUTO;
+		p.roller=Panel::Roller::AUTO;
+		p.roller_arm=Panel::Roller_arm::AUTO;
+		p.shooter=Panel::Shooter::AUTO;
 		p.gear_grabber=Panel::Gear_grabber::AUTO;
 		p.gear_arm=Panel::Gear_arm::AUTO;
-		p.shooter=Panel::Shooter::AUTO;
-		//p.ball_intake=Panel::Ball_intake::AUTO;
-		//p.ball_lift=Panel::Ball_lift::AUTO;
-		//p.ball_collector=Panel::Ball_collector::AUTO;
-
-		//p.ball_arm=Panel::Ball_arm::STOW;
+		p.gear_sensing=Panel::Gear_sensing::FULL_AUTO;
 	} else {
-		//p.ball_collector = d.button[Gamepad_button::RB] ? Panel::Ball_collector::DISABLED:Panel::Ball_collector::AUTO;
+		p.roller_control=d.button[Gamepad_button::RB]?Panel::Roller_control::OFF:Panel::Roller_control::AUTO;
 
 		if(d.button[Gamepad_button::B]) p.gear_grabber=Panel::Gear_grabber::CLOSED;
 		else if(!d.button[Gamepad_button::X]) p.gear_grabber= Panel::Gear_grabber::OPEN;
@@ -319,28 +316,25 @@ Panel interpret_gamepad(Joystick_data d){
 		else if(!d.button[Gamepad_button::A]) p.gear_arm=Panel::Gear_arm::DOWN;
 		else p.gear_arm=Panel::Gear_arm::AUTO;
 
-		//p.ball_lift=Panel::Ball_lift::AUTO;
-		//p.ball_intake=Panel::Ball_intake::AUTO;
+		p.roller=Panel::Roller::AUTO;
 		switch(pov_section(d.pov)){
 			case POV_section::CENTER:
 				break;
 			case POV_section::UP:
-				//p.ball_lift=Panel::Ball_lift::IN;
 				break;
 			case POV_section::UP_LEFT:
 				break;
 			case POV_section::LEFT:
-				//p.ball_intake=Panel::Ball_intake::IN;
+				p.roller=Panel::Roller::OUT;
 				break;
 			case POV_section::DOWN_LEFT:
 				break;
 			case POV_section::DOWN:
-				//p.ball_lift=Panel::Ball_lift::OUT;
 				break;
 			case POV_section::DOWN_RIGHT:
 				break;
 			case POV_section::RIGHT:
-				//p.ball_intake=Panel::Ball_intake::OUT;
+				p.roller=Panel::Roller::IN;
 				break;
 			case POV_section::UP_RIGHT:
 				break;
@@ -348,18 +342,14 @@ Panel interpret_gamepad(Joystick_data d){
 				assert(0);
 		}
 
-		switch(joystick_section(d.axis[Gamepad_axis::LEFTX],d.axis[Gamepad_axis::LEFTY])){
+		switch(joystick_section(d.axis[Gamepad_axis::LEFTX],d.axis[Gamepad_axis::LEFTY])){	
 			case Joystick_section::UP:
-				p.shooter=Panel::Shooter::ENABLED;
-				break;
-			case Joystick_section::LEFT:
-				p.shooter=Panel::Shooter::DISABLED;
-				break;
-			case Joystick_section::DOWN:
-				p.shooter=Panel::Shooter::DISABLED;
-				break;
 			case Joystick_section::RIGHT:
 				p.shooter=Panel::Shooter::ENABLED;
+				break;
+			case Joystick_section::DOWN:
+			case Joystick_section::LEFT:
+				p.shooter=Panel::Shooter::DISABLED;
 				break;
 			case Joystick_section::CENTER:
 				p.shooter=Panel::Shooter::AUTO;
@@ -370,17 +360,17 @@ Panel interpret_gamepad(Joystick_data d){
 
 		switch(joystick_section(d.axis[Gamepad_axis::RIGHTX],d.axis[Gamepad_axis::RIGHTY])){
 			case Joystick_section::UP:
-				//p.ball_arm=Panel::Ball_arm::STOW;
+				p.roller_arm=Panel::Roller_arm::STOW;
 				break;
 			case Joystick_section::LEFT:
 				break;
 			case Joystick_section::DOWN:
-				//p.ball_arm=Panel::Ball_arm::LOW;
+				p.roller_arm=Panel::Roller_arm::LOW;
 				break;
 			case Joystick_section::RIGHT:
 				break;
 			case Joystick_section::CENTER:
-				//p.ball_arm=Panel::Ball_arm::AUTO;
+				p.roller_arm=Panel::Roller_arm::AUTO;
 				break;
 			default:
 				assert(0);

@@ -38,32 +38,31 @@ Gunner:
  Y          - Prep score gear
               AO: Gear collector up
  Start      - Learn
- Back       - Toggle ball/gear indicator
+ Back       -
  RB         - 
  LB         - Alternative Operation (AO) - changes what other buttons do if held
- RT         - 
+ RT         - AO: Disable roller
  LT         - Shooter speed modifier
  L_Joy:
-  Up        - 
-  Down      - 
-  Left      - 
-  Right     - 
+  Up        - Shooter enabled
+  Down      - Shooter disabled
+  Left      - Shooter disabled
+  Right     - Shooter enabled
   Pushed in - 
  R_Joy:
-  Up        - AO: Ball collector up
-  Down      - AO: Ball collector down
+  Up        - AO: Rollers up
+  Down      - AO: Rollers down
   Left      - 
   Right     - 
   Pushed in - 
  POV:        
   Center     - 
-  Up         - Collect
-               AO: Ball lift in
+  Up         -
   Up_left    - 
-  Left       - AO: Ball intake out
+  Left       - Camera light
+               AO: Ball intake out
   Down_left  - 
   Down       - Climb
-               AO: Ball lift out
   Down_right - 
   Right      - Shoot
                AO: Ball intake in
