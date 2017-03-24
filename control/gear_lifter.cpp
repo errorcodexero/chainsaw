@@ -91,12 +91,12 @@ bool operator==(Gear_lifter,Gear_lifter){ return 1; }
 bool operator!=(Gear_lifter a, Gear_lifter b){ return !(a==b); }
 
 Gear_lifter::Input Gear_lifter::Input_reader::operator()(Robot_inputs const& r) const{
-	return {r.robot_mode.enabled, r.digital_io.in[GEAR_LIFTER_LIMIT]==Digital_in::_1};
+	return {r.robot_mode.enabled, r.digital_io.in[GEAR_LIFTER_LIMIT]==Digital_in::_0};
 }
 
 Robot_inputs Gear_lifter::Input_reader::operator()(Robot_inputs r, Gear_lifter::Input in) const{
 	r.robot_mode.enabled = in.enabled;
-	r.digital_io.in[GEAR_LIFTER_LIMIT] = in.limit_switch?Digital_in::_1:Digital_in::_0;
+	r.digital_io.in[GEAR_LIFTER_LIMIT] = in.limit_switch?Digital_in::_0:Digital_in::_1;
 	return r;
 }
 
