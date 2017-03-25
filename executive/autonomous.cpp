@@ -79,7 +79,7 @@ Executive get_auto_mode(Next_mode_info info){
 	}};
 
 	//Score a gear on the boiler-side peg
-	static const Inch FIRST_DRIVE_DIST_BOILER = (133 - ROBOT_LENGTH) + .5 * ROBOT_LENGTH;//centers the robot on the turning point to align with gear peg //from testing
+	static const Inch FIRST_DRIVE_DIST_BOILER = (115 - ROBOT_LENGTH) + .5 * ROBOT_LENGTH;//centers the robot on the turning point to align with gear peg //from testing
 
 	auto auto_score_gear_boiler_side=[=](bool red){
 		return Executive{Chain{
@@ -142,7 +142,7 @@ Executive get_auto_mode(Next_mode_info info){
 	const Executive auto_score_gear_boiler_side_extended_red=auto_score_gear_boiler_side_extended(1);
 	
 	//scores a gear on the loading station-side peg
-	static const Inch FIRST_DRIVE_DIST_LOADING = (127 - ROBOT_LENGTH) + .5 * ROBOT_LENGTH;
+	static const Inch FIRST_DRIVE_DIST_LOADING = (115 - ROBOT_LENGTH) + .5 * ROBOT_LENGTH;
 	auto auto_score_gear_loading_station=[=](bool red){
 		return Executive{Chain{
 			Step{Drive_straight{FIRST_DRIVE_DIST_LOADING}},
