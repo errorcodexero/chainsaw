@@ -363,15 +363,7 @@ bool Combo::operator==(Combo const& b)const{
 	return step_a == b.step_a && step_b == b.step_b;
 }
 
-///
-
-Turn_on_light::Turn_on_light(){
-	lights_goal = [=]{
-		Lights::Goal a;
-		a.camera_light = true;
-		return a;
-	}();
-}
+Turn_on_light::Turn_on_light():lights_goal({Lights::Loading_indicator::GEARS,true}){}
 
 Step::Status Turn_on_light::done(Next_mode_info info){
 	return (ready(status(info.status.lights),lights_goal)) ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;
@@ -381,8 +373,7 @@ Toplevel::Goal Turn_on_light::run(Run_info info){
 	return run(info,{});
 }
 
-Toplevel::Goal Turn_on_light::run(Run_info info,Toplevel::Goal goals){
-	(void)info;
+Toplevel::Goal Turn_on_light::run(Run_info,Toplevel::Goal goals){
 	goals.lights = lights_goal;
 	return goals;
 }
