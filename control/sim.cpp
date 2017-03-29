@@ -54,14 +54,14 @@ struct Drivebase_sim{
 	int ticks_left = 0;
 	int ticks_right = 0;
 	void update(Time t,bool enable,Output out){
-		static const double POWER_TO_SPEED = 2.5;
+		static const double POWER_TO_SPEED = 2.5;//speed is ft/s
 		Time dt=t-last_time;
 		last_time=t;
 		if(!enable) return;
-		double dtheta = (((out.l-out.r)*5/12.5))*6.25;
 		Drivebase::Speeds speeds = {out.l * POWER_TO_SPEED, out.r * POWER_TO_SPEED};
 		Drivebase::Distances distances = {speeds.l * dt, speeds.r * dt};
-		double avg_dist_traveled = (distances.l + distances.r)/2;
+		double avg_dist_traveled = mean(distances.l,distances.r);
+		double dtheta = (((out.l-out.r)*5/12.5))*6.25;
 		double dy = avg_dist_traveled * cosf(position.theta);
 		double dx = avg_dist_traveled * sinf(position.theta);
 		ticks_left += inches_to_ticks(distances.l * 12);
@@ -82,7 +82,7 @@ struct Drivebase_sim{
 };
 
 ostream& operator<<(ostream& o,Drivebase_sim const& a){
-	return o << "Drivebase_sim(" << a.position << ")\n";
+	return o << "Drivebase_sim(" << a.position << ")";
 }
 
 struct Gear_collector_sim{
@@ -313,7 +313,7 @@ int main(){
 	}*/
 
 	//Dedup_print mode,outp,inp,statusp;
-	Dedup2 mode,outp,inp,statusp,panel;
+	Dedup2 mode,outp,inp,statusp,panel,drive_sim;
 	{
 		Toplevel_sim sim;
 		Main m;
@@ -324,7 +324,7 @@ int main(){
 		all.ds_info.alliance = Alliance::RED;
 		all.joystick[Panel::PORT].axis[6] = -0.58;//should be loading station side (auto selector 5)
 
-		auto robot_inputs = m.toplevel.input_reader(all,sim.get());
+		Robot_inputs robot_inputs = m.toplevel.input_reader(all,sim.get());
 		robot_inputs.robot_mode.autonomous = true;
 		robot_inputs.robot_mode.enabled = true;
 	
@@ -334,20 +334,21 @@ int main(){
 			robot_inputs.now = t;
 			//cout << "Main " << m << "\n";
 			inp(as_string(t)+"\tin",sim.get());
-			auto out=m(robot_inputs);
+			Robot_outputs out = m(robot_inputs);
 			//cout << "Mode: " <<m.mode << "\n";	
+			drive_sim(as_string(t)+"\tdrive_sim",sim.drive);
 			panel(as_string(t)+"\tpanel",interpret_oi(all.joystick[Panel::PORT]));
 			mode(as_string(t)+"\tmode",m.mode);
 			//auto out=example((Toplevel::Output*)0);
 			/*Toplevel::Goal goal;
 			goal.drive.left=1;
 			goal.drive.right=1;*/
-			auto status_detail=m.toplevel.estimator.get();
+			Toplevel::Status_detail status_detail = m.toplevel.estimator.get();
 			statusp(as_string(t)+"\tstatus_detail",status_detail);
 			//auto out=control(status_detail,goal);*/
 			//cout <<"out "  << out << "\n";
 			outp(as_string(t)+ "\tout",out);
-			sim.update(t,1,m.toplevel.output_applicator(out));
+			sim.update(t,true,m.toplevel.output_applicator(out));
 			m.toplevel.estimator.update(t,sim.get(),m.toplevel.output_applicator(out));
 			robot_inputs = m.toplevel.input_reader(robot_inputs,sim.get());
 		}
