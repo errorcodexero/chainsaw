@@ -3,9 +3,10 @@
 using namespace std;
 
 #define PISTON_LOC 2
+#define GEAR_LIFTER_LIMIT 5
 
 Gear_lifter::Input::Input():enabled(false){}
-Gear_lifter::Input::Input(bool a):enabled(a){}
+Gear_lifter::Input::Input(bool e,bool l):enabled(e),limit_switch(l){}
 
 Gear_lifter::Estimator::Estimator(){
 	last = Status_detail::DOWN;
@@ -36,8 +37,10 @@ ostream& operator<<(ostream& o,Gear_lifter::Output a){
 
 std::set<Gear_lifter::Input> examples(Gear_lifter::Input*){
 	return {
-		{true},
-		{false}
+		{false, false},
+		{false, true},
+		{true, false},
+		{true, true}
 	};
 }
 
@@ -88,11 +91,12 @@ bool operator==(Gear_lifter,Gear_lifter){ return 1; }
 bool operator!=(Gear_lifter a, Gear_lifter b){ return !(a==b); }
 
 Gear_lifter::Input Gear_lifter::Input_reader::operator()(Robot_inputs const& r) const{
-	return {r.robot_mode.enabled};
+	return {r.robot_mode.enabled, r.digital_io.in[GEAR_LIFTER_LIMIT]==Digital_in::_0};
 }
 
 Robot_inputs Gear_lifter::Input_reader::operator()(Robot_inputs r, Gear_lifter::Input in) const{
 	r.robot_mode.enabled = in.enabled;
+	r.digital_io.in[GEAR_LIFTER_LIMIT] = in.limit_switch?Digital_in::_0:Digital_in::_1;
 	return r;
 }
 
@@ -120,16 +124,8 @@ void Gear_lifter::Estimator::update(Time time,Gear_lifter::Input input,Gear_lift
 			}
 			break;
 		case Gear_lifter::Output::DOWN:
-			if(last == Status::GOING_DOWN){
-				state_timer.update(time,input.enabled);
-			} else if(last != Status::DOWN){ 
-				const Time DOWN_TIME = .6;//seconds. tested
-				last = Status::GOING_DOWN;
-				state_timer.set(DOWN_TIME);
-			}
-			if(state_timer.done() || last == Status::DOWN) { 
-				last = Status::DOWN;
-			}
+			if(last != Status::DOWN) last = Status::GOING_DOWN;
+			if(input.limit_switch || last == Status::DOWN) last = Status::DOWN;
 			break;
 		default:
 			assert(0);
@@ -198,7 +194,7 @@ int main(){
 
 			cout<<"t:"<<t<<"\tgoal:"<<goal<<"\tstatus:"<<status<<"\n";
 
-			a.estimator.update(t,Gear_lifter::Input{ENABLED},out);
+			a.estimator.update(t,Gear_lifter::Input{ENABLED,false},out);
 			if(ready(status,goal)){
 				cout<<"Goal "<<goal<<" reached. Finishing\n";
 				break;
@@ -213,7 +209,7 @@ int main(){
 
 			cout<<"t:"<<t<<"\tgoal:"<<goal<<"\tstatus:"<<status<<"\n";
 
-			a.estimator.update(t,Gear_lifter::Input{ENABLED},out);
+			a.estimator.update(t,Gear_lifter::Input{ENABLED,t>2},out);
 			if(ready(status,goal)){
 				cout<<"Goal "<<goal<<" reached. Finishing\n";
 				break;
