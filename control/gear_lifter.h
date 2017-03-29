@@ -21,9 +21,9 @@ struct Gear_lifter{
 	};
 	
 	struct Input{
-		bool enabled;
+		bool enabled, limit_switch;
 		Input();
-		Input(bool);
+		Input(bool, bool);
 	};
 
 	enum class Status_detail{DOWN,GOING_DOWN,GOING_UP,UP};

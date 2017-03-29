@@ -50,6 +50,6 @@ else
 		exit 1
 	else
 		echo "Deploying backup ${restore}..."
-		./deploy -f $backup -t $team
+		bash deploy -f $backup -t $team
 	fi
 fi
