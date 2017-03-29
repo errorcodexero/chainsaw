@@ -355,6 +355,21 @@ cc_test(
 )
 
 cc_library(
+	name="auto_distances",
+	srcs=["util/auto_distances.cpp", "util/quick.h"],
+	hdrs=["util/auto_distances.h"],
+	deps=[":interface"]
+)
+
+cc_test(
+	name="auto_distances_test",
+	srcs=["util/auto_distances.cpp","util/auto_distances.h", "util/quick.h"],
+	copts=["-DAUTO_DISTANCES_TEST"],
+	deps=[":interface"],
+	timeout="short"
+)
+
+cc_library(
 	name="monitor",
 	srcs=["control/monitor.cpp"],
 	hdrs=["control/monitor.h"],

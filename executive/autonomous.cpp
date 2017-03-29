@@ -66,7 +66,7 @@ Executive get_auto_mode(Next_mode_info info){
 				Step{Lift_gear()},
 				Executive{Chain{
 					Step{Combo{
-						Step{Drive_straight{ALIGN_DIST}},
+						Step{Ram{ALIGN_DIST}},
 						Step{Lift_gear()},
 					}},
 					Executive{Chain{
@@ -95,7 +95,7 @@ Executive get_auto_mode(Next_mode_info info){
 						Step{Lift_gear()},
 						Executive{Chain{
 							Step{Combo{
-								Step{Drive_straight{6}},//drive forward a bit so score_gear can take over
+								Step{Ram{6}},//drive forward a bit so score_gear can take over
 								Step{Lift_gear()}
 							}},
 							Executive{Chain{
@@ -157,7 +157,7 @@ Executive get_auto_mode(Next_mode_info info){
 						Step{Lift_gear()},
 						Executive{Chain{
 							Step{Combo{
-								Step{Drive_straight{6}},
+								Step{Ram{6}},
 								Step{Lift_gear()}
 							}},
 							Executive{Chain{

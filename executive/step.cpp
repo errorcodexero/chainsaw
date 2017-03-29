@@ -180,6 +180,52 @@ bool Drive_straight::operator==(Drive_straight const& b)const{
 	return target_dist == b.target_dist && initial_distances == b.initial_distances && init == b.init && motion_profile == b.motion_profile && in_range == b.in_range /*&& stall_timer == b.stall_timer*/ && gear == b.gear;
 }
 
+Ram::Ram(Inch goal):target_dist(goal),initial_distances(Drivebase::Distances{0,0}),init(false),gear(Gear_shifter::Goal::LOW){}//Motion profiling v
+
+Drivebase::Distances Ram::get_distance_travelled(Drivebase::Distances current){
+	return current - initial_distances;
+}
+
+Step::Status Ram::done(Next_mode_info info){
+	static const Inch TOLERANCE = 3.0;//inches
+	Drivebase::Distances distance_travelled = get_distance_travelled(info.status.drive.distances);
+	Drivebase::Distances distance_left = Drivebase::Distances{target_dist,target_dist} - distance_travelled;
+	//ignoring right encoder because it's proven hard to get meaningful data from it
+	if(fabs(distance_left.l) < TOLERANCE){
+		in_range.update(info.in.now,info.in.robot_mode.enabled);
+	} else {
+		static const Time FINISH_TIME = .50;
+		in_range.set(FINISH_TIME);
+	}
+
+	return in_range.done() ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;
+}
+
+Toplevel::Goal Ram::run(Run_info info){
+	return run(info,{});
+}
+
+Toplevel::Goal Ram::run(Run_info info,Toplevel::Goal goals){
+	if(!init){
+		initial_distances = info.status.drive.distances;
+		init = true;
+	}
+
+
+	goals.drive.left = 1;//TODO: move .11 to the constructor of Drive_straight and set an instance variable
+	goals.drive.right = 1; //right side would go faster than the left without error correction
+	goals.shifter = gear;
+	return goals;
+}
+
+unique_ptr<Step_impl> Ram::clone()const{
+	return unique_ptr<Step_impl>(new Ram(*this));
+}
+
+bool Ram::operator==(Ram const& b)const{
+	return target_dist == b.target_dist && initial_distances == b.initial_distances && init == b.init && in_range == b.in_range /*&& stall_timer == b.stall_timer*/ && gear == b.gear;
+}
+
 Wait::Wait(Time wait_time){
 	wait_timer.set(wait_time);
 }
@@ -343,12 +389,12 @@ Score_gear::Score_gear():
 			Step{Lift_gear()},//lift the gear
 			Step{Combo{ //slide the gear on the peg
 				Step{Lift_gear()},
-				Step{Drive_straight{SCORE_GEAR_APPROACH_DIST}}
+				Step{Ram{SCORE_GEAR_APPROACH_DIST}}
 			}},
 			Step{Drop_gear()}, //release the gear
 			Step{Combo{ //back off
 				Step{Drop_gear()},
-				Step{Drive_straight{-SCORE_GEAR_APPROACH_DIST}}
+				Step{Ram{-SCORE_GEAR_APPROACH_DIST}}
 			}},
 			Step{Drop_collector()}, // lower the collector to the floor
 	}),
