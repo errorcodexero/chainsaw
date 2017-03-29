@@ -89,6 +89,27 @@ class Drive_straight:public Step_impl_inner<Drive_straight>{//Drives straight a 
 	bool operator==(Drive_straight const&)const;
 };
 
+class Ram:public Step_impl_inner<Ram>{//Drives straight a certain distance
+	Inch target_dist;
+	Drivebase::Distances initial_distances;
+	bool init;
+	Countdown_timer in_range;
+	Countdown_timer stall_timer;
+	Gear_shifter::Goal gear;
+
+	Drivebase::Distances get_distance_travelled(Drivebase::Distances);//TODO: do this better
+
+	public:
+	explicit Ram(Inch);
+
+	Toplevel::Goal run(Run_info,Toplevel::Goal);
+	Toplevel::Goal run(Run_info);
+	Step::Status done(Next_mode_info);
+	std::unique_ptr<Step_impl> clone()const;
+	bool operator==(Ram const&)const;
+};
+
+
 class Wait: public Step_impl_inner<Wait>{//Either stops all operation for a given period of time or continues to run the same goals for that time
 	Countdown_timer wait_timer;//seconds
 	public:
