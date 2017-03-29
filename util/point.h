@@ -4,21 +4,21 @@
 #include<iosfwd>
 #include "interface.h"
 
-struct Pt{
+struct Point{
 	double x,y;//feet
 	double theta;//radians
 
-	Pt();
-	Pt(double,double,double);
+	Point();
+	Point(double,double,double);
 };
 
-std::ostream& operator<<(std::ostream&,Pt);
-Pt operator*(Pt,double);
-Pt& operator+=(Pt&,Pt);
+std::ostream& operator<<(std::ostream&,Point const&);
+Point operator*(Point,double);
+Point& operator+=(Point&,Point);
 
 bool approx_equal(double,double);
-bool approx_equal(Pt,Pt);
+bool approx_equal(Point,Point);
 
-Pt shift_axes_clockwise(Pt p,Rad theta);
+Point shift_axes_clockwise(Point p,Rad theta);
 
 #endif

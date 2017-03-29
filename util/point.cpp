@@ -6,37 +6,37 @@
 
 using namespace std;
 
-Pt::Pt():x(0),y(0),theta(0){}
-Pt::Pt(double a,double b,double c):x(a),y(b),theta(c){}
+Point::Point():x(0),y(0),theta(0){}
+Point::Point(double a,double b,double c):x(a),y(b),theta(c){}
 
-Pt operator*(Pt p,double d){
+Point operator*(Point p,double d){
 	p.x*=d;
 	p.y*=d;
 	p.theta*=p.theta;
 	return p;
 }
 
-Pt& operator+=(Pt& a,Pt b){
+Point& operator+=(Point& a,Point b){
 	a.x+=b.x;
 	a.y+=b.y;
 	a.theta+=b.theta;
 	return a;
 }
 
-ostream& operator<<(ostream& o,Pt p){
-	return o<<"Pt("<<p.x<<","<<p.y<<","<<p.theta<<")";
+ostream& operator<<(ostream& o,Point const& p){
+	return o<<"Point(x:"<<p.x<<" y:"<<p.y<<" theta:"<<p.theta<<")";
 }
 
 bool approx_equal(double a,double b){
 	return fabs(a-b)<.001;
 }
 
-bool approx_equal(Pt a,Pt b){
+bool approx_equal(Point a,Point b){
 	return approx_equal(a.x,b.x) && approx_equal(a.y,b.y) && approx_equal(a.theta,b.theta);
 }
 
-Pt shift_axes_clockwise(Pt p,Rad theta){
-	Pt r;
+Point shift_axes_clockwise(Point p,Rad theta){
+	Point r;
 	r.x=cos(theta)*p.x+sin(theta)*p.y;
 	r.y=sin(theta)*p.x+cos(theta)*p.y;
 	r.theta=p.theta;
@@ -52,9 +52,9 @@ Pt shift_axes_clockwise(Pt p,Rad theta){
 
 int main(){
 	{
-		Pt a(1,0,0);
-		Pt b(0,1,0);
-		Pt out=shift_axes_clockwise(a,M_PI/2);
+		Point a(1,0,0);
+		Point b(0,1,0);
+		Point out=shift_axes_clockwise(a,M_PI/2);
 		assert(approx_equal(out,b));
 	}
 }
