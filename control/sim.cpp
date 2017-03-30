@@ -41,10 +41,45 @@ using Climber_sim=Nop_sim<Climber::Input>;
 using Roller_arm_sim=Nop_sim<Roller_arm::Input>;
 using Roller_sim=Nop_sim<Roller::Input>;
 using Gear_shifter_sim=Nop_sim<Gear_shifter::Input>;
-using Gear_lifter_sim=Nop_sim<Gear_lifter::Input>;
-using Gear_grabber_sim=Nop_sim<Gear_grabber::Input>;
 using Shooter_sim=Nop_sim<Shooter::Input>;
 using Lights_sim=Nop_sim<Lights::Input>;
+
+struct Gear_grabber_sim{
+	using Input = Gear_grabber::Input;
+	using Output = Gear_grabber::Output;
+	
+	bool enabled;
+
+	void update(Time t,bool enable,Output out){
+		enabled = enable;
+	}
+	
+	Input get()const{
+		bool has_gear = false;
+		return {has_gear,enabled};
+	}
+
+	Gear_grabber_sim():enabled(false){}
+};
+
+
+struct Gear_lifter_sim{
+	using Input = Gear_lifter::Input;
+	using Output = Gear_lifter::Output;
+	
+	bool enabled;
+
+	void update(Time t,bool enable,Output out){
+		enabled = enable;
+	}
+	
+	Input get()const{
+		bool limit_switch = false;
+		return {enabled,limit_switch};
+	}
+
+	Gear_lifter_sim():enabled(false){}
+};
 
 struct Drivebase_sim{
 	using Input=Drivebase::Input;
@@ -320,7 +355,7 @@ int main(){
 
 	//Dedup_print mode,outp,inp,statusp;
 	Dedup2 mode,outp,inp,statusp,panel,drive_sim;
-	{
+	{//NOTE: All this is calibrated for use with side gear auto scoring (specifically the loading station side)
 		Toplevel_sim sim;
 		Main m;
 
@@ -361,6 +396,7 @@ int main(){
 			robot_inputs = m.toplevel.input_reader(robot_inputs,sim.get());
 			robot_inputs.robot_mode.autonomous = true;//override this for now
 			robot_inputs.robot_mode.enabled = true;
+			robot_inputs.camera.blocks = {{0,155,0,100,100}};//for align
 		}
 	}
 	return 0;	

@@ -93,7 +93,6 @@ class Ram:public Step_impl_inner<Ram>{//Drives straight a certain distance
 	Inch target_dist;
 	Drivebase::Distances initial_distances;
 	bool init;
-	Countdown_timer in_range;
 	Countdown_timer stall_timer;
 	Gear_shifter::Goal gear;
 

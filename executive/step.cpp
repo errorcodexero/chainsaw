@@ -48,7 +48,6 @@ Toplevel::Goal Turn::run(Run_info info){
 }
 
 Toplevel::Goal Turn::run(Run_info info,Toplevel::Goal goals){
-	cout<<"\n\nTURNING\n\n";
 	if(!init){
 		initial_distances = info.status.drive.distances;
 		init = true;
@@ -192,14 +191,7 @@ Step::Status Ram::done(Next_mode_info info){
 	Drivebase::Distances distance_travelled = get_distance_travelled(info.status.drive.distances);
 	Drivebase::Distances distance_left = Drivebase::Distances{target_dist,target_dist} - distance_travelled;
 	//ignoring right encoder because it's proven hard to get meaningful data from it
-	if(fabs(distance_left.l) < TOLERANCE){
-		in_range.update(info.in.now,info.in.robot_mode.enabled);
-	} else {
-		static const Time FINISH_TIME = .50;
-		in_range.set(FINISH_TIME);
-	}
-
-	return in_range.done() ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;
+	return (distance_left.l <= TOLERANCE) ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;
 }
 
 Toplevel::Goal Ram::run(Run_info info){
@@ -212,7 +204,6 @@ Toplevel::Goal Ram::run(Run_info info,Toplevel::Goal goals){
 		init = true;
 	}
 
-
 	goals.drive.left = 1;//TODO: move .11 to the constructor of Drive_straight and set an instance variable
 	goals.drive.right = 1; //right side would go faster than the left without error correction
 	goals.shifter = gear;
@@ -224,7 +215,7 @@ unique_ptr<Step_impl> Ram::clone()const{
 }
 
 bool Ram::operator==(Ram const& b)const{
-	return target_dist == b.target_dist && initial_distances == b.initial_distances && init == b.init && in_range == b.in_range /*&& stall_timer == b.stall_timer*/ && gear == b.gear;
+	return target_dist == b.target_dist && initial_distances == b.initial_distances && init == b.init /*&& stall_timer == b.stall_timer*/ && gear == b.gear;
 }
 
 Wait::Wait(Time wait_time){
