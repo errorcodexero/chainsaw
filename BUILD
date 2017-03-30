@@ -620,14 +620,14 @@ cc_library(
 	name="sim",
 	srcs=["control/sim.cpp"],
 	hdrs=["control/nop.h"],
-	deps=[":nop",":point"]
+	deps=[":nop",":step",":point"]
 )
 
 cc_test(
 	name="sim_test",
 	srcs=["control/sim.cpp"],
 	copts=["-DSIM_TEST","-g"],
-	deps=[":toplevel",":point",":type",":nop", ":main",":util"],
+	deps=[":step",":toplevel",":point",":type",":nop", ":main",":util"],
 	timeout="short"
 )
 

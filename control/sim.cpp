@@ -2,6 +2,7 @@
 #include "toplevel.h"
 #include "../util/type.h"
 #include "nop.h"
+#include "../executive/step.h"
 #include <math.h>
 #include "main.h"
 #include "../util/point.h"
@@ -40,8 +41,8 @@ using Climber_sim=Nop_sim<Climber::Input>;
 using Roller_arm_sim=Nop_sim<Roller_arm::Input>;
 using Roller_sim=Nop_sim<Roller::Input>;
 using Gear_shifter_sim=Nop_sim<Gear_shifter::Input>;
-using Gear_grabber_sim=Nop_sim<Gear_grabber::Input>;
 using Gear_lifter_sim=Nop_sim<Gear_lifter::Input>;
+using Gear_grabber_sim=Nop_sim<Gear_grabber::Input>;
 using Shooter_sim=Nop_sim<Shooter::Input>;
 using Lights_sim=Nop_sim<Lights::Input>;
 
@@ -49,35 +50,40 @@ struct Drivebase_sim{
 	using Input=Drivebase::Input;
 	using Output=Drivebase::Output;
 	
-	Point position; //x,y are in distance in feet
-	Time last_time = 0;
-	int ticks_left = 0;
-	int ticks_right = 0;
+	Point position; //x,y are in distance in feet, theta is in radians (positive is counterclockwise from straight forward)
+	Time last_time;
+	Drivebase::Distances distances;
+
 	void update(Time t,bool enable,Output out){
-		static const double POWER_TO_SPEED = 2.5;//speed is ft/s
+		static const double POWER_TO_SPEED = 6.5 * 12;//speed is in/s
 		Time dt=t-last_time;
 		last_time=t;
 		if(!enable) return;
 		Drivebase::Speeds speeds = {out.l * POWER_TO_SPEED, out.r * POWER_TO_SPEED};
-		Drivebase::Distances distances = {speeds.l * dt, speeds.r * dt};
-		double avg_dist_traveled = mean(distances.l,distances.r);
-		double dtheta = (((out.l-out.r)*5/12.5))*6.25;
+		Drivebase::Distances ddistances = {speeds.l * dt, speeds.r * dt};
+		double avg_dist_traveled = mean(ddistances.l,ddistances.r);
+		double dtheta = ((out.l-out.r)*POWER_TO_SPEED*dt)/ROBOT_WIDTH;
+		/*
+			Angle is calculated as the difference between the two sides' powers divided by 2 --   (out.l - out.r) / 2
+			That is then converted to a distance   --   ((out.l - out.r) / 2) * POWER_TO_SPEED * dt
+			That distance is then converted to an angle -- ((((out.l - our.r) / 2) * POWER_TO_SPEED * dt) * 2) / ROBOT_WIDTH
+		*/
+		cout<<"l:"<<out.l<<" r:"<<out.r<<" dtheta:"<<dtheta<<"\n";
 		double dy = avg_dist_traveled * cosf(position.theta);
 		double dx = avg_dist_traveled * sinf(position.theta);
-		ticks_left += inches_to_ticks(distances.l * 12);
-		ticks_right += inches_to_ticks(distances.r * 12);
-		position.y += dy;
-		position.x += dx;
-		position.theta += dtheta;
+		distances += ddistances;
+		position += {dx,dy,dtheta};
 	}
 	Input get()const{
 		auto d = Digital_in::_0;
 		auto p = make_pair(d,d);
 		Drivebase::Input in = {Drivebase::Input{
-			{0,0,0,0,0,0},p,p,ticks_to_inches(Drivebase::Encoder_ticks{ticks_left,ticks_right}),0.0
+			{0,0,0,0,0,0},p,p,distances,0.0
 		}};
 		return in;
 	}
+
+	Drivebase_sim():position({}),last_time(0),distances({0,0}){}
 
 };
 
@@ -318,13 +324,15 @@ int main(){
 		Toplevel_sim sim;
 		Main m;
 
-		Robot_inputs all;	
-		all.robot_mode.autonomous = true;
-		all.robot_mode.enabled = true;
-		all.ds_info.alliance = Alliance::RED;
-		all.joystick[Panel::PORT].axis[6] = -0.58;//should be loading station side (auto selector 5)
-
-		Robot_inputs robot_inputs = m.toplevel.input_reader(all,sim.get());
+		Robot_inputs robot_inputs;
+		{
+			Robot_inputs all;	
+			all.robot_mode.autonomous = true;
+			all.robot_mode.enabled = true;
+			all.ds_info.alliance = Alliance::RED;
+			all.joystick[Panel::PORT].axis[6] = -0.58;//should be loading station side (auto selector 5)
+			robot_inputs = m.toplevel.input_reader(all,sim.get());
+		}
 		robot_inputs.robot_mode.autonomous = true;
 		robot_inputs.robot_mode.enabled = true;
 	
@@ -337,7 +345,7 @@ int main(){
 			Robot_outputs out = m(robot_inputs);
 			//cout << "Mode: " <<m.mode << "\n";	
 			drive_sim(as_string(t)+"\tdrive_sim",sim.drive);
-			panel(as_string(t)+"\tpanel",interpret_oi(all.joystick[Panel::PORT]));
+			panel(as_string(t)+"\tpanel",interpret_oi(robot_inputs.joystick[Panel::PORT]));
 			mode(as_string(t)+"\tmode",m.mode);
 			//auto out=example((Toplevel::Output*)0);
 			/*Toplevel::Goal goal;
@@ -348,9 +356,11 @@ int main(){
 			//auto out=control(status_detail,goal);*/
 			//cout <<"out "  << out << "\n";
 			outp(as_string(t)+ "\tout",out);
-			sim.update(t,true,m.toplevel.output_applicator(out));
+			sim.update(t,robot_inputs.robot_mode.enabled,m.toplevel.output_applicator(out));
 			m.toplevel.estimator.update(t,sim.get(),m.toplevel.output_applicator(out));
 			robot_inputs = m.toplevel.input_reader(robot_inputs,sim.get());
+			robot_inputs.robot_mode.autonomous = true;//override this for now
+			robot_inputs.robot_mode.enabled = true;
 		}
 	}
 	return 0;	

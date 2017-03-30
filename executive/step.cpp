@@ -48,6 +48,7 @@ Toplevel::Goal Turn::run(Run_info info){
 }
 
 Toplevel::Goal Turn::run(Run_info info,Toplevel::Goal goals){
+	cout<<"\n\nTURNING\n\n";
 	if(!init){
 		initial_distances = info.status.drive.distances;
 		init = true;
@@ -326,6 +327,15 @@ bool Drop_collector::operator==(Drop_collector const& b)const{
 	return true;
 }
 
+void Combo::display(std::ostream& o)const{
+	Step_impl_inner<Combo>::display(o);
+	o<<"(";
+	step_a.display(o);
+	o<<" ";
+	step_b.display(o);
+	o<<")";
+}
+
 Combo::Combo(Step a,Step b):step_a(a),step_b(b){}
 
 Step::Status Combo::done(Next_mode_info info){
@@ -382,6 +392,16 @@ unique_ptr<Step_impl> Turn_on_light::clone()const{
 
 bool Turn_on_light::operator==(Turn_on_light const& b)const{
 	return lights_goal == b.lights_goal;
+}
+
+void Score_gear::display(std::ostream& o)const{
+	Step_impl_inner<Score_gear>::display(o);
+	o<<"(";
+	for(Step a: steps){
+		a.display(o);
+		o<<" ";
+	}
+	o<<")";
 }
 
 Score_gear::Score_gear():

@@ -169,6 +169,7 @@ class Combo: public Step_impl_inner<Combo>{//Runs two steps at the same time
 	Toplevel::Goal run(Run_info,Toplevel::Goal);
 	Toplevel::Goal run(Run_info);
 	Step::Status done(Next_mode_info);
+	void display(std::ostream& o)const;
 	std::unique_ptr<Step_impl> clone()const;
 	bool operator==(Combo const&)const;
 };
@@ -219,6 +220,7 @@ struct Score_gear: Step_impl_inner<Score_gear>{
 	explicit Score_gear();
 	Toplevel::Goal run(Run_info,Toplevel::Goal);
 	Toplevel::Goal run(Run_info);
+	void display(std::ostream& o)const;
 	Step::Status done(Next_mode_info);
 	std::unique_ptr<Step_impl> clone()const;
 	bool operator==(Score_gear const&)const;

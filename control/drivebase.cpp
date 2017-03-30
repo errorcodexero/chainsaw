@@ -118,7 +118,6 @@ Drivebase::Encoder_ticks operator+(Drivebase::Encoder_ticks const& a,Drivebase::
 }
 
 
-
 Drivebase::Distances operator+(Drivebase::Distances const& a,Drivebase::Distances const& b){
 	Drivebase::Distances sum = {
 		#define X(TYPE,SIDE) 0,
@@ -129,6 +128,13 @@ Drivebase::Distances operator+(Drivebase::Distances const& a,Drivebase::Distance
 	DISTANCES_ITEMS(X)
 	#undef X
 	return sum;
+}
+
+Drivebase::Distances& operator+=(Drivebase::Distances& a,Drivebase::Distances const& b){
+	#define X(TYPE,SIDE) a.SIDE += b.SIDE;
+	DISTANCES_ITEMS(X)
+	#undef X
+	return a;
 }
 
 Drivebase::Encoder_ticks operator-(Drivebase::Encoder_ticks const& a){
