@@ -90,7 +90,7 @@ struct Drivebase_sim{
 	Drivebase::Distances distances;
 
 	void update(Time t,bool enable,Output out){
-		static const double POWER_TO_SPEED = 6.5 * 12;//speed is in/s
+		static const double POWER_TO_SPEED = 6.5 * 12;//speed is in/s assuming low gear
 		Time dt=t-last_time;
 		last_time=t;
 		if(!enable) return;
@@ -103,7 +103,6 @@ struct Drivebase_sim{
 			That is then converted to a distance   --   ((out.l - out.r) / 2) * POWER_TO_SPEED * dt
 			That distance is then converted to an angle -- ((((out.l - our.r) / 2) * POWER_TO_SPEED * dt) * 2) / ROBOT_WIDTH
 		*/
-		cout<<"l:"<<out.l<<" r:"<<out.r<<" dtheta:"<<dtheta<<"\n";
 		double dy = avg_dist_traveled * cosf(position.theta);
 		double dx = avg_dist_traveled * sinf(position.theta);
 		distances += ddistances;
