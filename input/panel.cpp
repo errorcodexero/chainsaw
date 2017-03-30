@@ -7,7 +7,7 @@
 
 using namespace std;
 static const unsigned int ROLLER_CONTROL_AXIS=0, ROLLER_AXIS=1, ROLLER_ARM_AXIS=2, SHOOTER_AXIS=3, GEAR_GRABBER_AXIS=4, GEAR_ARM_AXIS=5, AUTO_SELECTOR_AXIS=6, SPEED_DIAL_AXIS=7;//TODO: rename constants
-static const unsigned int CAMERA_LIGHT_LOC=1, SHOOT_LOC=2, PREP_COLLECT_GEAR_LOC=3, PREP_SCORE_GEAR_LOC=4, COLLECT_GEAR_LOC=5, SCORE_GEAR_LOC=6, CLIMB_LOC=7, LEARN_LOC=8, GEAR_SENSING_FULL_AUTO_LOC=9, GEAR_SENSING_SEMI_AUTO_LOC=10;//TODO: rename constants 
+static const unsigned int CAMERA_LIGHT_LOC=1, SHOOT_LOC=2, PREP_COLLECT_GEAR_LOC=3, PREP_SCORE_GEAR_LOC=4, COLLECT_GEAR_LOC=5, SCORE_GEAR_LOC=6, CLIMB_LOC=7, LEARN_LOC=8, GEAR_SENSING_FULL_AUTO_LOC=9, GEAR_SENSING_NO_AUTO_LOC=10;//TODO: rename constants 
 
 #define BUTTONS \
 	X(camera_light) X(shoot) X(gear_prep_collect) X(gear_prep_score) X(gear_collect) X(gear_score) X(climb) X(learn)
@@ -84,7 +84,7 @@ ostream& operator<<(ostream& o,Panel::Gear_arm a){
 
 ostream& operator<<(ostream& o,Panel::Gear_sensing a){
 	#define X(NAME) if(a==Panel::Gear_sensing::NAME) return o<<""#NAME;
-	X(SEMI_AUTO) X(FULL_AUTO)
+	X(NO_AUTO) X(SEMI_AUTO) X(FULL_AUTO)
 	#undef X
 	assert(0);
 }
@@ -194,10 +194,10 @@ Panel interpret_oi(Joystick_data d){
 			return Panel::Gear_arm::AUTO;
 		}();
 		
-		bool gear_sensing_full_auto = d.button[GEAR_SENSING_FULL_AUTO_LOC], gear_sensing_semi_auto = d.button[GEAR_SENSING_SEMI_AUTO_LOC];
+		bool gear_sensing_full_auto = d.button[GEAR_SENSING_FULL_AUTO_LOC], gear_sensing_no_auto = d.button[GEAR_SENSING_NO_AUTO_LOC];
 		p.gear_sensing = [&]{
 			if(gear_sensing_full_auto) return Panel::Gear_sensing::FULL_AUTO;
-			if(gear_sensing_semi_auto) return Panel::Gear_sensing::SEMI_AUTO;
+			if(gear_sensing_no_auto) return Panel::Gear_sensing::NO_AUTO;
 			return Panel::Gear_sensing::SEMI_AUTO;
 		}();
 	
@@ -304,7 +304,7 @@ Panel interpret_gamepad(Joystick_data d){
 		p.shooter=Panel::Shooter::AUTO;
 		p.gear_grabber=Panel::Gear_grabber::AUTO;
 		p.gear_arm=Panel::Gear_arm::AUTO;
-		p.gear_sensing=Panel::Gear_sensing::FULL_AUTO;
+		p.gear_sensing=Panel::Gear_sensing::SEMI_AUTO;
 	} else {
 		p.roller_control=d.button[Gamepad_button::RB]?Panel::Roller_control::OFF:Panel::Roller_control::AUTO;
 

@@ -108,16 +108,17 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	if(info.panel.gear_score) gear_collector_mode=Gear_collector_mode::SCORE;
 
 	bool gear_detected=info.status.gear_collector.gear_grabber.has_gear && info.status.gear_collector.gear_lifter==Gear_lifter::Status::DOWN;
-
-	if(info.panel.gear_sensing==Panel::Gear_sensing::FULL_AUTO && gear_detected)
-		gear_collector_mode=Gear_collector_mode::PREP_SCORE; //Go into PREP_SCORE mode from STOW if a gear is detected and the sensor-using mode is selected
-
-	//TODO: as roller arm moves down, move roller out
+	if(gear_detected){
+		if(info.panel.gear_sensing==Panel::Gear_sensing::FULL_AUTO) gear_collector_mode=Gear_collector_mode::PREP_SCORE; //Go into PREP_SCORE mode from STOW if a gear is detected and the corresponding mode is selected
+		if(info.panel.gear_sensing==Panel::Gear_sensing::SEMI_AUTO) gear_collector_mode=Gear_collector_mode::STOW_CLOSED; //Go into STOW_CLOSE mode from STOW if a gear is detected and the corresponding mode is selected
+	}
 
 	goals.gear_collector=[&]{
 		switch(gear_collector_mode){
 			case Gear_collector_mode::STOW: 
 				return Gear_collector::Goal{Gear_grabber::Goal::OPEN,Gear_lifter::Goal::DOWN,Roller::Goal::OFF,Roller_arm::Goal::STOW};
+			case Gear_collector_mode::STOW_CLOSED:
+				return Gear_collector::Goal{Gear_grabber::Goal::CLOSE,Gear_lifter::Goal::DOWN,Roller::Goal::OFF,Roller_arm::Goal::STOW};
 			case Gear_collector_mode::COLLECT: 
 				return Gear_collector::Goal{Gear_grabber::Goal::OPEN,Gear_lifter::Goal::DOWN,Roller::Goal::IN,Roller_arm::Goal::LOW};
 			case Gear_collector_mode::PREP_SCORE: 

@@ -14,7 +14,7 @@ struct Teleop : Executive_impl<Teleop> {
 		Countdown_timer timer;
 	};
 
-	#define GEAR_COLLECTOR_MODES X(STOW) X(COLLECT) X(PREP_SCORE) X(SCORE)
+	#define GEAR_COLLECTOR_MODES X(STOW) X(STOW_CLOSED) X(COLLECT) X(PREP_SCORE) X(SCORE)
 	enum class Gear_collector_mode{
 		#define X(NAME) NAME,
 		GEAR_COLLECTOR_MODES
