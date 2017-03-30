@@ -30,7 +30,7 @@ struct Panel{
 	Gear_grabber gear_grabber;
 	enum class Gear_arm{UP,DOWN,AUTO};
 	Gear_arm gear_arm;
-	enum class Gear_sensing{SEMI_AUTO,FULL_AUTO};
+	enum class Gear_sensing{NO_AUTO,SEMI_AUTO,FULL_AUTO};
 	Gear_sensing gear_sensing;
 	//10 *position switches:
 	int auto_select;//0-19
