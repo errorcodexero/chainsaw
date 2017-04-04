@@ -27,7 +27,7 @@ Toplevel::Goal Step::run(Run_info info){
 	return impl->run(info,{});
 }
 
-const double RIGHT_SPEED_CORRECTION = 0.0;//-0.045; // 0.0;// 0 is for comp bot. //left and right sides of the practice robot drive at different speeds given the same power, adjust this to make the robot drive straight
+const double RIGHT_SPEED_CORRECTION = -0.045; // 0.0;// 0 is for comp bot. //left and right sides of the practice robot drive at different speeds given the same power, adjust this to make the robot drive straight
 
 Drivebase::Distances Turn::angle_to_distances(Rad target_angle){
 	Inch side_goal = target_angle * 0.5 * ROBOT_WIDTH;
@@ -180,7 +180,7 @@ bool Drive_straight::operator==(Drive_straight const& b)const{
 	return target_dist == b.target_dist && initial_distances == b.initial_distances && init == b.init && motion_profile == b.motion_profile && in_range == b.in_range /*&& stall_timer == b.stall_timer*/ && gear == b.gear;
 }
 
-Ram::Ram(Inch goal):target_dist(goal),initial_distances(Drivebase::Distances{0,0}),init(false),gear(Gear_shifter::Goal::LOW){}//Motion profiling v
+Ram::Ram(Inch goal):target_dist(goal),initial_distances(Drivebase::Distances{0,0}),init(false),gear(Gear_shifter::Goal::LOW){}
 
 Drivebase::Distances Ram::get_distance_travelled(Drivebase::Distances current){
 	return current - initial_distances;
@@ -189,9 +189,9 @@ Drivebase::Distances Ram::get_distance_travelled(Drivebase::Distances current){
 Step::Status Ram::done(Next_mode_info info){
 	static const Inch TOLERANCE = 3.0;//inches
 	Drivebase::Distances distance_travelled = get_distance_travelled(info.status.drive.distances);
-	Drivebase::Distances distance_left = Drivebase::Distances{target_dist,target_dist} - distance_travelled;
+	//Drivebase::Distances distance_left = Drivebase::Distances{target_dist,target_dist} - distance_travelled;
 	//ignoring right encoder because it's proven hard to get meaningful data from it
-	return (distance_left.l <= TOLERANCE) ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;
+	return (fabs(distance_travelled.l) >= fabs(target_dist) - TOLERANCE) ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;
 }
 
 Toplevel::Goal Ram::run(Run_info info){
@@ -204,8 +204,10 @@ Toplevel::Goal Ram::run(Run_info info,Toplevel::Goal goals){
 		init = true;
 	}
 
-	goals.drive.left = 1;//TODO: move .11 to the constructor of Drive_straight and set an instance variable
-	goals.drive.right = 1; //right side would go faster than the left without error correction
+	static const double POWER = .5;
+
+	goals.drive.left = POWER;
+	goals.drive.right = POWER; //right side would go faster than the left without error correction
 	goals.shifter = gear;
 	return goals;
 }

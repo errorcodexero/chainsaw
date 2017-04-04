@@ -57,7 +57,7 @@ Executive get_auto_mode(Next_mode_info info){
 	static const Inch DIST_TO_MIDDLE_PEG = 114;//distance from alliance wall to the middle peg //TODO: find out correct distance
 	const Executive auto_score_gear_middle{Chain{
 		Step{Combo{
-			Step{Drive_straight{DIST_TO_MIDDLE_PEG - SCORE_GEAR_APPROACH_DIST - ROBOT_LENGTH - EXTENDED_GEAR_LENGTH - ALIGN_DIST}},
+			Step{Drive_straight{(DIST_TO_MIDDLE_PEG - ROBOT_LENGTH - EXTENDED_GEAR_LENGTH) - SCORE_GEAR_APPROACH_DIST - ALIGN_DIST}},
 			Step{Turn_on_light()}
 		}},
 		Executive{Chain{
