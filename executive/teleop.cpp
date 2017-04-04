@@ -108,7 +108,8 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	if(info.panel.gear_score) gear_collector_mode=Gear_collector_mode::SCORE;
 
 	bool gear_detected=info.status.gear_collector.gear_grabber.has_gear && info.status.gear_collector.gear_lifter==Gear_lifter::Status::DOWN;
-	if(gear_detected){
+	bool gear_trigger=has_gear_trigger(gear_detected);
+	if(gear_trigger){
 		if(info.panel.gear_sensing==Panel::Gear_sensing::FULL_AUTO) gear_collector_mode=Gear_collector_mode::PREP_SCORE; //Go into PREP_SCORE mode from STOW if a gear is detected and the corresponding mode is selected
 		if(info.panel.gear_sensing==Panel::Gear_sensing::SEMI_AUTO) gear_collector_mode=Gear_collector_mode::STOW_CLOSED; //Go into STOW_CLOSE mode from STOW if a gear is detected and the corresponding mode is selected
 	}
@@ -146,7 +147,7 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	//Flash camera light when a gear enters the gear collector
 	const Time GEAR_LIGHT_DURATION = 1;
 	gear_light_timer.update(info.in.now,enabled);
-	if(has_gear_trigger(gear_detected)) gear_light_timer.set(GEAR_LIGHT_DURATION);
+	if(gear_trigger) gear_light_timer.set(GEAR_LIGHT_DURATION);
 	if(!gear_light_timer.done() && (int)floor(10*info.in.now)%2==0) goals.lights.camera_light=1;
 
 	//Manual controls
