@@ -187,7 +187,7 @@ Drivebase::Distances Ram::get_distance_travelled(Drivebase::Distances current){
 }
 
 Step::Status Ram::done(Next_mode_info info){
-	static const Inch TOLERANCE = 3.0;//inches
+	static const Inch TOLERANCE = 0.0;//inches
 	Drivebase::Distances distance_travelled = get_distance_travelled(info.status.drive.distances);
 	//Drivebase::Distances distance_left = Drivebase::Distances{target_dist,target_dist} - distance_travelled;
 	//ignoring right encoder because it's proven hard to get meaningful data from it
@@ -205,9 +205,10 @@ Toplevel::Goal Ram::run(Run_info info,Toplevel::Goal goals){
 	}
 
 	static const double POWER = .5;
+	double p = copysign(POWER,target_dist);
 
-	goals.drive.left = POWER;
-	goals.drive.right = POWER; //right side would go faster than the left without error correction
+	goals.drive.left = p;
+	goals.drive.right = p + p * RIGHT_SPEED_CORRECTION; //right side would go faster than the left without error correction
 	goals.shifter = gear;
 	return goals;
 }
