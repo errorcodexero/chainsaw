@@ -28,8 +28,9 @@
 		}
 		
 		var trigger_request = new XMLHttpRequest();
-		function trigger(enable){	
-			trigger_request.open("GET", "http://10.14.25.18/axis-cgi/io/virtualinput.cgi?action=6:" + (enable?"/":"\\"), true);
+		function trigger(enable){
+			address=document.getElementById("selector").value;
+			trigger_request.open("GET", "http://" + address + "/axis-cgi/io/virtualinput.cgi?action=6:" + (enable?"/":"\\"), true);
 			trigger_request.send(null);
 			document.getElementById("trigger_text").innerHTML="Trigger: " + (enable?"ON":"OFF");
 		}
