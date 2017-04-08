@@ -40,6 +40,7 @@ struct Panel{
 };
 
 bool operator!=(Panel const&,Panel const&);
+std::ostream& operator<<(std::ostream&,Panel::Gear_sensing);
 std::ostream& operator<<(std::ostream&,Panel);
 
 Panel interpret_oi(Joystick_data);

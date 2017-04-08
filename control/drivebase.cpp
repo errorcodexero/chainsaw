@@ -35,7 +35,7 @@ const unsigned int TICKS_PER_REVOLUTION=200;//for 2017
 const double WHEEL_DIAMETER=4.25;//inches for 2017
 const double WHEEL_CIRCUMFERENCE=WHEEL_DIAMETER*PI;//inches
 const double INCHES_PER_TICK=WHEEL_CIRCUMFERENCE/(double)TICKS_PER_REVOLUTION;
-const double ERROR_CORRECTION = 0.181952663;//*.958;//2017, encoders are geared. Rough calculation from left encoder, second value is the mod for the comp bot.
+const double ERROR_CORRECTION = 0.181952663*.958;//2017, encoders are geared. Rough calculation from left encoder, second value is the mod for the comp bot.
 
 double ticks_to_inches(const int ticks){
 	return ticks*INCHES_PER_TICK*ERROR_CORRECTION;

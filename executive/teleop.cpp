@@ -5,8 +5,6 @@
 
 using namespace std;
 
-#define CLEAR_BALL_TIME 2 //seconds
-
 double set_drive_speed(double axis,double boost,bool slow){
 	static const float MAX_SPEED=1;//Change this value to change the max power the robot will achieve with full boost (cannot be larger than 1.0)
 	static const float DEFAULT_SPEED=.4;//Change this value to change the default power
@@ -110,8 +108,18 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	bool gear_detected=info.status.gear_collector.gear_grabber.has_gear && info.status.gear_collector.gear_lifter==Gear_lifter::Status::DOWN;
 	bool gear_trigger=has_gear_trigger(gear_detected);
 	if(gear_trigger){
-		if(info.panel.gear_sensing==Panel::Gear_sensing::FULL_AUTO) gear_collector_mode=Gear_collector_mode::PREP_SCORE; //Go into PREP_SCORE mode from STOW if a gear is detected and the corresponding mode is selected
-		if(info.panel.gear_sensing==Panel::Gear_sensing::SEMI_AUTO) gear_collector_mode=Gear_collector_mode::STOW_CLOSED; //Go into STOW_CLOSE mode from STOW if a gear is detected and the corresponding mode is selected
+		switch(info.panel.gear_sensing){
+			case Panel::Gear_sensing::FULL_AUTO:
+				gear_collector_mode=Gear_collector_mode::PREP_SCORE; //Go into PREP_SCORE mode from STOW if a gear is detected and the corresponding mode is selected
+				break;
+			case Panel::Gear_sensing::SEMI_AUTO:
+				gear_collector_mode=Gear_collector_mode::STOW_CLOSED; //Go into STOW_CLOSE mode from STOW if a gear is detected and the corresponding mode is selected
+				break;
+			case Panel::Gear_sensing::NO_AUTO:
+				break;
+			default:
+				nyi	
+		}
 	}
 
 	goals.gear_collector=[&]{

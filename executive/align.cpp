@@ -41,7 +41,8 @@ Step::Status Align::done(Next_mode_info info){
 	switch(mode){
 		case Mode::VISION:
 			{
-				if(info.since_switch>10){ //time is seince begining of auto period
+				const Time TIMEOUT_TIME = 8; //10; //seconds since start of autonomous
+				if(info.since_switch > TIMEOUT_TIME){ 
 					return Step::Status::FINISHED_SUCCESS;
 				}
 				in_range.update(info.in.now,info.in.robot_mode.enabled);

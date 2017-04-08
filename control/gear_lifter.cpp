@@ -124,6 +124,7 @@ void Gear_lifter::Estimator::update(Time time,Gear_lifter::Input input,Gear_lift
 			}
 			break;
 		case Gear_lifter::Output::DOWN:
+			/*
 			if(last == Status::GOING_DOWN){
 				state_timer.update(time,input.enabled);
 			} else if(last != Status::DOWN){ 
@@ -133,9 +134,9 @@ void Gear_lifter::Estimator::update(Time time,Gear_lifter::Input input,Gear_lift
 			}
 			if(state_timer.done() || last == Status::DOWN) { 
 				last = Status::DOWN;
-			}
-			//if(last != Status::DOWN) last = Status::GOING_DOWN;
-			//if(input.limit_switch || last == Status::DOWN) last = Status::DOWN;
+			}*/
+			if(last != Status::DOWN) last = Status::GOING_DOWN;
+			if(input.limit_switch || last == Status::DOWN) last = Status::DOWN;
 			break;
 		default:
 			assert(0);
