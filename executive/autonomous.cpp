@@ -145,7 +145,7 @@ Executive get_auto_mode(Next_mode_info info){
 	static const Inch FIRST_DRIVE_DIST_LOADING = (115 - ROBOT_LENGTH) + .5 * ROBOT_LENGTH;
 	auto auto_score_gear_loading_station=[=](bool red){
 		return Executive{Chain{
-			Step{Drive_straight{FIRST_DRIVE_DIST_LOADING}},
+			Step{Drive_straight{FIRST_DRIVE_DIST_LOADING,0.02,1.0}}, //TODO: set max speed to 1.0 ? or leave at default?
 			Executive{Chain{
 				Step{Combo{
 					Step{Turn{deg_to_rad(red?33:-33)}},
