@@ -240,14 +240,14 @@ cc_library(
 	name="stall_monitor",
 	srcs=["util/stall_monitor.cpp"],
 	hdrs=["util/stall_monitor.h"],
-	deps=[":interface"]
+	deps=[":interface",":persistent_tracker"]
 )
 
 cc_test(
 	name="stall_monitor_test",
 	srcs=["util/stall_monitor.cpp","util/stall_monitor.h"],
 	copts=["-DSTALL_MONITOR_TEST"],
-	deps=[":stall_monitor"],
+	deps=[":stall_monitor",":persistent_tracker"],
 	timeout="short"
 )
 
