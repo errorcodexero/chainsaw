@@ -2,6 +2,8 @@
 # Stuff common to pgm, lib, and test
 #
 
+BUILD=mybuild
+
 
 #
 # Make sure I have a list of source files
@@ -27,7 +29,7 @@ endif
 #
 # define the target directory for object files and libraries
 #
-TARGETDIR=$(TOP)/build/$(TARGET)
+TARGETDIR=$(TOP)/$(BUILD)/$(TARGET)
 
 #
 # Include a make file that sets up the tools.  It sets up the cross compile environment
