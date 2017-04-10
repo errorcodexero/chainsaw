@@ -1,25 +1,28 @@
-CXX = arm-frc-linux-gnueabi-g++
-CXXFLAGS = -std=c++14
 
-SRC = \
-	arm.cpp\
+TOP = ..
+SOURCE = \
+	climber.cpp\
 	drivebase.cpp\
 	force.cpp\
 	force_interface.cpp\
-	grabber.cpp\
-	gun.cpp\
+	gear_collector.cpp\
+	gear_grabber.cpp\
+	gear_lifter.cpp\
+	gear_shifter.cpp\
+	lights.cpp\
 	log.cpp\
 	main.cpp\
 	monitor.cpp\
 	motor_check.cpp\
 	nop.cpp\
 	pump.cpp\
+	roller.cpp\
+	roller_arm.cpp\
+	shooter.cpp\
 	sim.cpp\
-	toplevel.cpp\
-	tote_sensors.cpp\
-	winch.cpp
+	toplevel.cpp
 
-OBJS = $(SRC:.cpp=.o)
+LIBNAME = control
 
-control.a: $(OBJS)
-	$(AR) r $@ $(OBJS)
+
+include ../mkfiles/lib.mk

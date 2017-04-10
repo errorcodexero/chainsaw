@@ -1,7 +1,6 @@
-CXX = arm-frc-linux-gnueabi-g++
-CXXFLAGS = -std=c++14
 
-SRC = \
+TOP = ..
+SOURCE = \
 	bound_tracker.cpp\
 	countdown_timer.cpp\
 	countup_timer.cpp\
@@ -10,11 +9,8 @@ SRC = \
 	fixVictor.cpp\
 	input.cpp\
 	interface.cpp\
-	jag_interface.cpp\
 	meta.cpp\
 	motion_profile.cpp\
-	nav2.cpp\
-	nav.cpp\
 	negedge_trigger.cpp\
 	network.cpp\
 	output.cpp\
@@ -23,15 +19,15 @@ SRC = \
 	posedge_toggle.cpp\
 	posedge_trigger.cpp\
 	posedge_trigger_debounce.cpp\
-	pwm.cpp\
 	settable_toggle.cpp\
+	speed_tracker.cpp\
+	stall_monitor.cpp\
 	string_utils.cpp\
-	tagger.cpp\
 	type.cpp\
 	util.cpp\
 	visitable.cpp
 
-OBJS = $(SRC:.cpp=.o)
+LIBNAME = util
 
-util.a: $(OBJS)
-	$(AR) r $@ $(OBJS)
+
+include ../mkfiles/lib.mk

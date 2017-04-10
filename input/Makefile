@@ -1,13 +1,10 @@
-CXX = arm-frc-linux-gnueabi-g++
-CXXFLAGS = -std=c++14
 
-SRC = \
-	joystick_linux.cpp\
+TOP = ..
+SOURCE = \
 	panel.cpp\
-	range_finder.cpp\
 	util.cpp
 
-OBJS = $(SRC:.cpp=.o)
+LIBNAME = input
 
-input.a: $(OBJS)
-	$(AR) r $@ $(OBJS)
+
+include ../mkfiles/lib.mk
