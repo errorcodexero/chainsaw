@@ -11,4 +11,4 @@ t.mk
 FRCUserProgram
 bazel-*
 backups
-build
+mybuild

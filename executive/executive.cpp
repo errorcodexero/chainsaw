@@ -144,5 +144,7 @@ int main(){
 		auto x=rand(b);
 		assert(x==x);
 	}
+
+	return 0 ;
 }
 #endif
