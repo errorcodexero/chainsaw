@@ -6,9 +6,11 @@ echo =========================================================
 echo Unit Test Results
 echo =================
 
+search="process terminating"
+
 for i in $1/*.log ;
 do
-    grep -i "process terminating" --quiet $i
+    grep -i "assertion" $i | grep --quiet "failed"
     if [ $? -eq 0 ]; then
 	echo Unit test $i failed
 	counter=$((counter+1))
