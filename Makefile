@@ -27,7 +27,8 @@ robot:
 test: locallibs runtests analyze
 
 analyze:
-	@echo Analyzing results
+	bash analysis.sh mybuild/LOCAL/logs
+
 
 runtests:
 	$(foreach THIS,$(TESTLISTMK),\

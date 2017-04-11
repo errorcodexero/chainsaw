@@ -4,6 +4,8 @@ using namespace std;
 
 #ifdef DEBOUNCE_TEST
 int main(){
+	char *p = new char[512] ;
+	(void)p ;
 	Debounce<bool> d = {false};
 	assert(d.get()==0);
 	d.update(0,1);
