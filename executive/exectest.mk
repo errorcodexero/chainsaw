@@ -1,4 +1,3 @@
-# -*- mode: makefile-gmake -*-
 
 TOP = ..
 SOURCE=\
@@ -19,5 +18,4 @@ MYLIBS=\
 MYCFLAGS=-DEXECUTIVE_TEST
 APP=executive_test
 
-include ../mkfiles/test.mk
-
+include $(TOP)/mkfiles/test.mk

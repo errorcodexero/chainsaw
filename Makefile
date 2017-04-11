@@ -11,6 +11,9 @@ robot:
 
 test: locallibs
 	(cd executive ; make -f exectest.mk TARGET=LOCAL)
+	(cd executive ; make -f timetest.mk TARGET=LOCAL)
+	(cd executive ; make -f steptest.mk TARGET=LOCAL)
+	(cd executive ; make -f teleoptest.mk TARGET=LOCAL)
 
 locallibs:
 	(cd input ; make TARGET=LOCAL)
