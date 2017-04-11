@@ -12,4 +12,4 @@ $(error TARGET is not defined or defined to something other than 'ROBOT' or 'LOC
 endif
 endif
 
-CXXFLAGS += -std=c++14
+CXXFLAGS += -pthread -Wall -Wextra -Werror -O2 -g -std=c++14

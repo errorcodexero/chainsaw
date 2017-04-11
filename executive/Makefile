@@ -10,10 +10,15 @@ SOURCE = \
 	test.cpp\
 	timed.cpp
 
+TESTLIST = \
+	exectest\
+	steptest\
+	teleoptest\
+	timetest
 
 LIBNAME = executive
 
-TESTLIST = exectest
 
 include ../mkfiles/lib.mk
+
 

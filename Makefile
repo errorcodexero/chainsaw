@@ -1,3 +1,18 @@
+#
+# Generate the test list by asking the make file in each subdirectory what tests
+# it has.
+#
+TESTLIST = $(addprefix executive/,$(shell cd executive ; make TARGET=LOCAL testlist))
+TESTLIST += $(addprefix input/,$(shell cd input ; make TARGET=LOCAL testlist))
+TESTLIST += $(addprefix control/,$(shell cd control ; make TARGET=LOCAL testlist))
+TESTLIST += $(addprefix pixycam/,$(shell cd pixycam ; make TARGET=LOCAL testlist))
+TESTLIST += $(addprefix util/,$(shell cd util ; make TARGET=LOCAL testlist))
+
+#
+# Generate the path to the actual make file for each test
+#
+TESTLISTMK = $(addsuffix .mk,$(TESTLIST))
+
 
 all: robot test
 
@@ -9,11 +24,14 @@ robot:
 	(cd pixycam ; make TARGET=ROBOT)
 	(cd roborio ; make TARGET=ROBOT)
 
-test: locallibs
-	(cd executive ; make -f exectest.mk TARGET=LOCAL)
-	(cd executive ; make -f timetest.mk TARGET=LOCAL)
-	(cd executive ; make -f steptest.mk TARGET=LOCAL)
-	(cd executive ; make -f teleoptest.mk TARGET=LOCAL)
+test: locallibs runtests analyze
+
+analyze:
+	@echo Analyzing results
+
+runtests:
+	$(foreach THIS,$(TESTLISTMK),\
+	(cd $(dir $(THIS)) ; make TARGET=LOCAL -f $(notdir $(THIS)));)
 
 locallibs:
 	(cd input ; make TARGET=LOCAL)

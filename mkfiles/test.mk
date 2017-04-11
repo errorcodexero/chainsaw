@@ -34,18 +34,20 @@ TESTRESULT=$(TARGETDIR)/logs/$(APP).log
 #
 # Run the test with the output in a log file
 #
+all: dirs $(TESTRESULT)
+
 $(TESTRESULT): $(APPNAME)
-	$(VALGRIND) $(APPNAME) > $(TARGETDIR)/logs/$(APP).log 2>&1
+	$(VALGRIND) $(APPNAME) > $(TESTRESULT) 2>&1
 
 #
 # The program depends on the object files specified, which depends on the source files given
 #
-$(APPNAME) : dirs $(OBJS)
+$(APPNAME) : $(OBJS)
 	$(CXX) -o $(APPNAME) $(OBJS) $(LDFLAGS) $(PGMLIBS)
 
 #
 # Be sure the directories we need are created
 #
-dirs::
+dirs:
 	mkdir -p $(DEPDIR)
 	mkdir -p $(TARGETDIR)/logs

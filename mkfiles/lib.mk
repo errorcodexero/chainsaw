@@ -23,6 +23,14 @@ $(ARNAME) : $(DEPFILES) $(OBJS)
 	$(AR) r $(ARNAME) $(OBJS)
 
 #
+# Advertise the list of tests in this directory
+#
+testlist::
+	@echo $(TESTLIST)
+
+#
 # Include the dependencies
 #
 -include $(DEPFILES)
+
+

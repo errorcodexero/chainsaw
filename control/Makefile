@@ -22,6 +22,18 @@ SOURCE = \
 	sim.cpp\
 	toplevel.cpp
 
+TESTLIST = \
+	drivebase_test\
+	force_interface_test\
+	log_test\
+	main_test\
+	monitor_test\
+	motor_check_test\
+	nop_test\
+	pump_test\
+	sim_test\
+	toplevel_test
+
 LIBNAME = control
 
 
