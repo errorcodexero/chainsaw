@@ -12,3 +12,4 @@ FRCUserProgram
 bazel-*
 backups
 mybuild
+control/x1.txt

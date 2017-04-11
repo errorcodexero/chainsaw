@@ -8,6 +8,6 @@ MYLIBS=\
 	pixycam
 
 MYCFLAGS=-DUTIL_TEST
-APP=util
+APP=util_test
 
 include $(TOP)/mkfiles/test.mk

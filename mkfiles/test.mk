@@ -12,7 +12,7 @@ include $(TOP)/mkfiles/common.mk
 ifeq ($(OS),Windows_NT)
 VALGRIND=sh -c
 else
-VALGRIND=valgrind
+VALGRIND=valgrind --error-exitcode=1
 endif
 
 #
