@@ -2,6 +2,10 @@
 
 counter=0
 
+echo =========================================================
+echo Unit Test Results
+echo =================
+
 for i in $1/*.log ;
 do
     grep -i "process terminating" --quiet $i
@@ -16,6 +20,7 @@ do
 	counter=$((counter+1))
     fi
 done
+echo =========================================================
 
 if [ $counter -eq 0 ]; then
     echo All unit tests passed
