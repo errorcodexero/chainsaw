@@ -5,6 +5,21 @@
 #include "../util/motion_profile.h"
 #include "step.h"
 
+static const int CENTER = 145; //px
+static const int DIST_BETWEEN = 70; //px
+
+struct Block_pr{
+	static const int LEFT = CENTER - (DIST_BETWEEN / 2); 
+	static const int RIGHT = CENTER - (DIST_BETWEEN / 2);
+	
+	Pixy::Block block;
+	double left;
+	double right;
+	
+	Block_pr();
+	Block_pr(Pixy::Block,double,double);
+};
+
 struct Align: public Step_impl_inner<Align>{
 	enum class Mode{VISION,NONVISION};
 	Mode mode;

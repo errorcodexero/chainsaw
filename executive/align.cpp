@@ -14,7 +14,6 @@ ostream& operator<<(ostream& o,Align::Mode a){
 	}
 }
 
-static const int CENTER = 145;
 static const Time INITIAL_SEARCH = 0.1;
 
 Align::Align(Rad a):mode(Align::Mode::VISION),blocks({}),current(0),estimated_angle(a),nonvision_align(Step{Turn(a)}){
@@ -22,7 +21,47 @@ Align::Align(Rad a):mode(Align::Mode::VISION),blocks({}),current(0),estimated_an
 }
 Align::Align():Align(0){}
 
+Block_pr::Block_pr(Pixy::Block b, double l, double r):block(b),left(l),right(r){}
+Block_pr::Block_pr():Block_pr({0,0,0,0,0},0.0,0.0){}
+
+double pixel_to_pr(const int PIXELS_OFF){
+	const double FOV = 60.0; //field of view of camera, degrees
+	const int WIDTH = (int)(Pixy::Block::max_x / FOV); 
+	if(PIXELS_OFF < WIDTH * -4.5){
+		return 0.0;
+	}
+	if(PIXELS_OFF < WIDTH * -3.5){
+		return 0.04;
+	} 
+	if(PIXELS_OFF < WIDTH * -2.5){
+		return 0.07;
+	} 
+	if(PIXELS_OFF < WIDTH * -1.5){
+		return 0.10;
+	} 
+	if(PIXELS_OFF < WIDTH * -0.5){
+		return 0.16;
+	} 
+	if(PIXELS_OFF < WIDTH * 0.5){
+		return 0.26;
+	} 
+	if(PIXELS_OFF < WIDTH * 1.5){
+		return 0.16;
+	} 
+	if(PIXELS_OFF < WIDTH * 2.5){
+		return 0.10;
+	}
+	if(PIXELS_OFF < WIDTH * 3.5){
+		return 0.07;
+	} 
+	if(PIXELS_OFF < WIDTH * 4.5){
+		return 0.04;
+	}
+	return 0.0;
+}
+
 void Align::update(Camera camera){
+	#if 0
 	/*if((!camera.enabled || camera.blocks.empty()) && initial_search.done()){
 		//TODO: should search for vision target instead
 		mode = Mode::NONVISION;
@@ -34,6 +73,48 @@ void Align::update(Camera camera){
 		else if(blocks.size()==1) current = blocks[0].x;
 		//if we dont see any blobs we will continue as if we still see what we saw before there being no blocks
 	//}
+	#endif 
+	mode = Mode::VISION;
+	blocks = camera.blocks;
+	vector<Block_pr> block_prs;
+	for(unsigned i = 0; i < blocks.size(); i++){
+		Pixy::Block block = blocks[i];
+		block_prs.push_back({block,pixel_to_pr(Block_pr::LEFT - block.x),pixel_to_pr(Block_pr::RIGHT - block.x)});
+	}
+
+	//static const double PR_THRESHHOLD = 0.10;
+	//static const int OFFSET = DIST_BETWEEN / 2;//px	
+
+	Maybe<Pixy::Block> right_block = [&]{
+		Maybe<Block_pr> max;
+		for(Block_pr a: block_prs){
+			if(!max || a.right > (*max).right){
+				max = a;
+			}
+		}
+		if(!max) return Maybe<Pixy::Block>{};
+		return Maybe<Pixy::Block>{(*max).block};
+	}();
+
+	Maybe<Pixy::Block> left_block = [&]{
+		Maybe<Block_pr> max;
+		for(Block_pr a: block_prs){
+			if(!max || a.left > (*max).left){
+				max = a;
+			}
+		}
+		if(!max) return Maybe<Pixy::Block>{};
+		return Maybe<Pixy::Block>{(*max).block};
+	}();
+	
+	
+	if(left_block && right_block){
+		current = mean((*left_block).x,(*right_block).x);
+	}
+	else if(blocks.size() == 1){
+		current = blocks[0].x;
+	}
+
 }
 
 Step::Status Align::done(Next_mode_info info){
