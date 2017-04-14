@@ -20,6 +20,7 @@ struct Main{
 	Log log;	
 	
 	Main();
+	Main(Executive);
 	Robot_outputs operator()(Robot_inputs,std::ostream& = std::cerr);
 };
 

@@ -5,12 +5,12 @@
 #include "../util/motion_profile.h"
 #include "step.h"
 
-static const int CENTER = 145; //px
-static const int DIST_BETWEEN = 70; //px
+static const int CENTER = 145; //px posiiton in the image that corresponds to the center of the robot (calibrated to account for angle and offset of the camera)
+static const int DIST_BETWEEN = 70; //px the expected distance between the two pieces of tape if the robot is 2ft away
 
 struct Block_pr{
-	static const int LEFT = CENTER - (DIST_BETWEEN / 2); 
-	static const int RIGHT = CENTER - (DIST_BETWEEN / 2);
+	static const int LEFT = CENTER - (DIST_BETWEEN / 2); //px where we expect the left tape to be
+	static const int RIGHT = CENTER + (DIST_BETWEEN / 2); //px where we expect the right tape to be
 	
 	Pixy::Block block;
 	double left;
@@ -19,6 +19,8 @@ struct Block_pr{
 	Block_pr();
 	Block_pr(Pixy::Block,double,double);
 };
+
+std::ostream& operator<<(std::ostream&,Block_pr const&);
 
 struct Align: public Step_impl_inner<Align>{
 	enum class Mode{VISION,NONVISION};

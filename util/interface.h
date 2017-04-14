@@ -184,6 +184,7 @@ bool operator!=(Digital_inputs const&,Digital_inputs const&);
 std::ostream& operator<<(std::ostream&,Digital_inputs const&);
 
 struct Camera{
+	static const double FOV; //degrees
 	bool enabled;
 	std::vector<Pixy::Block> blocks;
 	

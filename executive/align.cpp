@@ -1,4 +1,5 @@
 #include "align.h"
+
 #include <iostream>
 
 using namespace std;
@@ -24,9 +25,17 @@ Align::Align():Align(0){}
 Block_pr::Block_pr(Pixy::Block b, double l, double r):block(b),left(l),right(r){}
 Block_pr::Block_pr():Block_pr({0,0,0,0,0},0.0,0.0){}
 
+ostream& operator<<(ostream& o, Block_pr const& a){
+	o<<"Block_pr(";
+	o<<"block:("<<a.block<<")";
+	o<<" left:"<<a.left;
+	o<<" right:"<<a.right;
+	o<<")";
+	return o;
+}
+
 double pixel_to_pr(const int PIXELS_OFF){
-	const double FOV = 60.0; //field of view of camera, degrees
-	const int WIDTH = (int)(Pixy::Block::max_x / FOV); 
+	const int WIDTH = (int)(Pixy::Block::max_x / Camera::FOV); 
 	if(PIXELS_OFF < WIDTH * -4.5){
 		return 0.0;
 	}
@@ -83,7 +92,6 @@ void Align::update(Camera camera){
 	}
 
 	//static const double PR_THRESHHOLD = 0.10;
-	//static const int OFFSET = DIST_BETWEEN / 2;//px	
 
 	Maybe<Pixy::Block> right_block = [&]{
 		Maybe<Block_pr> max;
@@ -106,15 +114,24 @@ void Align::update(Camera camera){
 		if(!max) return Maybe<Pixy::Block>{};
 		return Maybe<Pixy::Block>{(*max).block};
 	}();
-	
+
+	{//for testing
+		cout<<"\nAlign block probabilities: \n";
+		for(Block_pr a: block_prs){
+			cout<<a<<"\n";
+		}
+		cout<<"Assigned left:("<<left_block<<") Assigned_right:("<<right_block<<")\n";
+	}
 	
 	if(left_block && right_block){
 		current = mean((*left_block).x,(*right_block).x);
-	}
-	else if(blocks.size() == 1){
-		current = blocks[0].x;
-	}
+	} else if(left_block){
+		current = mean((*left_block).x, (*left_block).x + DIST_BETWEEN);
+	} else if(right_block){
+		current = mean((*right_block).x, (*right_block).x - DIST_BETWEEN);
+	} else {
 
+	}
 }
 
 Step::Status Align::done(Next_mode_info info){
@@ -127,7 +144,7 @@ Step::Status Align::done(Next_mode_info info){
 					return Step::Status::FINISHED_SUCCESS;
 				}
 				in_range.update(info.in.now,info.in.robot_mode.enabled);
-				const int VISION_THRESHHOLD = 24*.75;//starting with something large; theoretically this could be as large at 30px and be ok.
+				const int VISION_THRESHHOLD = 10;//24*.75;//starting with something large; theoretically this could be as large at 30px and be ok.
 				const bool ok_now=(current > CENTER - VISION_THRESHHOLD && current < CENTER + VISION_THRESHHOLD);
 				if(!ok_now){
 					static const Time FINISH_TIME = .50;
@@ -148,8 +165,8 @@ Toplevel::Goal Align::run(Run_info info){
 
 Toplevel::Goal Align::run(Run_info info,Toplevel::Goal goals){
 	initial_search.update(info.in.now,info.in.robot_mode.enabled);
-	goals.lights.camera_light=1;
 	update(info.in.camera);
+	goals.lights.camera_light=1;
 	//cout<<"Align:    mode:"<<mode<<" blocks:"<<blocks<<"   current:"<<current<<"   CENTER:"<<CENTER<<"    angle:"<<estimated_angle<<"\n";
 	goals.shifter = Gear_shifter::Goal::LOW;
 	switch(mode){
@@ -180,3 +197,22 @@ bool Align::operator==(Align const& b)const{
 	return mode == b.mode && blocks == b.blocks && current == b.current && in_range == b.in_range && estimated_angle == b.estimated_angle && initial_search == b.initial_search && nonvision_align == b.nonvision_align;
 }
 
+
+#ifdef ALIGN_TEST
+
+#include "test.h"
+#include "chain.h"
+#include "teleop.h"
+
+int main(){
+	Executive align{Chain{
+		Step{Align()},
+		Executive{Teleop()}
+	}};
+	test_executive(align);
+
+	//align.done();
+	//align.run();
+	return 0;
+}
+#endif

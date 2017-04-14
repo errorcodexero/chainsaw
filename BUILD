@@ -627,7 +627,18 @@ cc_test(
 	name="sim_test",
 	srcs=["control/sim.cpp"],
 	copts=["-DSIM_TEST","-g"],
-	deps=[":step",":toplevel",":point",":type",":nop", ":main",":util"],
+	deps=[
+		":chain",
+		":step",
+		":teleop",
+		":toplevel",
+		":point",
+		":type",
+		":nop",
+		":main",
+		":util",
+		":align"
+	],
 	timeout="short"
 )
 
@@ -700,6 +711,13 @@ cc_library(
 	deps=[":executive",":posedge_trigger_debounce",":posedge_toggle",":motion_profile",":step"]
 )
 
+cc_library(
+	name="teleop",
+	srcs=["executive/teleop.cpp"],
+	hdrs=["executive/teleop.h"],
+	deps=[":executive",":posedge_trigger_debounce",":posedge_toggle",":test"]
+)
+
 cc_test(
 	name="teleop_test",
 	srcs=["executive/teleop.cpp","executive/teleop.h"],
@@ -746,11 +764,34 @@ cc_library(
 	hdrs=["executive/step.h"],
 	deps=[":executive",":motion_profile"]
 )
+
+cc_library(
+	name="chain",
+	srcs=["executive/chain.cpp"],
+	hdrs=["executive/chain.h"],
+	deps=[":step",":executive_impl"]
+)
+
 cc_library(
 	name="align",
 	srcs=["executive/align.cpp"],
 	hdrs=["executive/align.h"],
 	deps=[":executive",":motion_profile",":step"]
+)
+
+cc_test(
+	name="align_test",
+	srcs=["executive/align.cpp","executive/align.h"],
+	copts=["-DALIGN_TEST"],
+	deps=[
+		":executive",
+		":step",
+		":test",
+		":teleop",
+		":chain",
+		":motion_profile"
+	],
+	timeout="short"
 )
 
 cc_test(
