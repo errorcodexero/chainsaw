@@ -423,8 +423,6 @@ int main(){
 		robot_inputs.robot_mode.autonomous = true;
 		robot_inputs.robot_mode.enabled = true;
 
-
-	
 		static const Time TIMESTEP = .05;
 		static const Time AUTO_LENGTH = 15;
 		for(Time t = 0; t < AUTO_LENGTH; t += TIMESTEP){//set to 15 seconds for autonomous testing.
@@ -450,14 +448,14 @@ int main(){
 					{0,Block_pr::LEFT + MISALIGNED,0,40,40}, //left tape
 					{0,Block_pr::RIGHT + MISALIGNED,0,30,30}, //right tape
 					{0,0,30,20,20}, //random other
-					{0,200,14,10,10} //random other
+					{0,250,14,10,10} //random other
 				};
 			
 				//shift the blocks according to the robot's angle
 				static const double PIXELS_PER_DEGREE = (double)Pixy::Block::max_x / (double)Camera::FOV; // px/degree
 				int rotate = sim.drive.position.theta * (180 /PI) * PIXELS_PER_DEGREE; //px how much to shift the x values of the blocks as the robot turns
-				for(unsigned i = 0; i < robot_inputs.camera.blocks.size(); i++){
-					robot_inputs.camera.blocks[i].x -= rotate; //- becase image shifts left if robot turns clockwise
+				for(Pixy::Block& a: robot_inputs.camera.blocks){
+					a.x = max((int)a.x - rotate, 0); //- becase image shifts left if robot turns clockwise
 				}
 				
 			}

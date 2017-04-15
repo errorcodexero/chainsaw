@@ -111,12 +111,12 @@ void Align::update(Camera camera){
 		block_prs.push_back({block});
 	}
 
-	//static const double PR_THRESHHOLD = 0.10;
+	static const double PR_THRESHOLD = 0.0;
 
 	Maybe<Pixy::Block> right_block = [&]{
 		Maybe<Block_pr> max;
 		for(Block_pr a: block_prs){
-			if(!max || a.right > (*max).right){
+			if(a.right > PR_THRESHOLD && (!max || a.right > (*max).right)){
 				max = a;
 			}
 		}
@@ -127,7 +127,7 @@ void Align::update(Camera camera){
 	Maybe<Pixy::Block> left_block = [&]{
 		Maybe<Block_pr> max;
 		for(Block_pr a: block_prs){
-			if(!max || a.left > (*max).left){
+			if(a.left > PR_THRESHOLD && (!max || a.left > (*max).left)){
 				max = a;
 			}
 		}
@@ -141,9 +141,9 @@ void Align::update(Camera camera){
 	} else if(left_block){
 		current = (*left_block).x + OFFSET;
 	} else if(right_block){
-		current = (*right_block).x + OFFSET;
+		current = (*right_block).x - OFFSET;
 	} else {
-
+		//TODO: what do we do if we don't see anything that could be the tape?
 	}
 
 	{//for testing
