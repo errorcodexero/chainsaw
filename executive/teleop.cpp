@@ -139,8 +139,19 @@ Toplevel::Goal Teleop::run(Run_info info) {
 		}
 	}();
 
-	goals.climber=info.panel.climb?Climber::Goal::CLIMB:Climber::Goal::STOP;
-	if(info.panel.climb) gear_collector_mode=Gear_collector_mode::STOW; //Go into STOW if climbing
+	goals.climber = [&]{
+		if(info.panel.climb){
+			gear_collector_mode=Gear_collector_mode::STOW; //Go into STOW if climbing
+			switch(info.panel.climber_mode){
+				case Panel::Climber_mode::STANDARD: return Climber::Goal::STANDARD_CLIMB;
+				case Panel::Climber_mode::TURBO: return Climber::Goal::TURBO_CLIMB;
+				case Panel::Climber_mode::RELEASE: return Climber::Goal::RELEASE;
+				default:
+					nyi
+			}
+		}
+		return Climber::Goal::STOP;
+	}();	
 
 	/*
 	indicator_toggle.update(info.panel.loading_indicator);
@@ -173,6 +184,7 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	}
 	goals.gear_collector.manual_override=(info.panel.roller_control!=Panel::Roller_control::OFF) && (info.panel.roller!=Panel::Roller::AUTO);
 
+	/*
 	goals.shooter = [&]{
 		switch(info.panel.shooter){
 			case Panel::Shooter::ENABLED: return Shooter::Goal::FORWARD;
@@ -184,6 +196,7 @@ Toplevel::Goal Teleop::run(Run_info info) {
 				nyi
 		}
 	}();	
+	*/ 
 
 	#if 0
 	if(info.in.ds_info.connected && (print_number%10)==0){

@@ -16,8 +16,13 @@ struct Block_pr{
 	double left;
 	double right;
 	
+	static double generate_left(const int);
+	static double generate_right(const int);
+	static double generate_pr(const int);
+	
 	Block_pr();
 	Block_pr(Pixy::Block,double,double);
+	Block_pr(const Pixy::Block);
 };
 
 std::ostream& operator<<(std::ostream&,Block_pr const&);
