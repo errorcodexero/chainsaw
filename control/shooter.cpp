@@ -25,16 +25,20 @@ bool operator==(Shooter::Output_applicator,Shooter::Output_applicator){ return t
 bool operator==(Shooter a,Shooter b){ return (a.input_reader==b.input_reader && a.estimator==b.estimator && a.output_applicator==b.output_applicator); }
 bool operator!=(Shooter a,Shooter b){ return !(a==b); }
 
-Shooter::Output Shooter::Output_applicator::operator()(Robot_outputs const& r)const{
+Shooter::Output Shooter::Output_applicator::operator()(Robot_outputs const& /*r*/)const{
+	#if 0
 	//assuming talon srx is in percent mode
 
 	double power = r.talon_srx[SHOOTER_LOC].power_level;
 	if(power == 0) return Shooter::Output::OFF;
 	if(power > 0) return Shooter::Output::FORWARD;
 	return Shooter::Output::REVERSE; //assuming less than 0 is reverse
+	#endif
+	return Shooter::Output::OFF;
 }
 
-Robot_outputs Shooter::Output_applicator::operator()(Robot_outputs r,Shooter::Output out)const{ 
+Robot_outputs Shooter::Output_applicator::operator()(Robot_outputs r,Shooter::Output /*out*/)const{ 
+	#if 0
 	r.talon_srx[SHOOTER_LOC] = Talon_srx_output::percent([=]{
 		switch(out){
 			case Shooter::Output::OFF:
@@ -47,15 +51,17 @@ Robot_outputs Shooter::Output_applicator::operator()(Robot_outputs r,Shooter::Ou
 				assert(0);
 		}
 	}());
+	#endif
 	return r;
 }
 
 std::set<Shooter::Goal> examples(Shooter::Goal*){
-	return {Shooter::Goal::REVERSE,Shooter::Goal::OFF,Shooter::Goal::FORWARD};
+	return {Shooter::Goal::OFF/*,Shooter::Goal::REVERSE,Shooter::Goal::FORWARD*/};
 }
 
-Shooter::Output control(Shooter::Status_detail, Shooter::Goal goal){
-	return goal;
+Shooter::Output control(Shooter::Status_detail, Shooter::Goal){
+	return Shooter::Output::OFF;
+	//return goal;
 }
 
 bool ready(Shooter::Status,Shooter::Goal){
@@ -67,7 +73,9 @@ bool ready(Shooter::Status,Shooter::Goal){
 
 int main(){
 	Shooter a;
-	tester(a);
+	Tester_mode t;
+	t.check_multiple_outputs = 0;
+	tester(a,t);
 }
 
 #endif

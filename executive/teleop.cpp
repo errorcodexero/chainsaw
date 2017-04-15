@@ -5,8 +5,6 @@
 
 using namespace std;
 
-#define CLEAR_BALL_TIME 2 //seconds
-
 double set_drive_speed(double axis,double boost,bool slow){
 	static const float MAX_SPEED=1;//Change this value to change the max power the robot will achieve with full boost (cannot be larger than 1.0)
 	static const float DEFAULT_SPEED=.4;//Change this value to change the default power
@@ -110,8 +108,18 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	bool gear_detected=info.status.gear_collector.gear_grabber.has_gear && info.status.gear_collector.gear_lifter==Gear_lifter::Status::DOWN;
 	bool gear_trigger=has_gear_trigger(gear_detected);
 	if(gear_trigger){
-		if(info.panel.gear_sensing==Panel::Gear_sensing::FULL_AUTO) gear_collector_mode=Gear_collector_mode::PREP_SCORE; //Go into PREP_SCORE mode from STOW if a gear is detected and the corresponding mode is selected
-		if(info.panel.gear_sensing==Panel::Gear_sensing::SEMI_AUTO) gear_collector_mode=Gear_collector_mode::STOW_CLOSED; //Go into STOW_CLOSE mode from STOW if a gear is detected and the corresponding mode is selected
+		switch(info.panel.gear_sensing){
+			case Panel::Gear_sensing::FULL_AUTO:
+				gear_collector_mode=Gear_collector_mode::PREP_SCORE; //Go into PREP_SCORE mode from STOW if a gear is detected and the corresponding mode is selected
+				break;
+			case Panel::Gear_sensing::SEMI_AUTO:
+				gear_collector_mode=Gear_collector_mode::STOW_CLOSED; //Go into STOW_CLOSE mode from STOW if a gear is detected and the corresponding mode is selected
+				break;
+			case Panel::Gear_sensing::NO_AUTO:
+				break;
+			default:
+				nyi	
+		}
 	}
 
 	goals.gear_collector=[&]{
@@ -131,8 +139,19 @@ Toplevel::Goal Teleop::run(Run_info info) {
 		}
 	}();
 
-	goals.climber=info.panel.climb?Climber::Goal::CLIMB:Climber::Goal::STOP;
-	if(info.panel.climb) gear_collector_mode=Gear_collector_mode::STOW; //Go into STOW if climbing
+	goals.climber = [&]{
+		if(info.panel.climb || info.driver_joystick.button[Gamepad_button::START]){
+			gear_collector_mode = Gear_collector_mode::STOW; //Go into STOW if climbing
+			switch(info.panel.climber_mode){
+				case Panel::Climber_mode::STANDARD: return Climber::Goal::STANDARD_CLIMB;
+				case Panel::Climber_mode::TURBO: return Climber::Goal::TURBO_CLIMB;
+				case Panel::Climber_mode::RELEASE: return Climber::Goal::RELEASE;
+				default:
+					nyi
+			}
+		}
+		return Climber::Goal::STOP;
+	}();	
 
 	/*
 	indicator_toggle.update(info.panel.loading_indicator);
@@ -141,7 +160,7 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	*/
 	
 	//Set the camera light
-	camera_light_toggle.update(info.driver_joystick.button[Gamepad_button::START] || info.panel.camera_light);
+	camera_light_toggle.update(info.driver_joystick.button[Gamepad_button::BACK] || info.panel.camera_light);
 	goals.lights.camera_light=camera_light_toggle.get();
 
 	//Flash camera light when a gear enters the gear collector
@@ -151,7 +170,7 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	if(!gear_light_timer.done() && (int)floor(10*info.in.now)%2==0) goals.lights.camera_light=1;
 
 	//Manual controls
-	if(info.panel.gear_grabber==Panel::Gear_grabber::OPEN) goals.gear_collector.gear_grabber=Gear_grabber::Goal::OPEN;
+	
 	if(info.panel.gear_grabber==Panel::Gear_grabber::CLOSED) goals.gear_collector.gear_grabber=Gear_grabber::Goal::CLOSE;
 	if(info.panel.gear_arm==Panel::Gear_arm::UP) goals.gear_collector.gear_lifter=Gear_lifter::Goal::UP;
 	if(info.panel.gear_arm==Panel::Gear_arm::DOWN) goals.gear_collector.gear_lifter=Gear_lifter::Goal::DOWN;	
@@ -163,7 +182,9 @@ Toplevel::Goal Teleop::run(Run_info info) {
 		if(info.panel.roller==Panel::Roller::OUT) goals.gear_collector.roller=Roller::Goal::OUT;
 		if(info.panel.roller==Panel::Roller::IN) goals.gear_collector.roller=Roller::Goal::IN;
 	}
+	goals.gear_collector.manual_override=(info.panel.roller_control!=Panel::Roller_control::OFF) && (info.panel.roller!=Panel::Roller::AUTO);
 
+	/*
 	goals.shooter = [&]{
 		switch(info.panel.shooter){
 			case Panel::Shooter::ENABLED: return Shooter::Goal::FORWARD;
@@ -175,6 +196,7 @@ Toplevel::Goal Teleop::run(Run_info info) {
 				nyi
 		}
 	}();	
+	*/ 
 
 	#if 0
 	if(info.in.ds_info.connected && (print_number%10)==0){

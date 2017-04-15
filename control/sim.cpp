@@ -3,6 +3,9 @@
 #include "../util/type.h"
 #include "nop.h"
 #include "../executive/step.h"
+#include "../executive/chain.h"
+#include "../executive/align.h"
+#include "../executive/teleop.h"
 #include <math.h>
 #include "main.h"
 #include "../util/point.h"
@@ -353,8 +356,8 @@ int main(){
 	}*/
 
 	//Dedup_print mode,outp,inp,statusp;
-	Dedup2 mode,outp,inp,statusp,panel,drive_sim;
 	{//NOTE: All this is calibrated for use with side gear auto scoring (specifically the loading station side)
+		Dedup2 mode,outp,inp,statusp,panel,drive_sim;
 		Toplevel_sim sim;
 		Main m;
 
@@ -396,6 +399,67 @@ int main(){
 			robot_inputs.robot_mode.autonomous = true;//override this for now
 			robot_inputs.robot_mode.enabled = true;
 			robot_inputs.camera.blocks = {{0,155,0,100,100}};//for align
+		}
+	}
+
+	cout<<"\n\n\n=====================================================================================\n\n\n";
+
+	{//NOTE: All this is calibrated for use for Align
+		Dedup2 mode,outp,inp,statusp,panel,drive_sim;
+		Toplevel_sim sim;
+		Main m{Executive{Chain{
+			Step{Align()},
+			Executive{Teleop()}
+		}}};
+
+		Robot_inputs robot_inputs;
+		{
+			Robot_inputs all;	
+			all.robot_mode.autonomous = true;
+			all.robot_mode.enabled = true;
+			all.ds_info.alliance = Alliance::RED;
+			robot_inputs = m.toplevel.input_reader(all,sim.get());
+		}
+		robot_inputs.robot_mode.autonomous = true;
+		robot_inputs.robot_mode.enabled = true;
+
+		static const Time TIMESTEP = .05;
+		static const Time AUTO_LENGTH = 15;
+		for(Time t = 0; t < AUTO_LENGTH; t += TIMESTEP){//set to 15 seconds for autonomous testing.
+			robot_inputs.now = t;
+			inp(as_string(t)+"\tin",sim.get());
+			Robot_outputs out = m(robot_inputs);
+			drive_sim(as_string(t)+"\tdrive_sim",sim.drive);
+			panel(as_string(t)+"\tpanel",interpret_oi(robot_inputs.joystick[Panel::PORT]));
+			mode(as_string(t)+"\tmode",m.mode);
+			Toplevel::Status_detail status_detail = m.toplevel.estimator.get();
+			statusp(as_string(t)+"\tstatus_detail",status_detail);
+			outp(as_string(t)+ "\tout",out);
+			sim.update(t,robot_inputs.robot_mode.enabled,m.toplevel.output_applicator(out));
+			m.toplevel.estimator.update(t,sim.get(),m.toplevel.output_applicator(out));
+			robot_inputs = m.toplevel.input_reader(robot_inputs,sim.get());
+			robot_inputs.robot_mode.autonomous = true;//override this for now
+			robot_inputs.robot_mode.enabled = true;
+
+			{
+				//set up the initial location of the blocks
+				static const int MISALIGNED = 10;// px
+				robot_inputs.camera.blocks = {
+					{0,Block_pr::LEFT + MISALIGNED,0,40,40}, //left tape
+					{0,Block_pr::RIGHT + MISALIGNED,0,30,30}, //right tape
+					{0,0,30,20,20}, //random other
+					{0,250,14,10,10} //random other
+				};
+			
+				//shift the blocks according to the robot's angle
+				static const double PIXELS_PER_DEGREE = (double)Pixy::Block::max_x / (double)Camera::FOV; // px/degree
+				int rotate = sim.drive.position.theta * (180 /PI) * PIXELS_PER_DEGREE; //px how much to shift the x values of the blocks as the robot turns
+				for(Pixy::Block& a: robot_inputs.camera.blocks){
+					a.x = max((int)a.x - rotate, 0); //- becase image shifts left if robot turns clockwise
+				}
+				
+			}
+			
 		}
 	}
 	return 0;	

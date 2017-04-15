@@ -24,8 +24,8 @@ struct Panel{
 	Roller roller;
 	enum class Roller_arm{STOW,LOW,AUTO};
 	Roller_arm roller_arm;
-	enum class Shooter{ENABLED,DISABLED,AUTO};
-	Shooter shooter;
+	enum class Climber_mode{TURBO,STANDARD,RELEASE};
+	Climber_mode climber_mode;
 	enum class Gear_grabber{OPEN,CLOSED,AUTO};
 	Gear_grabber gear_grabber;
 	enum class Gear_arm{UP,DOWN,AUTO};
@@ -40,6 +40,7 @@ struct Panel{
 };
 
 bool operator!=(Panel const&,Panel const&);
+std::ostream& operator<<(std::ostream&,Panel::Gear_sensing);
 std::ostream& operator<<(std::ostream&,Panel);
 
 Panel interpret_oi(Joystick_data);

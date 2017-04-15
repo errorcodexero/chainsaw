@@ -585,6 +585,8 @@ bool operator!=(DS_info const& a,DS_info const& b){ return !(a==b); }
 
 Camera::Camera():enabled(0){}
 
+const double Camera::FOV = 60.0;//degrees
+
 ostream& operator<<(ostream& o,Camera const& a){
 	o<<"Camera(";
 	o<<"enabled:"<<a.enabled;

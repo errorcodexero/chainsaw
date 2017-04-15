@@ -77,6 +77,17 @@ Executive get_auto_mode(Next_mode_info info){
 			}}
 		}}
 	}};
+	
+	const Executive auto_score_gear_middle_nonvision{Chain{
+		Step{Drive_straight{(DIST_TO_MIDDLE_PEG - ROBOT_LENGTH - EXTENDED_GEAR_LENGTH) - SCORE_GEAR_APPROACH_DIST}},
+		Executive{Chain{
+			Step{Lift_gear()},
+			Executive{Chain{
+				Step{Score_gear()},
+				Executive{Teleop()}
+			}}
+		}}
+	}};
 
 	//Score a gear on the boiler-side peg
 	static const Inch FIRST_DRIVE_DIST_BOILER = (115 - ROBOT_LENGTH) + .5 * ROBOT_LENGTH;//centers the robot on the turning point to align with gear peg //from testing
@@ -145,7 +156,7 @@ Executive get_auto_mode(Next_mode_info info){
 	static const Inch FIRST_DRIVE_DIST_LOADING = (115 - ROBOT_LENGTH) + .5 * ROBOT_LENGTH;
 	auto auto_score_gear_loading_station=[=](bool red){
 		return Executive{Chain{
-			Step{Drive_straight{FIRST_DRIVE_DIST_LOADING}},
+			Step{Drive_straight{FIRST_DRIVE_DIST_LOADING,0.02,1.0}}, //TODO: set max speed to 1.0 ? or leave at default?
 			Executive{Chain{
 				Step{Combo{
 					Step{Turn{deg_to_rad(red?33:-33)}},
@@ -275,6 +286,7 @@ Executive get_auto_mode(Next_mode_info info){
 		case 10:
 			return auto_forward;
 		case 11:
+			return auto_score_gear_middle_nonvision;
 		case 12:
 		case 13:
 		case 14:

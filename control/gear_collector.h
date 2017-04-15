@@ -25,8 +25,10 @@ struct Gear_collector{
 		#define X(A,B) A::Goal B;
 		GEAR_COLLECTOR_ITEMS(X)
 		#undef X
+		bool manual_override;
 		Goal();
 		Goal(Gear_grabber::Goal,Gear_lifter::Goal,Roller::Goal,Roller_arm::Goal);
+		
 	};
 
 	struct Input_reader{
