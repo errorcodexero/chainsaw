@@ -2,9 +2,9 @@
 
 using namespace std;
 
-Gear_collector::Goal::Goal():gear_grabber(Gear_grabber::Goal::CLOSE),gear_lifter(Gear_lifter::Goal::DOWN),roller(Roller::Goal::OFF),roller_arm(Roller_arm::Goal::STOW){}
+Gear_collector::Goal::Goal():gear_grabber(Gear_grabber::Goal::CLOSE),gear_lifter(Gear_lifter::Goal::DOWN),roller(Roller::Goal::OFF),roller_arm(Roller_arm::Goal::STOW),manual_override(0){}
 
-Gear_collector::Goal::Goal(Gear_grabber::Goal g,Gear_lifter::Goal l,Roller::Goal r,Roller_arm::Goal ra):gear_grabber(g),gear_lifter(l),roller(r),roller_arm(ra){}
+Gear_collector::Goal::Goal(Gear_grabber::Goal g,Gear_lifter::Goal l,Roller::Goal r,Roller_arm::Goal ra):gear_grabber(g),gear_lifter(l),roller(r),roller_arm(ra),manual_override(0){}
 
 ostream& operator<<(ostream& o,Gear_collector const&){
 	return o<<"Gear_collector()";
@@ -172,7 +172,7 @@ Gear_collector::Output control(Gear_collector::Status_detail const& st,Gear_coll
 	if(st.roller_arm!=Roller_arm::Status::STOW) g.gear_lifter=Gear_lifter::Goal::DOWN; //Keep gear grabber in if the roller is down
 	if(st.gear_lifter!=Gear_lifter::Status::DOWN){
 		g.roller_arm=Roller_arm::Goal::STOW; //Keep roller stowed if gear grabber is out
-		g.roller = Roller::Goal::OFF;//Keep roller off if gear grabber is out
+		if(!g.manual_override) g.roller = Roller::Goal::OFF;//Keep roller off if gear grabber is out
 	}
 	if((g.gear_lifter==Gear_lifter::Goal::UP && st.gear_lifter!=Gear_lifter::Status_detail::UP) || (g.gear_lifter==Gear_lifter::Goal::DOWN && st.gear_lifter!=Gear_lifter::Status_detail::DOWN))
 		g.gear_grabber=Gear_grabber::Goal::CLOSE; //Keep gear grabber closed while the gear lifter is moving

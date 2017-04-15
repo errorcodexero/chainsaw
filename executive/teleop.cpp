@@ -159,7 +159,7 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	if(!gear_light_timer.done() && (int)floor(10*info.in.now)%2==0) goals.lights.camera_light=1;
 
 	//Manual controls
-	if(info.panel.gear_grabber==Panel::Gear_grabber::OPEN) goals.gear_collector.gear_grabber=Gear_grabber::Goal::OPEN;
+	
 	if(info.panel.gear_grabber==Panel::Gear_grabber::CLOSED) goals.gear_collector.gear_grabber=Gear_grabber::Goal::CLOSE;
 	if(info.panel.gear_arm==Panel::Gear_arm::UP) goals.gear_collector.gear_lifter=Gear_lifter::Goal::UP;
 	if(info.panel.gear_arm==Panel::Gear_arm::DOWN) goals.gear_collector.gear_lifter=Gear_lifter::Goal::DOWN;	
@@ -171,6 +171,7 @@ Toplevel::Goal Teleop::run(Run_info info) {
 		if(info.panel.roller==Panel::Roller::OUT) goals.gear_collector.roller=Roller::Goal::OUT;
 		if(info.panel.roller==Panel::Roller::IN) goals.gear_collector.roller=Roller::Goal::IN;
 	}
+	goals.gear_collector.manual_override=(info.panel.roller_control!=Panel::Roller_control::OFF) && (info.panel.roller!=Panel::Roller::AUTO);
 
 	goals.shooter = [&]{
 		switch(info.panel.shooter){
