@@ -140,8 +140,8 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	}();
 
 	goals.climber = [&]{
-		if(info.panel.climb){
-			gear_collector_mode=Gear_collector_mode::STOW; //Go into STOW if climbing
+		if(info.panel.climb || info.driver_joystick.button[Gamepad_button::START]){
+			gear_collector_mode = Gear_collector_mode::STOW; //Go into STOW if climbing
 			switch(info.panel.climber_mode){
 				case Panel::Climber_mode::STANDARD: return Climber::Goal::STANDARD_CLIMB;
 				case Panel::Climber_mode::TURBO: return Climber::Goal::TURBO_CLIMB;
@@ -160,7 +160,7 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	*/
 	
 	//Set the camera light
-	camera_light_toggle.update(info.driver_joystick.button[Gamepad_button::START] || info.panel.camera_light);
+	camera_light_toggle.update(info.driver_joystick.button[Gamepad_button::BACK] || info.panel.camera_light);
 	goals.lights.camera_light=camera_light_toggle.get();
 
 	//Flash camera light when a gear enters the gear collector

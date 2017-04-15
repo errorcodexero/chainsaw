@@ -4,7 +4,7 @@ Driver:
  X          - 
  Y          - 
  Start      - Climb (Toggle winch)
- Back       - 
+ Back       - Toggle camera lights on/off
  RB         - Low gear
  LB         - Slow
  RT         - High gear

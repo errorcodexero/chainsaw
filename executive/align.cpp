@@ -37,11 +37,8 @@ ostream& operator<<(ostream& o, Block_pr const& a){
 }
 
 double Block_pr::generate_pr(const int PIXELS_OFF){
-	if(abs(PIXELS_OFF) > Camera::FOV / 2){
-		return 0.0; //error
-	}
-
-	return pow(M_E,(-pow((double)PIXELS_OFF, 2.0) / 130.0 ));
+	//returns a probability value between 0.0 and 1.0
+	return pow(M_E,(-pow((double)PIXELS_OFF, 2.0) / 130.0 )); //arbitrary function which works pretty well (probabilty decreases further from 0px)
 }
 	
 double old(const int PIXELS_OFF){
@@ -111,7 +108,7 @@ void Align::update(Camera camera){
 		block_prs.push_back({block});
 	}
 
-	static const double PR_THRESHOLD = 0.0;
+	static const double PR_THRESHOLD = 0.001;
 
 	Maybe<Pixy::Block> right_block = [&]{
 		Maybe<Block_pr> max;
@@ -144,6 +141,7 @@ void Align::update(Camera camera){
 		current = (*right_block).x - OFFSET;
 	} else {
 		//TODO: what do we do if we don't see anything that could be the tape?
+		//DO nothing: current is not updated and we use whatever we saw last (often times is just the 0 from the constructor)
 	}
 
 	{//for testing
@@ -188,7 +186,6 @@ Toplevel::Goal Align::run(Run_info info,Toplevel::Goal goals){
 	initial_search.update(info.in.now,info.in.robot_mode.enabled);
 	update(info.in.camera);
 	goals.lights.camera_light=1;
-	//cout<<"Align:    mode:"<<mode<<" blocks:"<<blocks<<"   current:"<<current<<"   CENTER:"<<CENTER<<"    angle:"<<estimated_angle<<"\n";
 	goals.shifter = Gear_shifter::Goal::LOW;
 	switch(mode){
 		case Mode::VISION:
