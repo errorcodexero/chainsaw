@@ -457,7 +457,7 @@ int main(){
 				static const double PIXELS_PER_DEGREE = (double)Pixy::Block::max_x / (double)Camera::FOV; // px/degree
 				int rotate = sim.drive.position.theta * (180 /PI) * PIXELS_PER_DEGREE; //px how much to shift the x values of the blocks as the robot turns
 				for(unsigned i = 0; i < robot_inputs.camera.blocks.size(); i++){
-					robot_inputs.camera.blocks[i].x += rotate;
+					robot_inputs.camera.blocks[i].x -= rotate; //- becase image shifts left if robot turns clockwise
 				}
 				
 			}
