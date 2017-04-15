@@ -447,10 +447,10 @@ int main(){
 				//set up the initial location of the blocks
 				static const int MISALIGNED = 10;// px
 				robot_inputs.camera.blocks = {
-					{0,Block_pr::LEFT + MISALIGNED,0,10,40}, //left tape
-					{0,Block_pr::RIGHT + MISALIGNED,0,10,40}, //right tape
-					{0,0,30,40,4}, //random other
-					{0,200,14,25,8} //random other
+					{0,Block_pr::LEFT + MISALIGNED,0,40,40}, //left tape
+					{0,Block_pr::RIGHT + MISALIGNED,0,30,30}, //right tape
+					{0,0,30,20,20}, //random other
+					{0,200,14,10,10} //random other
 				};
 			
 				//shift the blocks according to the robot's angle

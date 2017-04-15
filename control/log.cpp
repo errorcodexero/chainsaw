@@ -193,12 +193,6 @@ void visit(Func f,int i){
 	f.terminal(i);
 }
 
-
-template<typename Func>
-void visit(Func f,Climber::Status const& a){
-	f.terminal(a);
-}
-
 template<typename Func>
 void visit(Func f,Roller_arm::Status const& a){
 	f.terminal(a);

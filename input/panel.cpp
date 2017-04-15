@@ -6,13 +6,13 @@
 #include <cmath>
 
 using namespace std;
-static const unsigned int ROLLER_CONTROL_AXIS=0, ROLLER_AXIS=1, ROLLER_ARM_AXIS=2, SHOOTER_AXIS=3, GEAR_GRABBER_AXIS=4, GEAR_ARM_AXIS=5, AUTO_SELECTOR_AXIS=6, SPEED_DIAL_AXIS=7;//TODO: rename constants
+static const unsigned int ROLLER_CONTROL_AXIS=0, ROLLER_AXIS=1, ROLLER_ARM_AXIS=2, CLIMBER_MODE_AXIS=3, GEAR_GRABBER_AXIS=4, GEAR_ARM_AXIS=5, AUTO_SELECTOR_AXIS=6, SPEED_DIAL_AXIS=7;//TODO: rename constants
 static const unsigned int CAMERA_LIGHT_LOC=1, SHOOT_LOC=2, PREP_COLLECT_GEAR_LOC=3, PREP_SCORE_GEAR_LOC=4, COLLECT_GEAR_LOC=5, SCORE_GEAR_LOC=6, CLIMB_LOC=7, LEARN_LOC=8, GEAR_SENSING_FULL_AUTO_LOC=9, GEAR_SENSING_NO_AUTO_LOC=10;//TODO: rename constants 
 
 #define BUTTONS \
 	X(camera_light) X(shoot) X(gear_prep_collect) X(gear_prep_score) X(gear_collect) X(gear_score) X(climb) X(learn)
 #define THREE_POS_SWITCHES \
-	X(roller_control) X(roller) X(roller_arm) X(shooter) X(gear_grabber) X(gear_arm) X(gear_sensing)
+	X(roller_control) X(roller) X(roller_arm) X(climber_mode) X(gear_grabber) X(gear_arm) X(gear_sensing)
 #define TEN_POS_SWITCHES \
 	X(auto_select)
 #define DIALS \
@@ -32,7 +32,7 @@ Panel::Panel():
 	roller_control(Roller_control::AUTO),
 	roller(Roller::AUTO),
 	roller_arm(Roller_arm::AUTO),
-	shooter(Shooter::DISABLED),
+	climber_mode(Climber_mode::STANDARD),
 	gear_grabber(Gear_grabber::CLOSED),
 	gear_arm(Gear_arm::DOWN),
 	gear_sensing(Gear_sensing::FULL_AUTO),
@@ -61,9 +61,9 @@ ostream& operator<<(ostream& o,Panel::Roller_arm a){
 	assert(0);
 }
 
-ostream& operator<<(ostream& o,Panel::Shooter a){
-	#define X(NAME) if(a==Panel::Shooter::NAME) return o<<""#NAME;
-	X(ENABLED) X(DISABLED) X(AUTO)
+ostream& operator<<(ostream& o,Panel::Climber_mode a){
+	#define X(NAME) if(a==Panel::Climber_mode::NAME) return o<<""#NAME;
+	X(TURBO) X(STANDARD) X(RELEASE)
 	#undef X
 	assert(0);
 }
@@ -170,12 +170,12 @@ Panel interpret_oi(Joystick_data d){
 			return Panel::Roller_arm::AUTO;
 		}();
 
-		float shooter = d.axis[SHOOTER_AXIS];
-		p.shooter = [&]{
-			static const float AUTO=-1,DISABLED=0,ENABLED=1;
-			if(set_button(shooter,AUTO,DISABLED,ENABLED)) return Panel::Shooter::DISABLED;
-			if(set_button(shooter,DISABLED,ENABLED,ARTIFICIAL_MAX)) return Panel::Shooter::ENABLED;
-			return Panel::Shooter::AUTO;
+		float climber_mode = d.axis[CLIMBER_MODE_AXIS];
+		p.climber_mode = [&]{
+			static const float STANDARD=-1,TURBO=0,RELEASE=1;
+			if(set_button(climber_mode,STANDARD,TURBO,RELEASE)) return Panel::Climber_mode::TURBO;
+			if(set_button(climber_mode,TURBO,RELEASE,ARTIFICIAL_MAX)) return Panel::Climber_mode::RELEASE;
+			return Panel::Climber_mode::STANDARD;
 		}();
 
 		float gear_grabber = d.axis[GEAR_GRABBER_AXIS];
@@ -298,15 +298,33 @@ Panel interpret_gamepad(Joystick_data d){
 				assert(0);
 		}
 
+		switch(joystick_section(d.axis[Gamepad_axis::LEFTX],d.axis[Gamepad_axis::LEFTY])){	
+			case Joystick_section::UP:
+				break;
+			case Joystick_section::RIGHT:
+				p.climber_mode=Panel::Climber_mode::STANDARD;
+				break;
+			case Joystick_section::DOWN:
+				p.climber_mode=Panel::Climber_mode::TURBO;
+				break;
+			case Joystick_section::LEFT:
+				p.climber_mode=Panel::Climber_mode::RELEASE;
+				break;
+			case Joystick_section::CENTER:
+				break;
+			default:
+				assert(0);
+		}
+
 		p.roller_control=Panel::Roller_control::AUTO;
 		p.roller=Panel::Roller::AUTO;
 		p.roller_arm=Panel::Roller_arm::AUTO;
-		p.shooter=Panel::Shooter::AUTO;
 		p.gear_grabber=Panel::Gear_grabber::AUTO;
 		p.gear_arm=Panel::Gear_arm::AUTO;
 		p.gear_sensing=Panel::Gear_sensing::SEMI_AUTO;
 	} else {
 		p.roller_control=d.button[Gamepad_button::RB]?Panel::Roller_control::OFF:Panel::Roller_control::AUTO;
+		p.climber_mode=Panel::Climber_mode::STANDARD;
 
 		if(d.button[Gamepad_button::B]) p.gear_grabber=Panel::Gear_grabber::CLOSED;
 		else if(!d.button[Gamepad_button::X]) p.gear_grabber= Panel::Gear_grabber::OPEN;
@@ -341,23 +359,6 @@ Panel interpret_gamepad(Joystick_data d){
 			default:
 				assert(0);
 		}
-
-		switch(joystick_section(d.axis[Gamepad_axis::LEFTX],d.axis[Gamepad_axis::LEFTY])){	
-			case Joystick_section::UP:
-			case Joystick_section::RIGHT:
-				p.shooter=Panel::Shooter::ENABLED;
-				break;
-			case Joystick_section::DOWN:
-			case Joystick_section::LEFT:
-				p.shooter=Panel::Shooter::DISABLED;
-				break;
-			case Joystick_section::CENTER:
-				p.shooter=Panel::Shooter::AUTO;
-				break;
-			default:
-				assert(0);
-		}
-
 		switch(joystick_section(d.axis[Gamepad_axis::RIGHTX],d.axis[Gamepad_axis::RIGHTY])){
 			case Joystick_section::UP:
 				p.roller_arm=Panel::Roller_arm::STOW;
