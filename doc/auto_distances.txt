@@ -1,0 +1,4 @@
+bumper_width: Width of a bumper
+robot_length: Length of the robot without bumpers
+extended_gear_width: How far the gear extends from the robot when the gear collector is out
+middle_dist: Distance to the middle peg from the alliance wall

@@ -9,6 +9,7 @@
 #include "../input/util.h"
 #include <vector>
 #include "../executive/teleop.h"
+#include "../util/auto_distances.h"
 
 using namespace std;
 
@@ -64,6 +65,8 @@ Robot_outputs Main::operator()(const Robot_inputs in,ostream& /*print_stream*/){
 	);
 	
 	log(in,status,r);
+
+	if(print_count % 10 == 0) cout<<"ad:"<<read_auto_distances()<<endl;
 
 	#if 0
 	if(in.ds_info.connected && (print_count % 10) == 0){

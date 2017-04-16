@@ -403,14 +403,14 @@ cc_library(
 	name="main",
 	srcs=["control/main.cpp"],
 	hdrs=["control/main.h"],
-	deps=[":force_interface",":posedge_toggle",":perf_tracker",":countdown_timer",":countup_timer",":toplevel",":panel",":log",":posedge_trigger_debounce",":motion_profile",":executive_impl"]
+	deps=[":force_interface",":posedge_toggle",":perf_tracker",":countdown_timer",":countup_timer",":toplevel",":panel",":log",":posedge_trigger_debounce",":motion_profile",":executive_impl",":auto_distances"]
 )
 
 cc_test(
 	name="main_test",
 	srcs=["control/main.cpp","control/main.h"],
 	copts=["-DMAIN_TEST"],
-	deps=[":force_interface",":toplevel",":posedge_toggle",":perf_tracker",":countup_timer",":panel",":log",":posedge_trigger_debounce",":motion_profile",":monitor"],
+	deps=[":force_interface",":toplevel",":posedge_toggle",":perf_tracker",":countup_timer",":panel",":log",":posedge_trigger_debounce",":motion_profile",":monitor",":auto_distances"],
 	timeout="short"
 )
 
@@ -708,7 +708,7 @@ cc_library(
 		"executive/chain.h",
 		"executive/align.h"
 	],
-	deps=[":executive",":posedge_trigger_debounce",":posedge_toggle",":motion_profile",":step"]
+	deps=[":executive",":posedge_trigger_debounce",":posedge_toggle",":motion_profile",":step",":auto_distances"]
 )
 
 cc_library(
@@ -732,7 +732,7 @@ cc_test(
 	copts=["-DAUTONOMOUS_TEST"],
 	deps=[
 		":executive",":executive_impl",
-		":test",":align"
+		":test",":align",":auto_distances"
 	],
 	timeout="short"
 )
