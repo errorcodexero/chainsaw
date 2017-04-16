@@ -365,7 +365,7 @@ bool Combo::operator==(Combo const& b)const{
 	return step_a == b.step_a && step_b == b.step_b;
 }
 
-Turn_on_light::Turn_on_light():lights_goal({Lights::Loading_indicator::GEARS,true}){}
+Turn_on_light::Turn_on_light():lights_goal({Lights::Loading_indicator::GEARS,true,Lights::Blinky_mode::NO_FLASH}){}
 
 Step::Status Turn_on_light::done(Next_mode_info info){
 	return (ready(status(info.status.lights),lights_goal)) ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;

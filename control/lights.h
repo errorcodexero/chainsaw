@@ -8,11 +8,14 @@
 
 struct Lights{
 	enum class Loading_indicator{BALLS,GEARS};
+	enum class Blinky_mode{FLASH, NO_FLASH};
 	struct Goal{
 		Loading_indicator loading_indicator;
 		bool camera_light;
+		Blinky_mode blinky_mode;
+
 		Goal();
-		Goal(Loading_indicator,bool);
+		Goal(Loading_indicator,bool,Blinky_mode);
 	};
 	
 	using Input=Nop::Input;
@@ -25,9 +28,10 @@ struct Lights{
 
 	struct Output{
 		bool loading_indicator,camera_light;
+		double blinky_number;
 
 		Output();
-		Output(bool,bool);
+		Output(bool,bool,double);
 	};
 	
 	struct Output_applicator{
