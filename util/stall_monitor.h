@@ -2,12 +2,13 @@
 #define STALL_MONITOR_H
 
 #include "interface.h"
+#include "persistent_tracker.h"
 
 class Stall_monitor{
 	static const int KEEP = 5;
-	std::vector<double> currents;
+	Persistent_tracker<double> currents;
 	Maybe<double> max_current;
-	std::vector<double> speeds;
+	Persistent_tracker<double> speeds;
 	Maybe<double> mean_speed;
 	Maybe<bool> stall;
 

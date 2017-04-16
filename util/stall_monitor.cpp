@@ -4,42 +4,34 @@
 
 using namespace std;
 
-Stall_monitor::Stall_monitor(){}
+Stall_monitor::Stall_monitor():currents(Persistent_tracker<double>{KEEP}),speeds(Persistent_tracker<double>{KEEP}){}
 
 void Stall_monitor::update(double current,double velocity){
-	{//update speeds
-		double speed = fabs(velocity);
-			
-		if(speeds.size() > KEEP){
-			speeds.erase(speeds.begin());
-		}
-		speeds.push_back(speed);
-		
-		mean_speed = [&]{
-			if(speeds.empty()) return Maybe<double>{};
-			double sum = 0;
-			for(double a: speeds){
-				sum += a;
-			}
-			return Maybe<double>{sum / (double)speeds.size()};
-		}();
-	}
-
-	{//update currents
-		if(currents.size() > KEEP){
-			currents.erase(currents.begin());
-		}
-		currents.push_back(current);
+	//update speeds
+	double speed = fabs(velocity);
 	
-		max_current = [&]{
-			if(currents.empty()) return Maybe<double>{};
-			Maybe<double> max;
-			for(double a: currents){
-				if(!max || a > max) max = a;
-			}
-			return max;
-		}();
-	}
+	speeds.update(speed);	
+	
+	mean_speed = [&]{
+		if(speeds.get().empty()) return Maybe<double>{};
+		double sum = 0;
+		for(double a: speeds.get()){
+			sum += a;
+		}
+		return Maybe<double>{sum / (double)speeds.get().size()};
+	}();
+
+	//update currents
+	currents.update(current);
+	
+	max_current = [&]{
+		if(currents.get().empty()) return Maybe<double>{};
+		Maybe<double> max;
+		for(double a: currents.get()){
+			if(!max || a > max) max = a;
+		}
+		return max;
+	}();
 
 	{//update stall
 		bool spike = false, slow = false;

@@ -221,17 +221,33 @@ cc_test(
 )
 
 cc_library(
+	name="persistent_tracker",
+	srcs=["util/persistent_tracker.cpp"],
+	hdrs=["util/persistent_tracker.h","util/maybe.h"],
+	deps=[":util"]
+)
+
+cc_test(
+	name="persistent_tracker_test",
+	srcs=["util/persistent_tracker.cpp","util/persistent_tracker.h","util/maybe.h"],
+	copts=["-DPERSISTENT_TRACKER_TEST"],
+	deps=[":util"],
+	timeout="short"
+)
+
+
+cc_library(
 	name="stall_monitor",
 	srcs=["util/stall_monitor.cpp"],
 	hdrs=["util/stall_monitor.h"],
-	deps=[":interface"]
+	deps=[":interface",":persistent_tracker"]
 )
 
 cc_test(
 	name="stall_monitor_test",
 	srcs=["util/stall_monitor.cpp","util/stall_monitor.h"],
 	copts=["-DSTALL_MONITOR_TEST"],
-	deps=[":stall_monitor"],
+	deps=[":stall_monitor",":persistent_tracker"],
 	timeout="short"
 )
 
