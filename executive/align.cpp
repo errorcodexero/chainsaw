@@ -143,7 +143,7 @@ void Align::update(Camera camera){
 		//TODO: what do we do if we don't see anything that could be the tape?
 		//DO nothing: current is not updated and we use whatever we saw last (often times is just the 0 from the constructor)
 	}
-
+	/*
 	{//for testing
 		cout<<"\nAlign block probabilities: \n";
 		for(Block_pr a: block_prs){
@@ -151,6 +151,7 @@ void Align::update(Camera camera){
 		}
 		cout<<"Assigned left:("<<left_block<<") Assigned_right:("<<right_block<<")   curr:"<<current<<"\n";
 	}
+	*/
 }
 
 Step::Status Align::done(Next_mode_info info){
