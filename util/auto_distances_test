@@ -1,0 +1,9 @@
+g++ -std=c++14 -pthread -Wall -Wextra -DAUTO_DISTANCES_TEST \
+	auto_distances.cpp \
+	interface.cpp \
+	driver_station_interface.cpp \
+	util.cpp \
+	../pixycam/PixyImpl.cpp \
+	../pixycam/PixyUART.cpp \
+	../pixycam/PixyBlock.cpp \
+	-o auto_distances 2>&1 && ./auto_distances 2>&1
