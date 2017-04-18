@@ -11,3 +11,4 @@ t.mk
 FRCUserProgram
 bazel-*
 backups
+util/auto_distances.txt

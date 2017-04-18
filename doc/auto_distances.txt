@@ -1,4 +1,22 @@
-bumper_width: Width of a bumper
-robot_length: Length of the robot without bumpers
-extended_gear_width: How far the gear extends from the robot when the gear collector is out
-middle_dist: Distance to the middle peg from the alliance wall
+dash: Distance to run across the field at the end of auto (inches)
+align_comp: Decreases distance of initial drives to compensate for distance needed for align (inches)
+baseline_dist: Initial drive distance for baseline (inches)
+baseline_extra: Extra distance on baseline to allow some error (inches)
+baseline_ext_dist: Distance for baseline extended (inches)
+middle_dist: Distance to the middle peg from the alliance wall (inches)
+middle_ext_dist_1: First distance for baseline extended (inches)
+middle_ext_dist_2: Second distance for baseline extended (inches)
+middle_ext_dist_3: Third distance for baseline extended (inches)
+middle_ext_turn: Turn angle for baseline extended (degrees)
+boiler_dist: Initial drive distance for boiler side (inches)
+boiler_ram_dist: Distance the robot drives to ram the gear onto the peg for boiler side (inches)
+boiler_turn: Turn angle for boiler side (degrees)
+boiler_ext_dist_1: First distance for boiler extended (inches)
+boiler_ext_dist_2: Second distance for boiler extended (inches)
+boiler_ext_turn: Turn angle for boiler extended (degrees)
+loading_dist: Initial drive distance for loading station (inches)
+loading_ram_dist: Distance the robot drives to ram the gear onto the peg for loading station (inches)
+loading_turn: Turn angle for loading station (degrees)
+loading_ext_turn_1: First turn angle for loading station (degrees)
+loading_ext_turn_2: Second turn angle for loading station (degrees)
+loading_ext_dist: Distance for loading station (inches)
