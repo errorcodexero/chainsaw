@@ -94,7 +94,7 @@ Executive get_auto_mode(Next_mode_info info, Auto_distances ad){
 	}};
 	
 	const Executive auto_score_gear_middle_nonvision{Chain{
-		Step{Drive_straight{(DIST_TO_MIDDLE_PEG - ROBOT_LENGTH - EXTENDED_GEAR_LENGTH) - SCORE_GEAR_APPROACH_DIST}},
+		Step{Drive_straight{(ad.middle_dist - ROBOT_LENGTH - EXTENDED_GEAR_LENGTH) - SCORE_GEAR_APPROACH_DIST}},
 		Executive{Chain{
 			Step{Lift_gear()},
 			Executive{Chain{
