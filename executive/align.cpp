@@ -1,6 +1,7 @@
 #include "align.h"
 
 #include <iostream>
+#include <cmath>
 
 using namespace std;
 
@@ -24,6 +25,7 @@ Align::Align():Align(0){}
 
 Block_pr::Block_pr(Pixy::Block b, double l, double r):block(b),left(l),right(r){}
 Block_pr::Block_pr():Block_pr({0,0,0,0,0},0.0,0.0){}
+Block_pr::Block_pr(const Pixy::Block b):block(b),left(Block_pr::generate_left(b.x)),right(Block_pr::generate_right(b.x)){}
 
 ostream& operator<<(ostream& o, Block_pr const& a){
 	o<<"Block_pr(";
@@ -34,7 +36,12 @@ ostream& operator<<(ostream& o, Block_pr const& a){
 	return o;
 }
 
-double pixel_to_pr(const int PIXELS_OFF){
+double Block_pr::generate_pr(const int PIXELS_OFF){
+	//returns a probability value between 0.0 and 1.0
+	return pow(M_E,(-pow((double)PIXELS_OFF, 2.0) / 130.0 )); //arbitrary function which works pretty well (probabilty decreases further from 0px)
+}
+	
+double old(const int PIXELS_OFF){
 	const int WIDTH = (int)(Pixy::Block::max_x / Camera::FOV); 
 	if(PIXELS_OFF < WIDTH * -4.5){
 		return 0.0;
@@ -69,6 +76,16 @@ double pixel_to_pr(const int PIXELS_OFF){
 	return 0.0;
 }
 
+double Block_pr::generate_right(const int POS){
+	//POS is px
+	return generate_pr(Block_pr::RIGHT - POS);
+}
+
+double Block_pr::generate_left(const int POS){
+	//POS is px
+	return generate_pr(Block_pr::LEFT - POS);
+}
+
 void Align::update(Camera camera){
 	#if 0
 	/*if((!camera.enabled || camera.blocks.empty()) && initial_search.done()){
@@ -88,15 +105,15 @@ void Align::update(Camera camera){
 	vector<Block_pr> block_prs;
 	for(unsigned i = 0; i < blocks.size(); i++){
 		Pixy::Block block = blocks[i];
-		block_prs.push_back({block,pixel_to_pr(Block_pr::LEFT - block.x),pixel_to_pr(Block_pr::RIGHT - block.x)});
+		block_prs.push_back({block});
 	}
 
-	//static const double PR_THRESHHOLD = 0.10;
+	static const double PR_THRESHOLD = 0.001;
 
 	Maybe<Pixy::Block> right_block = [&]{
 		Maybe<Block_pr> max;
 		for(Block_pr a: block_prs){
-			if(!max || a.right > (*max).right){
+			if(a.right > PR_THRESHOLD && (!max || a.right > (*max).right)){
 				max = a;
 			}
 		}
@@ -107,7 +124,7 @@ void Align::update(Camera camera){
 	Maybe<Pixy::Block> left_block = [&]{
 		Maybe<Block_pr> max;
 		for(Block_pr a: block_prs){
-			if(!max || a.left > (*max).left){
+			if(a.left > PR_THRESHOLD && (!max || a.left > (*max).left)){
 				max = a;
 			}
 		}
@@ -115,22 +132,24 @@ void Align::update(Camera camera){
 		return Maybe<Pixy::Block>{(*max).block};
 	}();
 
+	static const int OFFSET = DIST_BETWEEN / 2;
+	if(left_block && right_block){
+		current = mean((*left_block).x,(*right_block).x);
+	} else if(left_block){
+		current = (*left_block).x + OFFSET;
+	} else if(right_block){
+		current = (*right_block).x - OFFSET;
+	} else {
+		//TODO: what do we do if we don't see anything that could be the tape?
+		//DO nothing: current is not updated and we use whatever we saw last (often times is just the 0 from the constructor)
+	}
+
 	{//for testing
 		cout<<"\nAlign block probabilities: \n";
 		for(Block_pr a: block_prs){
 			cout<<a<<"\n";
 		}
-		cout<<"Assigned left:("<<left_block<<") Assigned_right:("<<right_block<<")\n";
-	}
-	
-	if(left_block && right_block){
-		current = mean((*left_block).x,(*right_block).x);
-	} else if(left_block){
-		current = mean((*left_block).x, (*left_block).x + DIST_BETWEEN);
-	} else if(right_block){
-		current = mean((*right_block).x, (*right_block).x - DIST_BETWEEN);
-	} else {
-
+		cout<<"Assigned left:("<<left_block<<") Assigned_right:("<<right_block<<")   curr:"<<current<<"\n";
 	}
 }
 
@@ -141,7 +160,7 @@ Step::Status Align::done(Next_mode_info info){
 			{
 				const Time TIMEOUT_TIME = 8; //10; //seconds since start of autonomous
 				if(info.since_switch > TIMEOUT_TIME){ 
-					return Step::Status::FINISHED_SUCCESS;
+					return Step::Status::FINISHED_SUCCESS; //TODO: make failure (offseason)
 				}
 				in_range.update(info.in.now,info.in.robot_mode.enabled);
 				const int VISION_THRESHHOLD = 10;//24*.75;//starting with something large; theoretically this could be as large at 30px and be ok.
@@ -167,17 +186,17 @@ Toplevel::Goal Align::run(Run_info info,Toplevel::Goal goals){
 	initial_search.update(info.in.now,info.in.robot_mode.enabled);
 	update(info.in.camera);
 	goals.lights.camera_light=1;
-	//cout<<"Align:    mode:"<<mode<<" blocks:"<<blocks<<"   current:"<<current<<"   CENTER:"<<CENTER<<"    angle:"<<estimated_angle<<"\n";
 	goals.shifter = Gear_shifter::Goal::LOW;
 	switch(mode){
 		case Mode::VISION:
 			{
+				static const double MIN_SPEED = 0.05;
 				double power = target_to_out_power([&]{//power for left side, right side is opposite of this
 					double error=CENTER-current;
 					static const double P=.0025;//not tuned!
 					static const double LIMIT=.1;//not tuned!
 					return clamp(error*P,-LIMIT,LIMIT);
-				}(),.05);
+				}(),MIN_SPEED);
 				goals.drive.left = -power;
 				goals.drive.right = power;
 				return goals;
@@ -210,6 +229,15 @@ int main(){
 		Executive{Teleop()}
 	}};
 	test_executive(align);
+
+
+	{
+		static const unsigned RANGE = 2 * CENTER;
+		for(unsigned x : range(RANGE)){
+			Block_pr a = {{0,x,0,0,0}};
+			cout<<a<<" vs: (l:"<<old(Block_pr::LEFT - x)<<" r:"<<old(Block_pr::RIGHT - x)<<")\n";
+		}
+	}
 
 	//align.done();
 	//align.run();

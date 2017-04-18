@@ -92,6 +92,17 @@ Executive get_auto_mode(Next_mode_info info, Auto_distances ad){
 			}}
 		}}
 	}};
+	
+	const Executive auto_score_gear_middle_nonvision{Chain{
+		Step{Drive_straight{(DIST_TO_MIDDLE_PEG - ROBOT_LENGTH - EXTENDED_GEAR_LENGTH) - SCORE_GEAR_APPROACH_DIST}},
+		Executive{Chain{
+			Step{Lift_gear()},
+			Executive{Chain{
+				Step{Score_gear()},
+				Executive{Teleop()}
+			}}
+		}}
+	}};
 
 	//static const Inch MIDDLE_EXT_DIST_1 = 10 * 12;
 	//static const Inch MIDDLE_EXT_DIST_2 = -12;
@@ -297,6 +308,7 @@ Executive get_auto_mode(Next_mode_info info, Auto_distances ad){
 		case 10:
 			return auto_forward;
 		case 11:
+			return auto_score_gear_middle_nonvision;
 		case 12:
 		case 13:
 		case 14:
