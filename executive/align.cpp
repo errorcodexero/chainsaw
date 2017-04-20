@@ -87,7 +87,6 @@ double Block_pr::generate_left(const int POS){
 }
 
 void Align::update(Camera camera){
-	#if 0
 	/*if((!camera.enabled || camera.blocks.empty()) && initial_search.done()){
 		//TODO: should search for vision target instead
 		mode = Mode::NONVISION;
@@ -99,7 +98,7 @@ void Align::update(Camera camera){
 		else if(blocks.size()==1) current = blocks[0].x;
 		//if we dont see any blobs we will continue as if we still see what we saw before there being no blocks
 	//}
-	#endif 
+	#if 0 
 	mode = Mode::VISION;
 	blocks = camera.blocks;
 	vector<Block_pr> block_prs;
@@ -152,6 +151,7 @@ void Align::update(Camera camera){
 		cout<<"Assigned left:("<<left_block<<") Assigned_right:("<<right_block<<")   curr:"<<current<<"\n";
 	}
 	*/
+	#endif
 }
 
 Step::Status Align::done(Next_mode_info info){
