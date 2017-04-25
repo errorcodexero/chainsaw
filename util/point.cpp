@@ -56,7 +56,6 @@ int main(){
 		Point b(0,1,0);
 		Point out=shift_axes_clockwise(a,M_PI/2);
 		assert(approx_equal(out,b));
-		assert(0) ;
 	}
 }
 #endif

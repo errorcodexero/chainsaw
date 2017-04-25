@@ -17,7 +17,7 @@ CTREHOME=$(CTREOVERRIDE)
 $(warning Default location for CTRE has been overridden)
 $(warning Using $(CTREHOME) for CTRE library)
 else
-$(info Using default WPI library location, $(CTREHOME))
+$(info Using default CTRE library location, $(CTREHOME))
 endif
 
 WPIINC=$(WPIHOME)/cpp/current/include

@@ -13,3 +13,6 @@ bazel-*
 backups
 mybuild
 control/x1.txt
+*/Win32
+*/x64
+*.stackdump
