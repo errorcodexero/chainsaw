@@ -176,6 +176,7 @@ class To_roborio
 	//DriverStationLCD *lcd;
 	//NetworkTable *table;
 	//Gyro *gyro;
+	frc::Accelerometer *accel;
 	PowerDistributionPanel *power;
 	Compressor *compressor;
 	DriverStation& driver_station;
@@ -187,6 +188,7 @@ public:
 	To_roborio():error_code(0),driver_station(DriverStation::GetInstance()),uart("/dev/ttyS1"),camera(uart),cam_data_recieved(false),null_stream("/dev/null")//,gyro(NULL)
 	{
 		power = new PowerDistributionPanel();
+		accel = new frc::BuiltInAccelerometer(Accelerometer::kRange_4G);
 		// Wake the NUC by sending a Wake-on-LAN magic UDP packet:
 		//SendWOL();
 
@@ -281,6 +283,11 @@ public:
 		return c;
 	}
 
+	Accel read_accelerometer(Robot_inputs /*r*/){
+		Accel a = {accel->GetX(),accel->GetY(),accel->GetZ()};
+		return a;
+	}
+
 	pair<Robot_inputs,int> read(Robot_mode robot_mode){
 		int error_code=0;
 		Robot_inputs r;
@@ -292,6 +299,7 @@ public:
 		//error_code|=read_driver_station(r.driver_station);
 		r.current=read_currents();
 		r.camera=read_camera(r);
+		r.accel = read_accelerometer(r);
 		return make_pair(r,error_code);
 	}
 	array<double,Robot_inputs::CURRENT> read_currents(){
@@ -370,7 +378,7 @@ public:
 	void run(Robot_inputs in){
 		//std::ostream print_stream=cout;//(in.ds_info.connected && (print_num%PRINT_SPEED)==0)?cout:null_stream;
 		Robot_outputs out=main(in/*,print_stream*/);
-		#if 0
+		#if 1
 		const int PRINT_SPEED=10;
 		static int print_num=0;
 		if(in.ds_info.connected && (print_num%PRINT_SPEED)==0){	

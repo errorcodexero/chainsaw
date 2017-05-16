@@ -609,6 +609,32 @@ bool operator==(Camera const& a,Camera const& b){
 
 bool operator!=(Camera const& a,Camera const& b){ return !(a==b); }
 
+Accel::Accel(double a,double b,double c):x(a),y(b),z(c){}
+Accel::Accel():Accel(0,0,0){}
+
+bool operator==(Accel const& a,Accel const& b){
+	if(a.x != b.x) return false;
+	if(a.y != b.y) return false;
+	if(a.z != b.z) return false;
+	return true;
+}
+
+bool operator!=(Accel const& a,Accel const& b){
+	return !(a==b);
+}
+
+bool operator<(Accel const& a,Accel const& b){
+	if(a.x >= b.x) return false;
+	if(a.y >= b.y) return false;
+	if(a.z >= b.z) return false;
+	return true;
+}
+
+ostream& operator<<(ostream& o,Accel const& a){
+	o<<"Accel(x:"<<a.x<<" y:"<<a.y<<" z:"<<a.z<<")";
+	return o;
+}
+
 Robot_inputs::Robot_inputs():
 	now(0),orientation(0),pump(0)
 {
@@ -656,6 +682,7 @@ bool operator==(Robot_inputs a,Robot_inputs b){
 	}
 	if(a.driver_station!=b.driver_station) return 0;
 	if(a.camera!=b.camera) return 0;
+	if(a.accel!=b.accel) return 0;
 	return a.orientation==b.orientation;
 }
 
@@ -674,6 +701,7 @@ bool operator<(Robot_inputs a,Robot_inputs b){
 	X(talon_srx)
 	X(driver_station)
 	X(orientation)
+	X(accel)
 	X(current)
 	X(pump)
 	X(camera)
@@ -706,6 +734,7 @@ ostream& operator<<(ostream& o,Robot_inputs a){
 	o<<" driver_station_inputs:"<<a.driver_station;
 	o<<" camera:"<<a.camera;
 	o<<" orientation:"<<a.orientation;
+	o<<" accelerometer:"<<a.accel;
 	return o<<")";
 }
 

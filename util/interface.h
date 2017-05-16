@@ -198,6 +198,18 @@ std::ostream& operator<<(std::ostream&,Camera const&);
 typedef float Volt;
 typedef double Rad; //radians, clockwise
 
+struct Accel{//TODO: named so as a workaround with comflict in frc namepsace
+	double x, y, z;//in g-force
+	
+	Accel();
+	Accel(double,double,double);
+};
+
+bool operator==(Accel const&,Accel const&);
+bool operator!=(Accel const&,Accel const&);
+bool operator<(Accel const&,Accel const&);
+std::ostream& operator<<(std::ostream&,Accel const&);
+
 struct Robot_inputs{
 	Robot_mode robot_mode;
 	Time now;//time since robot code started running.
@@ -217,7 +229,8 @@ struct Robot_inputs{
 	
 	Driver_station_input driver_station;
 	Rad orientation;
-		
+	Accel accel;
+	
 	static const unsigned CURRENT=16;
 	Checked_array<double,CURRENT> current;
 	bool pump;
