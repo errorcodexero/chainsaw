@@ -1,7 +1,7 @@
 cc_library(
 	name="pixy_uart",
-	srcs=["pixycam/PixyUART.cpp","pixycam/PixyImpl.cpp","pixycam/PixyBlock.cpp"],
-	hdrs=["pixycam/PixyUART.h","pixycam/Pixy.h"],
+	srcs=["input/pixycam/PixyUART.cpp","input/pixycam/PixyImpl.cpp","input/pixycam/PixyBlock.cpp"],
+	hdrs=["input/pixycam/PixyUART.h","input/pixycam/Pixy.h"],
 	linkopts=["-pthread"]
 )
 

@@ -6,7 +6,7 @@
 #include "driver_station_interface.h"
 #include "maybe_inline.h"
 #include "checked_array.h"
-#include "../pixycam/PixyUART.h"
+#include "../input/pixycam/PixyUART.h"
 
 typedef double Time;//Seconds
 typedef bool Solenoid_output;

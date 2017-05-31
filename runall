@@ -94,7 +94,7 @@ def get_dir(test_script): return test_script.split('/')[0]
 
 def make_directories(make_tobj,objdir):	
 	test_scripts=filter(lambda x: 'joystick_linux' not in x and x.split('/')[0]!=objdir,glob('*/*_test'))
-	dirs=set(map(get_dir,test_scripts)+['roborio','pixycam'])
+	dirs=set(map(get_dir,test_scripts)+['roborio','input/pixycam'])
 	if(make_tobj): map(lambda x: os.system('mkdir -p '+objdir+'/%s'%x),dirs)
 	map(lambda x: os.system('mkdir -p obj/%s'%x),dirs)
 	return test_scripts

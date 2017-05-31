@@ -97,7 +97,7 @@ Executive get_auto_mode(Next_mode_info info){
 			Step{Drive_straight{FIRST_DRIVE_DIST_BOILER,0.02,1.0}},//NOTE: 0.02 must match that in step.cpp
 			Executive{Chain{
 				Step{Combo{
-					Step{Turn{deg_to_rad(red?-40:40)}},//from testing
+					Step{Turn{deg_to_rad(red?-33:33)}},//from testing
 					Step{Turn_on_light()},
 				}},
 				Executive{Chain{
@@ -134,13 +134,13 @@ Executive get_auto_mode(Next_mode_info info){
 		return Executive{Chain{
 			Step{Drive_straight{5*12}},
 			Executive{Chain{
-				Step{Turn{deg_to_rad(red?-40:40)}},
+				Step{Turn{deg_to_rad(red?-33:33)}},
 				Executive{Chain{
 					Step{Score_gear()},
 					Executive{Chain{
 						Step{Drive_straight{-2 * 12}},
 						Executive{Chain{
-							Step{Turn{deg_to_rad(red?40:-40)}},
+							Step{Turn{deg_to_rad(red?33:-33)}},
 							dash
 						}}
 					}}
