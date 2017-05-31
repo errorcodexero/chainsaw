@@ -98,7 +98,7 @@ void Align::update(Camera camera){
 		else if(blocks.size()==1) current = blocks[0].x;
 		//if we dont see any blobs we will continue as if we still see what we saw before there being no blocks
 	//}
-	#if 0 
+	#ifdef PRINT_OUTS
 	mode = Mode::VISION;
 	blocks = camera.blocks;
 	vector<Block_pr> block_prs;

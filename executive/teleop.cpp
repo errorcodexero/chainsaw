@@ -199,7 +199,7 @@ Toplevel::Goal Teleop::run(Run_info info) {
 	}();	
 	*/ 
 
-	#if 0
+	#ifdef PRINT_OUTS
 	if(info.in.ds_info.connected && (print_number%10)==0){
 		cout<<"\nstalled:"<<info.status.drive.stall<<"\n";
 		if(info.in.camera.enabled){

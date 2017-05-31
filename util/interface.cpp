@@ -363,8 +363,6 @@ Joystick_data::Joystick_data(){
 //int atoi(string s){ return ::atoi(s.c_str()); }
 
 Maybe<Joystick_data> Joystick_data::parse(string const& s){
-	//assert(0);
-	#if 1
 	string s2=inside_parens(s);
 	//cout<<"got:"<<s2<<"\n";
 	vector<string> v=split(s2,':');
@@ -393,7 +391,6 @@ Maybe<Joystick_data> Joystick_data::parse(string const& s){
 		}
 	}
 	return Maybe<Joystick_data>(r);
-	#endif
 }
 
 bool operator<(Joystick_data a,Joystick_data b){
