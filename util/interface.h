@@ -169,7 +169,7 @@ enum class Digital_in{OUTPUT,_0,_1,ENCODER};
 std::ostream& operator<<(std::ostream&,Digital_in);
 std::set<Digital_in> examples(Digital_in*);
 
-typedef int Encoder_output;
+typedef int Encoder_output;//TODO: is this not an input?
 
 struct Digital_inputs{
 	Checked_array<Digital_in,Robot_outputs::DIGITAL_IOS> in;

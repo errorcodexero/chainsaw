@@ -63,7 +63,7 @@ void Talon_srx_control::set(Talon_srx_output a, bool enable) {
 		case Talon_srx_output::Mode::PERCENT:
 			assert(a.power_level==clip(a.power_level));
 			if(mode!=Talon_srx_control::Mode::PERCENT){
-				talon->SetControlMode(CANSpeedController::kPercentVbus);
+				talon->SetControlMode(frc::CANSpeedController::kPercentVbus);
 				talon->EnableControl();
 				talon->SetExpiration(EXPIRATION);
 				talon->SetSafetyEnabled(true);
@@ -77,7 +77,7 @@ void Talon_srx_control::set(Talon_srx_output a, bool enable) {
 			break;
 		case Talon_srx_output::Mode::SPEED:
 			if(mode!=Talon_srx_control::Mode::SPEED || !pid_approx(out.pid,a.pid)){
-				talon->SetControlMode(CANSpeedController::kSpeed);
+				talon->SetControlMode(frc::CANSpeedController::kSpeed);
 				talon->SetPID(a.pid.p,a.pid.i,a.pid.d,a.pid.f);	
 				talon->EnableControl();
 				talon->SetFeedbackDevice(CANTalon::QuadEncoder); //TODO: change this so that we can use other feedback types
