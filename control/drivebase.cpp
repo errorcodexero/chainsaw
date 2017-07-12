@@ -232,13 +232,20 @@ set<Drivebase::Status> examples(Drivebase::Status*){
 
 set<Drivebase::Goal> examples(Drivebase::Goal*){
 	return {
-		Drivebase::Goal{0,0},
-		Drivebase::Goal{1,1}
+		Drivebase::Goal{Drivebase::Goal::Mode::ABSOLUTE, 0, 0,0},
+		Drivebase::Goal{Drivebase::Goal::Mode::ABSOLUTE, 0, 1,1}
 	};
 }
 
+std::ostream& operator<<(std::ostream& o, Drivebase::Goal::Mode a){
+	#define X(name) if(a==Drivebase::Goal::Mode::name) return o<<"Drivebase::Goal::Mode("#name")";
+	DRIVEBASE_GOAL_MODES
+	#undef X
+	nyi
+}
+
 ostream& operator<<(ostream& o,Drivebase::Goal const& a){
-	return o<<"Drivebase::Goal("<<a.left<<" "<<a.right<<")";
+	return o<<"Drivebase::Goal("<<a.mode<<" "<<a.distance<<" "<<a.left<<" "<<a.right<<")";
 }
 
 #define CMP(name) if(a.name<b.name) return 1; if(b.name<a.name) return 0;

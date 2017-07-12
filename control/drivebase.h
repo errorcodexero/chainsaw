@@ -75,7 +75,15 @@ struct Drivebase{
 	Output_applicator output_applicator;
 
 	struct Goal{
-		//speeds
+		#define DRIVEBASE_GOAL_MODES \
+			X(ABSOLUTE) \
+			X(DISTANCE)
+		#define X(name) name,
+		enum class Mode{DRIVEBASE_GOAL_MODES};
+		#undef X
+		Mode mode;
+
+		double distance;
 		double left,right;
 	};
 };
