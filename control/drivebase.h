@@ -28,8 +28,7 @@ struct Drivebase{
 		X(SINGLE_ARG(std::array<double,MOTORS>),current) \
 		X(Encoder_info,left) \
 		X(Encoder_info,right) \
-		X(Distances,distances) \
-		X(Time,now)
+		X(Distances,distances)
 	DECLARE_STRUCT(Input,DRIVEBASE_INPUT)
 
 	struct Input_reader{
@@ -56,7 +55,7 @@ struct Drivebase{
 		X(Output,last_output) \
 		X(Time,dt) \
 		X(Time,now)
-	DECLARE_STRUCT(Status,DRIVEBASE_STATUS)
+	DECLARE_STRUCT(Status,DRIVEBASE_STATUS) //time is all in seconds
 
 	typedef Status Status_detail;
 

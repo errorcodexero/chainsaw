@@ -2,7 +2,9 @@
 #include <iostream>
 #include <math.h>
 #include "../util/util.h"
-
+//temp
+#include "../util/point.h"
+//end temp
 using namespace std;
 
 #define L_MOTOR_LOC_1 0
@@ -73,7 +75,6 @@ Robot_inputs Drivebase::Input_reader::operator()(Robot_inputs all,Input in)const
 	encoder(R_ENCODER_PORTS,in.right);
 	all.digital_io.encoder[L_ENCODER_LOC] = -inches_to_ticks(in.distances.l);
 	all.digital_io.encoder[R_ENCODER_LOC] = inches_to_ticks(in.distances.r);
-	all.now = in.now;
 	return all;
 }
 
@@ -95,8 +96,7 @@ Drivebase::Input Drivebase::Input_reader::operator()(Robot_inputs const& in)cons
 		{
 			-ticks_to_inches(encoderconv(in.digital_io.encoder[L_ENCODER_LOC])),
 			ticks_to_inches(encoderconv(in.digital_io.encoder[R_ENCODER_LOC]))
-		},
-		in.now
+		}
 	};
 }
 
@@ -242,7 +242,7 @@ set<Drivebase::Goal> examples(Drivebase::Goal*){
 }
 
 std::ostream& operator<<(std::ostream& o, Drivebase::Goal::Mode a){
-	#define X(name) if(a==Drivebase::Goal::Mode::name) return o<<"Drivebase::Goal::Mode("#name")";
+	#define X(name) if(a==Drivebase::Goal::Mode::name) return o<<""#name;
 	DRIVEBASE_GOAL_MODES
 	#undef X
 	nyi
@@ -357,8 +357,8 @@ double get_output(Drivebase::Output out,Drivebase::Motor m){
 }
 
 void Drivebase::Estimator::update(Time now,Drivebase::Input in,Drivebase::Output out){
-	last.dt = last.now - in.now;
-	last.now = in.now;
+	last.dt = now - last.now;//TODO: should now come from input?
+	last.now = now;
 	last.last_output = out;
 	
 	speed_timer.update(now,true);
@@ -446,14 +446,17 @@ bool operator!=(Drivebase const& a,Drivebase const& b){
 
 Drivebase::Output trapezoidal_speed_control(Drivebase::Status status, Drivebase::Goal goal){
 	Drivebase::Output out = {0,0};
-	const double MAX = 1.0;//in "volts" //TODO: Fix units
+	const double MAX_OUT = 1.0;//in "volts" //TODO: Fix units
 	{//for ramping up (based on time)
-		const double K = 0.4 / 50; // in "volts"/ms //TODO: Rename and fix units
-		const double MAX_STEP = 0.1;// in "volts" //TODO: Fix units
+		const double K = 0.1 / 20; // in "volts"/ms //TODO: Rename, fix units, and currently arbitrary value
+		const double MAX_STEP = 0.2;// in "volts" //TODO: Fix units and currently arbitrary value
+		const double MILLISECONDS_PER_SECONDS = 1000 / 1;
 		
-		double step = clamp(status.dt * K,-MAX_STEP,MAX_STEP);// in "volts" //TODO: Fix units
+		double step = copysign(clamp(status.dt * MILLISECONDS_PER_SECONDS * K,-MAX_STEP,MAX_STEP),goal.distance());// in "volts" //TODO: Fix units
 		
-		out = {clamp(status.last_output.l + step,-MAX,MAX),clamp(status.last_output.r + step,-MAX,MAX)};
+		cout<<"\ndt:"<<status.dt * MILLISECONDS_PER_SECONDS<<" ms step:"<<step<<" "<<status<<"\n";
+		
+		out = {clamp(status.last_output.l + step,-MAX_OUT,MAX_OUT),clamp(status.last_output.r + step,-MAX_OUT,MAX_OUT)};
 	}
 	{//for rampping down (based on distance) //TODO
 		
@@ -474,13 +477,77 @@ Drivebase::Output control(Drivebase::Status status,Drivebase::Goal goal){
 
 Drivebase::Status status(Drivebase::Status a){ return a; }
 
-bool ready(Drivebase::Status,Drivebase::Goal){ return 1; }
+bool ready(Drivebase::Status status,Drivebase::Goal goal){
+	switch(goal.mode()){
+		case Drivebase::Goal::Mode::ABSOLUTE:
+			return true;
+		case Drivebase::Goal::Mode::DISTANCE:
+			{
+				const double TOLERANCE = 1;//inches
+				return fabs(goal.distance() - status.distances.l) < TOLERANCE;//TODO: this is just a placeholder for now
+			}
+		default:
+			nyi
+	}
+}
 
 #ifdef DRIVEBASE_TEST
 #include "formal.h"
+
+//temp
+using Inch = double;
+
+static const Inch ROBOT_WIDTH = 28; //inches, ignores bumpers //TODO: finds some way of dealing with constants like this and wheel diameter
+
+struct Drivebase_sim{
+	using Input=Drivebase::Input;
+	using Output=Drivebase::Output;
+	
+	Point position; //x,y are in distance in feet, theta is in radians (positive is counterclockwise from straight forward)
+	Time last_time;
+	Drivebase::Distances distances;
+
+	void update(Time t,bool enable,Output out){
+		static const double POWER_TO_SPEED = 6.5 * 12;//speed is in/s assuming low gear
+		Time dt=t-last_time;
+		last_time=t;
+		if(!enable) return;
+		Drivebase::Speeds speeds = {out.l * POWER_TO_SPEED, out.r * POWER_TO_SPEED};
+		Drivebase::Distances ddistances = {speeds.l * dt, speeds.r * dt};
+		double avg_dist_traveled = mean(ddistances.l,ddistances.r);
+		double dtheta = ((out.l-out.r)*POWER_TO_SPEED*dt)/ROBOT_WIDTH;
+		/*
+			Angle is calculated as the difference between the two sides' powers divided by 2 --   (out.l - out.r) / 2
+			That is then converted to a distance   --   ((out.l - out.r) / 2) * POWER_TO_SPEED * dt
+			That distance is then converted to an angle -- ((((out.l - our.r) / 2) * POWER_TO_SPEED * dt) * 2) / ROBOT_WIDTH
+		*/
+		double dy = avg_dist_traveled * cosf(position.theta);
+		double dx = avg_dist_traveled * sinf(position.theta);
+		distances += ddistances;
+		position += {dx,dy,dtheta};
+	}
+	Input get()const{
+		auto d = Digital_in::_0;
+		auto p = make_pair(d,d);
+		Drivebase::Input in = {Drivebase::Input{
+			{0,0,0,0,0,0},p,p,distances,0.0
+		}};
+		return in;
+	}
+
+	Drivebase_sim():position({}),last_time(0),distances({0,0}){}
+
+};
+
+ostream& operator<<(ostream& o,Drivebase_sim const& a){
+	return o << "Drivebase_sim(" << a.position << ")";
+}
+
+///end temp
+
 int main(){
 	{
-		Drivebase d;
+		Drivebase d;//TODO: re-enable
 		tester(d);
 	}
 	/*
@@ -490,5 +557,34 @@ int main(){
 		cout<<"\na:"<<a<<" b:"<<b<<" diff:"<<diff<<" sum:"<<sum<<" opp:"<<opp<<"\n";
 	}
 	*/
+	{
+		cout<<"\n==========================================================\n";
+		Drivebase_sim drive_sim;
+		Drivebase drive;
+		const Time TIMESTEP = .020;//sec
+		const Time MAX_TEST_LENGTH = 15;//sec
+		
+		Drivebase::Goal goal = Drivebase::Goal::distance(100);//inches
+		
+		const bool ENABLED = true;
+		
+		for(Time t = 0; t < MAX_TEST_LENGTH; t += TIMESTEP){
+			Drivebase::Status_detail status = drive.estimator.get();
+			Drivebase::Output out = control(status,goal);
+			
+			drive_sim.update(t,ENABLED,out);
+			
+			Drivebase::Input input = drive_sim.get();
+			
+			drive.estimator.update(t,input,out);
+			
+			cout<<"t:"<<t<<"\tgoal:"<<goal<<"\tstatus:"<<status<<"\n";
+			
+			if(ready(status,goal)){
+				cout<<"t:"<<t<<"\tgoal "<<goal<<" reached with status "<<status<<".\nFinishing\n";
+				break;
+			}
+		}
+	}
 }
 #endif
