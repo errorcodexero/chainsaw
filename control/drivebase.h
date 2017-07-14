@@ -51,7 +51,10 @@ struct Drivebase{
 		X(SINGLE_ARG(std::array<Motor_check::Status,MOTORS>),motor)\
 		X(bool,stall) \
 		X(Speeds,speeds)\
-		X(Distances,distances) 
+		X(Distances,distances) \
+		X(Output,last_output) \
+		X(Time,dt) \
+		X(Time,now)
 	DECLARE_STRUCT(Status,DRIVEBASE_STATUS)
 
 	typedef Status Status_detail;
@@ -62,8 +65,8 @@ struct Drivebase{
 		Countdown_timer speed_timer;
 		Stall_monitor stall_monitor;
 
-		void update(Time,Input,Output);
-		Status_detail get()const;
+		void update(Time,Input,Output);//TODO: update
+		Status_detail get()const;//TODO: may need updating
 		Estimator();
 	};
 	Estimator estimator;
@@ -80,11 +83,26 @@ struct Drivebase{
 			X(DISTANCE)
 		#define X(name) name,
 		enum class Mode{DRIVEBASE_GOAL_MODES};
-		#undef X
-		Mode mode;
+		#undef X 
 
-		double distance;
-		double left,right;
+		private:
+		Mode mode_;
+
+		double distance_;//used for both sides of the robot
+		double left_,right_;
+
+		public:
+		Goal();	
+
+		Mode mode()const;
+		
+		double distance()const;
+		
+		double right()const;
+		double left()const;
+		
+		static Goal distance(double);
+		static Goal absolute(double,double);		
 	};
 };
 bool operator==(Drivebase::Encoder_ticks const&,Drivebase::Encoder_ticks const&);

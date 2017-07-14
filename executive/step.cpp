@@ -56,8 +56,9 @@ Toplevel::Goal Turn::run(Run_info info,Toplevel::Goal goals){
 	
 	//ignoring right encoder because it's proven hard to get meaningful data from it
 	double power = motion_profile.target_speed(distance_travelled.l); 
-	goals.drive.left = clip(target_to_out_power(power));//TODO: move .2 to the constructor of Turn and set an instance variable
-	goals.drive.right = -clip(target_to_out_power(power - RIGHT_SPEED_CORRECTION * power));
+	double left = clip(target_to_out_power(power));//TODO: move .2 to the constructor of Turn and set an instance variable
+	double right = -clip(target_to_out_power(power - RIGHT_SPEED_CORRECTION * power));
+	goals.drive = Drivebase::Goal::absolute(left,right);
 	goals.shifter = Gear_shifter::Goal::LOW;
 	return goals;
 }
@@ -166,8 +167,9 @@ Toplevel::Goal Drive_straight::run(Run_info info,Toplevel::Goal goals){
 
 	double power = motion_profile.target_speed(distance_travelled.l); //ignoring right encoder because it's proven hard to get meaningful data from it
 
-	goals.drive.left = clip(target_to_out_power(power));//TODO: move .11 to the constructor of Drive_straight and set an instance variable
-	goals.drive.right = clip(target_to_out_power(power + power * RIGHT_SPEED_CORRECTION)); //right side would go faster than the left without error correction
+	double left = clip(target_to_out_power(power));//TODO: move .11 to the constructor of Drive_straight and set an instance variable
+	double right = clip(target_to_out_power(power + power * RIGHT_SPEED_CORRECTION)); //right side would go faster than the left without error correction
+	goals.drive = Drivebase::Goal::absolute(left,right);
 	goals.shifter = gear;
 	return goals;
 }
@@ -206,9 +208,12 @@ Toplevel::Goal Ram::run(Run_info info,Toplevel::Goal goals){
 
 	static const double POWER = .5;
 	double p = copysign(POWER,target_dist);
-
-	goals.drive.left = p;
-	goals.drive.right = p + p * RIGHT_SPEED_CORRECTION; //right side would go faster than the left without error correction
+	
+	{
+		double left = p;
+		double right = p + p * RIGHT_SPEED_CORRECTION; //right side would go faster than the left without error correction
+		goals.drive = Drivebase::Goal::absolute(left,right);
+	}
 	goals.shifter = gear;
 	return goals;
 }

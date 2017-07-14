@@ -73,7 +73,7 @@ Toplevel::Goal Teleop::run(Run_info info) {
 			nudges[i].timer.update(info.in.now,enabled);
 		}
 		const double NUDGE_POWER=.2,ROTATE_NUDGE_POWER=.2;
-		goals.drive.left=([&]{
+		double left=([&]{
 			if(!nudges[Nudges::FORWARD].timer.done()) return NUDGE_POWER;
 			if(!nudges[Nudges::BACKWARD].timer.done()) return -NUDGE_POWER;
 			if(!nudges[Nudges::CLOCKWISE].timer.done()) return ROTATE_NUDGE_POWER;
@@ -82,7 +82,7 @@ Toplevel::Goal Teleop::run(Run_info info) {
 			if(spin) power+=set_drive_speed(-info.driver_joystick.axis[Gamepad_axis::RIGHTX],boost,slow);
 			return -power; //inverted so drivebase values can be positive
 		}());
-		goals.drive.right=clip([&]{
+		double right=clip([&]{
 			if(!nudges[Nudges::FORWARD].timer.done()) return NUDGE_POWER;
 			if(!nudges[Nudges::BACKWARD].timer.done()) return -NUDGE_POWER;
 			if(!nudges[Nudges::CLOCKWISE].timer.done()) return -ROTATE_NUDGE_POWER;	
@@ -91,6 +91,8 @@ Toplevel::Goal Teleop::run(Run_info info) {
 			if(spin) power-=set_drive_speed(-info.driver_joystick.axis[Gamepad_axis::RIGHTX],boost,slow);
 			return -power; //inverted so drivebase values can be positive
 		}());
+
+		goals.drive = Drivebase::Goal::absolute(left,right);
 	}
 
 	goals.shifter=[&]{

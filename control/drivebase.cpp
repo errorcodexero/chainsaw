@@ -200,7 +200,6 @@ Drivebase::Distances operator-(Drivebase::Distances const& a,Drivebase::Distance
 	return a + (-b);
 }
 
-
 IMPL_STRUCT(Drivebase::Encoder_ticks::Encoder_ticks,ENCODER_TICKS)
 IMPL_STRUCT(Drivebase::Speeds::Speeds,SPEEDS_ITEMS)
 IMPL_STRUCT(Drivebase::Distances::Distances,DISTANCES_ITEMS)
@@ -226,14 +225,17 @@ set<Drivebase::Status> examples(Drivebase::Status*){
 		false,
 		{0.0,0.0},
 		{0,0},
+		*examples((Drivebase::Output*)nullptr).begin(),
+		0.0,
 		0.0
 	}};
 }
 
 set<Drivebase::Goal> examples(Drivebase::Goal*){
 	return {
-		Drivebase::Goal{Drivebase::Goal::Mode::ABSOLUTE, 0, 0,0},
-		Drivebase::Goal{Drivebase::Goal::Mode::ABSOLUTE, 0, 1,1}
+		Drivebase::Goal::distance(0),
+		Drivebase::Goal::absolute(0,0),
+		Drivebase::Goal::absolute(1,1)
 	};
 }
 
@@ -244,15 +246,63 @@ std::ostream& operator<<(std::ostream& o, Drivebase::Goal::Mode a){
 	nyi
 }
 
+Drivebase::Goal::Goal():mode_(Drivebase::Goal::Mode::ABSOLUTE),distance_(0),left_(0),right_(0){}
+
+Drivebase::Goal::Mode Drivebase::Goal::mode()const{
+	return mode_;
+}
+
+double Drivebase::Goal::distance()const{
+	assert(mode_ == Drivebase::Goal::Mode::DISTANCE);
+	return distance_;
+}
+
+double Drivebase::Goal::right()const{
+	assert(mode_ == Drivebase::Goal::Mode::ABSOLUTE);
+	return right_;
+}
+
+double Drivebase::Goal::left()const{
+	assert(mode_ == Drivebase::Goal::Mode::ABSOLUTE);
+	return left_;
+}
+
+Drivebase::Goal Drivebase::Goal::distance(double distance){
+	Drivebase::Goal a;
+	a.mode_ = Drivebase::Goal::Mode::DISTANCE;
+	a.distance_ = distance;
+	return a;
+}
+
+Drivebase::Goal Drivebase::Goal::absolute(double left,double right){
+	Drivebase::Goal a;
+	a.mode_ = Drivebase::Goal::Mode::ABSOLUTE;
+	a.left_ = left;
+	a.right_ = right;
+	return a;
+}
 ostream& operator<<(ostream& o,Drivebase::Goal const& a){
-	return o<<"Drivebase::Goal("<<a.mode<<" "<<a.distance<<" "<<a.left<<" "<<a.right<<")";
+	o<<"Drivebase::Goal("<<a.mode()<<" ";
+	switch(a.mode()){
+		case Drivebase::Goal::Mode::DISTANCE:
+			o<<a.distance();
+			break;
+		case Drivebase::Goal::Mode::ABSOLUTE:
+			o<<a.left()<<" "<<a.right();
+			break;
+		default: 
+			nyi
+	}
+	o<<")";
+	return o;
 }
 
 #define CMP(name) if(a.name<b.name) return 1; if(b.name<a.name) return 0;
 
 bool operator<(Drivebase::Goal const& a,Drivebase::Goal const& b){
-	CMP(left)
-	CMP(right)
+	CMP(mode())
+	CMP(left())
+	CMP(right())
 	return 0;
 }
 
@@ -273,7 +323,7 @@ set<Drivebase::Input> examples(Drivebase::Input*){
 	}};
 }
 
-Drivebase::Estimator::Estimator():motor_check(),last({{{}},false,{0,0},{0,0},0.0}){}
+Drivebase::Estimator::Estimator():motor_check(),last({{{}},false,{0,0},{0,0},{0,0},0.0,0.0}){}
 
 Drivebase::Status_detail Drivebase::Estimator::get()const{
 	/*array<Motor_check::Status,MOTORS> a;
@@ -388,8 +438,19 @@ bool operator!=(Drivebase const& a,Drivebase const& b){
 	return !(a==b);
 }
 
-Drivebase::Output control(Drivebase::Status /*status*/,Drivebase::Goal goal){
-	return Drivebase::Output{goal.left,goal.right};
+double trapezoidal_speed_control(const double CURRENT_DISTANCE, const double TARGET){
+	nyi //TODO
+}
+
+Drivebase::Output control(Drivebase::Status status,Drivebase::Goal goal){
+	switch(goal.mode()){
+		case Drivebase::Goal::Mode::DISTANCE:
+			return Drivebase::Output{trapezoidal_speed_control(status.distances.l,goal.distance()),trapezoidal_speed_control(status.distances.r,goal.distance())};
+		case Drivebase::Goal::Mode::ABSOLUTE:
+			return Drivebase::Output{goal.left(),goal.right()};
+		default:
+			nyi
+	}
 }
 
 Drivebase::Status status(Drivebase::Status a){ return a; }
