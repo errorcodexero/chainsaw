@@ -28,7 +28,8 @@ struct Drivebase{
 		X(SINGLE_ARG(std::array<double,MOTORS>),current) \
 		X(Encoder_info,left) \
 		X(Encoder_info,right) \
-		X(Distances,distances) 
+		X(Distances,distances) \
+		X(Time,now)
 	DECLARE_STRUCT(Input,DRIVEBASE_INPUT)
 
 	struct Input_reader{

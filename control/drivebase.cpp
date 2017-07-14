@@ -73,6 +73,7 @@ Robot_inputs Drivebase::Input_reader::operator()(Robot_inputs all,Input in)const
 	encoder(R_ENCODER_PORTS,in.right);
 	all.digital_io.encoder[L_ENCODER_LOC] = -inches_to_ticks(in.distances.l);
 	all.digital_io.encoder[R_ENCODER_LOC] = inches_to_ticks(in.distances.r);
+	all.now = in.now;
 	return all;
 }
 
@@ -94,7 +95,8 @@ Drivebase::Input Drivebase::Input_reader::operator()(Robot_inputs const& in)cons
 		{
 			-ticks_to_inches(encoderconv(in.digital_io.encoder[L_ENCODER_LOC])),
 			ticks_to_inches(encoderconv(in.digital_io.encoder[R_ENCODER_LOC]))
-		}
+		},
+		in.now
 	};
 }
 
@@ -355,6 +357,10 @@ double get_output(Drivebase::Output out,Drivebase::Motor m){
 }
 
 void Drivebase::Estimator::update(Time now,Drivebase::Input in,Drivebase::Output out){
+	last.dt = last.now - in.now;
+	last.now = in.now;
+	last.last_output = out;
+	
 	speed_timer.update(now,true);
 	static const double POLL_TIME = .05;//seconds
 	if(speed_timer.done()){
@@ -438,14 +444,27 @@ bool operator!=(Drivebase const& a,Drivebase const& b){
 	return !(a==b);
 }
 
-double trapezoidal_speed_control(const double CURRENT_DISTANCE, const double TARGET){
-	nyi //TODO
+Drivebase::Output trapezoidal_speed_control(Drivebase::Status status, Drivebase::Goal goal){
+	Drivebase::Output out = {0,0};
+	const double MAX = 1.0;//in "volts" //TODO: Fix units
+	{//for ramping up (based on time)
+		const double K = 0.4 / 50; // in "volts"/ms //TODO: Rename and fix units
+		const double MAX_STEP = 0.1;// in "volts" //TODO: Fix units
+		
+		double step = clamp(status.dt * K,-MAX_STEP,MAX_STEP);// in "volts" //TODO: Fix units
+		
+		out = {clamp(status.last_output.l + step,-MAX,MAX),clamp(status.last_output.r + step,-MAX,MAX)};
+	}
+	{//for rampping down (based on distance) //TODO
+		
+	}
+	return out;
 }
 
 Drivebase::Output control(Drivebase::Status status,Drivebase::Goal goal){
 	switch(goal.mode()){
 		case Drivebase::Goal::Mode::DISTANCE:
-			return Drivebase::Output{trapezoidal_speed_control(status.distances.l,goal.distance()),trapezoidal_speed_control(status.distances.r,goal.distance())};
+			return trapezoidal_speed_control(status,goal);
 		case Drivebase::Goal::Mode::ABSOLUTE:
 			return Drivebase::Output{goal.left(),goal.right()};
 		default:
@@ -464,10 +483,12 @@ int main(){
 		Drivebase d;
 		tester(d);
 	}
+	/*
 	{
 		Drivebase::Encoder_ticks a = {100,100}, b = {10,10};
 		Drivebase::Encoder_ticks diff = a - b, sum = a + b, opp = -a;
 		cout<<"\na:"<<a<<" b:"<<b<<" diff:"<<diff<<" sum:"<<sum<<" opp:"<<opp<<"\n";
 	}
+	*/
 }
 #endif
