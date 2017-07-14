@@ -44,6 +44,22 @@ cc_library(
 )
 
 cc_test(
+	name="settable_constant_test",
+	srcs=["util/settable_constant.cpp","util/settable_constant.h"],
+	copts=["-DSETTABLE_CONSTANT_TEST"],
+	deps=[],
+	timeout="short"
+
+)
+
+cc_library(
+	name="settable_constant",
+	srcs=["util/settable_constant.cpp"],
+	hdrs=["util/settable_constant.h"],
+)
+
+
+cc_test(
 	name="driver_station_interface_test",
 	srcs=["util/driver_station_interface.cpp"],
 	copts=["-DDRIVER_STATION_INTERFACE_TEST"],
