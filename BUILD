@@ -794,7 +794,7 @@ cc_library(
 	name="step",
 	srcs=["executive/step.cpp"],
 	hdrs=["executive/step.h"],
-	deps=[":executive",":motion_profile"]
+	deps=[":executive",":motion_profile",":settable_constant"]
 )
 
 cc_library(
@@ -830,7 +830,7 @@ cc_test(
 	name="step_test",
 	srcs=["executive/step.cpp","executive/step.h"],
 	copts=["-DSTEP_TEST"],
-	deps=[":executive_impl",":motion_profile"],
+	deps=[":executive_impl",":motion_profile",":settable_constant"],
 	timeout="short"
 )
 

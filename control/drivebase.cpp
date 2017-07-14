@@ -200,6 +200,7 @@ Drivebase::Distances operator-(Drivebase::Distances const& a,Drivebase::Distance
 	return a + (-b);
 }
 
+Drivebase::Encoder_ticks::Encoder_ticks():l(0),r(0){}
 
 IMPL_STRUCT(Drivebase::Encoder_ticks::Encoder_ticks,ENCODER_TICKS)
 IMPL_STRUCT(Drivebase::Speeds::Speeds,SPEEDS_ITEMS)

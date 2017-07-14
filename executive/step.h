@@ -3,6 +3,7 @@
 
 #include "executive.h"
 #include "../util/motion_profile.h"
+#include "../util/settable_constant.h"
 
 struct Step_impl;
 
@@ -87,6 +88,20 @@ class Drive_straight:public Step_impl_inner<Drive_straight>{//Drives straight a 
 	Step::Status done(Next_mode_info);
 	std::unique_ptr<Step_impl> clone()const;
 	bool operator==(Drive_straight const&)const;
+};
+
+class MP_drive:public Step_impl_inner<MP_drive>{
+	Inch target_distance;
+	Settable_constant<Drivebase::Encoder_ticks> target_ticks;
+	
+	public:
+	explicit MP_drive(Inch);
+
+	Toplevel::Goal run(Run_info,Toplevel::Goal);
+	Toplevel::Goal run(Run_info);
+	Step::Status done(Next_mode_info);
+	std::unique_ptr<Step_impl> clone()const;
+	bool operator==(MP_drive const&)const;
 };
 
 class Ram:public Step_impl_inner<Ram>{//Drives straight a certain distance

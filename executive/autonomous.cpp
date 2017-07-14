@@ -241,6 +241,11 @@ Executive get_auto_mode(Next_mode_info info){
 		Executive{Teleop()}
 	}};
 
+	const Executive motion_profile_test{Chain{
+		Step{MP_drive{5*12}},
+		Executive{Teleop()}
+	}};
+
 	if(!info.panel.in_use){
 		//Do nothing during autonomous mode if no panel exists
 		return auto_null;
@@ -304,6 +309,7 @@ Executive get_auto_mode(Next_mode_info info){
 		case 18:
 			return make_test_step(Align{PI/2});
 		case 19:
+			return motion_profile_test;
 		default:
 			return auto_null;
 	}

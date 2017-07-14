@@ -180,6 +180,30 @@ bool Drive_straight::operator==(Drive_straight const& b)const{
 	return target_dist == b.target_dist && initial_distances == b.initial_distances && init == b.init && motion_profile == b.motion_profile && in_range == b.in_range /*&& stall_timer == b.stall_timer*/ && gear == b.gear;
 }
 
+MP_drive::MP_drive(Inch target):target_distance(target){}
+
+Step::Status MP_drive::done(Next_mode_info info){
+	return Step::Status::UNFINISHED;//TODO
+}
+
+Toplevel::Goal MP_drive::run(Run_info info){
+	return run(info, {});
+}
+
+Toplevel::Goal MP_drive::run(Run_info info, Toplevel::Goal goals){
+	target_ticks = Drivebase::Encoder_ticks{inches_to_ticks(info.status.drive.distances.l + target_distance),inches_to_ticks(info.status.drive.distances.r + target_distance)};
+	//TODO
+	return goals;
+}
+
+unique_ptr<Step_impl> MP_drive::clone()const{
+	return unique_ptr<Step_impl>(new MP_drive(*this));
+}
+
+bool MP_drive::operator==(MP_drive const& a)const{
+	return target_distance==a.target_distance && target_ticks==a.target_ticks;
+}
+
 Ram::Ram(Inch goal):target_dist(goal),initial_distances(Drivebase::Distances{0,0}),init(false),gear(Gear_shifter::Goal::LOW){}
 
 Drivebase::Distances Ram::get_distance_travelled(Drivebase::Distances current){

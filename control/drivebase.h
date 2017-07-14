@@ -13,11 +13,16 @@ struct Drivebase{
 	enum Motor{LEFT1,LEFT2,LEFT3,RIGHT1,RIGHT2,RIGHT3,MOTORS};
 
 	typedef std::pair<Digital_in,Digital_in> Encoder_info;
-	
+
 	#define ENCODER_TICKS(X) \
-		X(int,l) \
-		X(int,r)
-	DECLARE_STRUCT(Encoder_ticks,ENCODER_TICKS)
+		X(double,l) \
+		X(double,r)
+	struct Encoder_ticks{
+		STRUCT_MEMBERS(ENCODER_TICKS)
+		
+		Encoder_ticks();
+		Encoder_ticks(ENCODER_TICKS(TYPES) bool=0);
+	};
 
 	#define DISTANCES_ITEMS(X) \
 		X(double,l) \
