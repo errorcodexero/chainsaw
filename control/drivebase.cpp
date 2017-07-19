@@ -457,10 +457,25 @@ Drivebase::Output trapezoidal_speed_control(Drivebase::Status status, Drivebase:
 		cout<<"\ndt:"<<status.dt * MILLISECONDS_PER_SECONDS<<" ms step:"<<step<<" "<<status<<"\n";
 		
 		out = {clamp(status.last_output.l + step,-MAX_OUT,MAX_OUT),clamp(status.last_output.r + step,-MAX_OUT,MAX_OUT)};
-	}
-	{//for rampping down (based on distance) //TODO
+	}	
+	{//for rampping down (based on distance) //TODO: finish it
+		Drivebase::Distances error = {status.distances.l - goal.distance(), status.distances.r - goal.distance()};
+		const double SLOW_WITHIN_DISTANCE = 100; //inches
 		
+		auto ramp_down = [=](double error){
+			const double K = .02; //percentage TODO: rename and currently arbitrary value
+			return clamp((-error * K), -MAX_OUT, MAX_OUT);
+		};
+		
+		if(error.l < SLOW_WITHIN_DISTANCE){
+			out.l = ramp_down(error.l);
+		}
+	
+		if(error.r < SLOW_WITHIN_DISTANCE){
+			out.r = ramp_down(error.r);
+		}
 	}
+	
 	return out;
 }
 
