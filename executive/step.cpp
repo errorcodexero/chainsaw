@@ -184,8 +184,9 @@ bool Drive_straight::operator==(Drive_straight const& b)const{
 
 MP_drive::MP_drive(Inch target):target_distance(target){}
 
-Step::Status MP_drive::done(Next_mode_info /*info*/){
-	return Step::Status::UNFINISHED;//TODO
+Step::Status MP_drive::done(Next_mode_info info){
+	drive_goal = Drivebase::Goal::distances(Drivebase::Distances(target_distance) + info.status.drive.distances);
+	return ready(info.status.drive, *drive_goal) ? Step::Status::FINISHED_SUCCESS : Step::Status::UNFINISHED;
 }
 
 Toplevel::Goal MP_drive::run(Run_info info){
@@ -193,8 +194,8 @@ Toplevel::Goal MP_drive::run(Run_info info){
 }
 
 Toplevel::Goal MP_drive::run(Run_info info, Toplevel::Goal goals){
-	target_distances = Drivebase::Distances(target_distance) + info.status.drive.distances;
-	goals.drive = Drivebase::Goal::distances(*target_distances);
+	drive_goal = Drivebase::Goal::distances(Drivebase::Distances(target_distance) + info.status.drive.distances);
+	goals.drive = *drive_goal;
 	return goals;
 }
 
@@ -203,7 +204,7 @@ unique_ptr<Step_impl> MP_drive::clone()const{
 }
 
 bool MP_drive::operator==(MP_drive const& a)const{
-	return target_distance==a.target_distance && target_distances==a.target_distances;
+	return target_distance==a.target_distance && drive_goal==a.drive_goal;
 }
 
 Ram::Ram(Inch goal):target_dist(goal),initial_distances(Drivebase::Distances{0,0}),init(false),gear(Gear_shifter::Goal::LOW){}
