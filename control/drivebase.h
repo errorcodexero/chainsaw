@@ -27,13 +27,19 @@ struct Drivebase{
 	#define DISTANCES_ITEMS(X) \
 		X(double,l) \
 		X(double,r)
-	DECLARE_STRUCT(Distances,DISTANCES_ITEMS)
+	struct Distances{
+		STRUCT_MEMBERS(ENCODER_TICKS)
+
+		Distances();
+		Distances(double);
+		Distances(DISTANCES_ITEMS(TYPES) bool=0);
+	};
 
 	#define DRIVEBASE_INPUT(X) \
 		X(SINGLE_ARG(std::array<double,MOTORS>),current) \
 		X(Encoder_info,left) \
 		X(Encoder_info,right) \
-		X(Distances,distances) 
+		X(Distances,distances)
 	DECLARE_STRUCT(Input,DRIVEBASE_INPUT)
 
 	struct Input_reader{
@@ -56,8 +62,11 @@ struct Drivebase{
 		X(SINGLE_ARG(std::array<Motor_check::Status,MOTORS>),motor)\
 		X(bool,stall) \
 		X(Speeds,speeds)\
-		X(Distances,distances) 
-	DECLARE_STRUCT(Status,DRIVEBASE_STATUS)
+		X(Distances,distances) \
+		X(Output,last_output) \
+		X(Time,dt) \
+		X(Time,now)
+	DECLARE_STRUCT(Status,DRIVEBASE_STATUS) //time is all in seconds
 
 	typedef Status Status_detail;
 
@@ -67,8 +76,8 @@ struct Drivebase{
 		Countdown_timer speed_timer;
 		Stall_monitor stall_monitor;
 
-		void update(Time,Input,Output);
-		Status_detail get()const;
+		void update(Time,Input,Output);//TODO: update
+		Status_detail get()const;//TODO: may need updating
 		Estimator();
 	};
 	Estimator estimator;
@@ -85,11 +94,26 @@ struct Drivebase{
 			X(DISTANCE)
 		#define X(name) name,
 		enum class Mode{DRIVEBASE_GOAL_MODES};
-		#undef X
-		Mode mode;
+		#undef X 
 
-		double distance;
-		double left,right;
+		private:
+		Mode mode_;
+
+		Distances distances_;//used for both sides of the robot
+		double left_,right_;
+
+		public:
+		Goal();	
+
+		Mode mode()const;
+		
+		Distances distances()const;
+		
+		double right()const;
+		double left()const;
+		
+		static Goal distances(Distances);
+		static Goal absolute(double,double);		
 	};
 };
 bool operator==(Drivebase::Encoder_ticks const&,Drivebase::Encoder_ticks const&);

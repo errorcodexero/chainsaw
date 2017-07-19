@@ -92,7 +92,7 @@ class Drive_straight:public Step_impl_inner<Drive_straight>{//Drives straight a 
 
 class MP_drive:public Step_impl_inner<MP_drive>{
 	Inch target_distance;
-	Settable_constant<Drivebase::Encoder_ticks> target_ticks;
+	Settable_constant<Drivebase::Distances> target_distances;
 	
 	public:
 	explicit MP_drive(Inch);

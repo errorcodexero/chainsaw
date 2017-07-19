@@ -198,8 +198,7 @@ Toplevel::Goal Align::run(Run_info info,Toplevel::Goal goals){
 					static const double LIMIT=.1;//not tuned!
 					return clamp(error*P,-LIMIT,LIMIT);
 				}(),MIN_SPEED);
-				goals.drive.left = -power;
-				goals.drive.right = power;
+				goals.drive = Drivebase::Goal::absolute(-power,power);
 				return goals;
 			}
 		case Mode::NONVISION:

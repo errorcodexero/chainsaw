@@ -56,8 +56,9 @@ Toplevel::Goal Turn::run(Run_info info,Toplevel::Goal goals){
 	
 	//ignoring right encoder because it's proven hard to get meaningful data from it
 	double power = motion_profile.target_speed(distance_travelled.l); 
-	goals.drive.left = clip(target_to_out_power(power));//TODO: move .2 to the constructor of Turn and set an instance variable
-	goals.drive.right = -clip(target_to_out_power(power - RIGHT_SPEED_CORRECTION * power));
+	double left = clip(target_to_out_power(power));//TODO: move .2 to the constructor of Turn and set an instance variable
+	double right = -clip(target_to_out_power(power - RIGHT_SPEED_CORRECTION * power));
+	goals.drive = Drivebase::Goal::absolute(left,right);
 	goals.shifter = Gear_shifter::Goal::LOW;
 	return goals;
 }
@@ -166,8 +167,9 @@ Toplevel::Goal Drive_straight::run(Run_info info,Toplevel::Goal goals){
 
 	double power = motion_profile.target_speed(distance_travelled.l); //ignoring right encoder because it's proven hard to get meaningful data from it
 
-	goals.drive.left = clip(target_to_out_power(power));//TODO: move .11 to the constructor of Drive_straight and set an instance variable
-	goals.drive.right = clip(target_to_out_power(power + power * RIGHT_SPEED_CORRECTION)); //right side would go faster than the left without error correction
+	double left = clip(target_to_out_power(power));//TODO: move .11 to the constructor of Drive_straight and set an instance variable
+	double right = clip(target_to_out_power(power + power * RIGHT_SPEED_CORRECTION)); //right side would go faster than the left without error correction
+	goals.drive = Drivebase::Goal::absolute(left,right);
 	goals.shifter = gear;
 	return goals;
 }
@@ -182,7 +184,7 @@ bool Drive_straight::operator==(Drive_straight const& b)const{
 
 MP_drive::MP_drive(Inch target):target_distance(target){}
 
-Step::Status MP_drive::done(Next_mode_info info){
+Step::Status MP_drive::done(Next_mode_info /*info*/){
 	return Step::Status::UNFINISHED;//TODO
 }
 
@@ -191,8 +193,8 @@ Toplevel::Goal MP_drive::run(Run_info info){
 }
 
 Toplevel::Goal MP_drive::run(Run_info info, Toplevel::Goal goals){
-	target_ticks = Drivebase::Encoder_ticks{inches_to_ticks(info.status.drive.distances.l + target_distance),inches_to_ticks(info.status.drive.distances.r + target_distance)};
-	//TODO
+	target_distances = Drivebase::Distances(target_distance) + info.status.drive.distances;
+	goals.drive = Drivebase::Goal::distances(*target_distances);
 	return goals;
 }
 
@@ -201,7 +203,7 @@ unique_ptr<Step_impl> MP_drive::clone()const{
 }
 
 bool MP_drive::operator==(MP_drive const& a)const{
-	return target_distance==a.target_distance && target_ticks==a.target_ticks;
+	return target_distance==a.target_distance && target_distances==a.target_distances;
 }
 
 Ram::Ram(Inch goal):target_dist(goal),initial_distances(Drivebase::Distances{0,0}),init(false),gear(Gear_shifter::Goal::LOW){}
@@ -230,9 +232,12 @@ Toplevel::Goal Ram::run(Run_info info,Toplevel::Goal goals){
 
 	static const double POWER = .5;
 	double p = copysign(POWER,target_dist);
-
-	goals.drive.left = p;
-	goals.drive.right = p + p * RIGHT_SPEED_CORRECTION; //right side would go faster than the left without error correction
+	
+	{
+		double left = p;
+		double right = p + p * RIGHT_SPEED_CORRECTION; //right side would go faster than the left without error correction
+		goals.drive = Drivebase::Goal::absolute(left,right);
+	}
 	goals.shifter = gear;
 	return goals;
 }

@@ -154,13 +154,7 @@ ostream& operator<<(ostream& o,Toplevel::Goal g){
 Toplevel::Status::Status():
 	pump(Pump::Status::NOT_FULL),
 	climber(),
-	drive(
-		{Motor_check::Status::OK_,Motor_check::Status::OK_},
-		false,
-		{0.0,0.0},
-		{0.0,0.0},
-		0.0
-	),
+	drive(*examples((Drivebase::Status*)nullptr).begin()),
 	gear_collector(),
 	shooter(),
 	lights(0)

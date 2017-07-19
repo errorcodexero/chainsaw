@@ -235,6 +235,12 @@ void visit(Func f,Drivebase::Speeds const& a){
 }
 
 template<typename Func>
+void visit(Func f,Drivebase::Output const& a){
+	f.terminal(a);
+}
+
+
+template<typename Func>
 void visit(Func f,Drivebase::Status const& r){
 	DRIVEBASE_STATUS(VISIT_2ND)
 }
