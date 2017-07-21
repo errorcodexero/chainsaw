@@ -28,7 +28,7 @@ struct Drivebase{
 		X(double,l) \
 		X(double,r)
 	struct Distances{
-		STRUCT_MEMBERS(ENCODER_TICKS)
+		STRUCT_MEMBERS(DISTANCES_ITEMS)
 
 		Distances();
 		Distances(double);

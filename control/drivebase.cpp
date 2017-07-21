@@ -454,7 +454,7 @@ Drivebase::Output trapezoidal_speed_control(Drivebase::Status status, Drivebase:
 	Drivebase::Output out = {0,0};
 	const double MAX_OUT = 1.0;//in "volts"
 	{//for ramping up (based on time)
-		const double SPEED_UP_TIME = 200; //milliseconds
+		const double SPEED_UP_TIME = 2000; //milliseconds
 		const double SLOPE = MAX_OUT / SPEED_UP_TIME; //"volts"/ms //TODO: currently arbitrary value
 		const double MAX_STEP = 0.2;//"volts" //TODO: currently arbitrary value
 		const double MILLISECONDS_PER_SECONDS = 1000 / 1;
@@ -511,6 +511,8 @@ bool ready(Drivebase::Status status,Drivebase::Goal goal){
 
 #ifdef DRIVEBASE_TEST
 #include "formal.h"
+#include <unistd.h>
+#include <fstream>
 
 //temp
 using Inch = double;

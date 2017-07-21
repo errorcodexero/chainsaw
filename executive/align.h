@@ -30,6 +30,7 @@ std::ostream& operator<<(std::ostream&,Block_pr const&);
 struct Align: public Step_impl_inner<Align>{
 	enum class Mode{VISION,NONVISION};
 	Mode mode;
+	bool demo;
 	std::vector<Pixy::Block> blocks;
 	int current;
 	Countdown_timer in_range;	
@@ -41,6 +42,7 @@ struct Align: public Step_impl_inner<Align>{
 	void update(Camera);
 
 	public:
+	explicit Align(Rad, bool);
 	explicit Align(Rad); //TODO: pass in initial encoders or find some way to set them inside of the Turn step
 	explicit Align();
 

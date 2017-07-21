@@ -67,8 +67,8 @@ Robot_outputs Main::operator()(const Robot_inputs in,ostream& /*print_stream*/){
 
 	#ifdef PRINT_OUTS
 	if(in.ds_info.connected && (print_count % 10) == 0){
-		cout<<"mode: "<<mode<<"\n\n";
-		cout<<"panel:"<<panel<<"\n";
+		//cout<<"mode: "<<mode<<"\n\n";
+		//cout<<"panel:"<<panel<<"\n";
 	}
 	#endif
 

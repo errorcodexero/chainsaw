@@ -18,7 +18,11 @@ ostream& operator<<(ostream& o,Align::Mode a){
 
 static const Time INITIAL_SEARCH = 0.1;
 
-Align::Align(Rad a):mode(Align::Mode::VISION),blocks({}),current(0),estimated_angle(a),nonvision_align(Step{Turn(a)}){
+Align::Align(Rad a, bool d):mode(Align::Mode::VISION),demo(d),blocks({}),current(0),estimated_angle(a),nonvision_align(Step{Turn(a)}){
+	initial_search.set(INITIAL_SEARCH);
+}
+
+Align::Align(Rad a):mode(Align::Mode::VISION),demo(0),blocks({}),current(0),estimated_angle(a),nonvision_align(Step{Turn(a)}){
 	initial_search.set(INITIAL_SEARCH);
 }
 Align::Align():Align(0){}
@@ -159,6 +163,7 @@ Step::Status Align::done(Next_mode_info info){
 	switch(mode){
 		case Mode::VISION:
 			{
+				if(demo) return Step::Status::UNFINISHED;
 				const Time TIMEOUT_TIME = 8; //10; //seconds since start of autonomous
 				if(info.since_switch > TIMEOUT_TIME){ 
 					return Step::Status::FINISHED_SUCCESS; //TODO: make failure (offseason)

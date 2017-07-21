@@ -375,15 +375,15 @@ public:
 		static int print_num=0;
 		if(in.ds_info.connected && (print_num%PRINT_SPEED)==0){	
 			cout<<"in: "<<in<<"\n";
-			cout<<"main: "<<main<<"\n";
+			//cout<<"main: "<<main<<"\n";
 			cout<<"out: "<<out<<"\n";
 			/*if(camera.isNewData()) {
 				vector<Pixy::Block> blocks=camera.getBlocks();
 				cout<<"size: "<<blocks.size()<<" blocks: "<<blocks<<"\n";
 			}
 			else cout<<"No new data."<<in.now<<"\n";*/
-			cout<<"cam_data_recieved: "<<cam_data_recieved<<"\n";
-			cout<<"CLEAR_SCREEN\n";
+			//cout<<"cam_data_recieved: "<<cam_data_recieved<<"\n";
+			//cout<<"CLEAR_SCREEN\n";
 		}
 		print_num++;
 		#endif

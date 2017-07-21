@@ -242,7 +242,7 @@ Executive get_auto_mode(Next_mode_info info){
 	}};
 
 	const Executive motion_profile_test{Chain{
-		Step{MP_drive{5*12}},
+		Step{MP_drive{8*12}},
 		Executive{Teleop()}
 	}};
 
@@ -307,7 +307,7 @@ Executive get_auto_mode(Next_mode_info info){
 		case 17:
 			return make_test_step(Turn{PI/2});
 		case 18:
-			return make_test_step(Align{PI/2});
+			return make_test_step(Align{PI/2,1});
 		case 19:
 			return motion_profile_test;
 		default:
