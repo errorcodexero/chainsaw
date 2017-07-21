@@ -449,15 +449,17 @@ bool operator!=(Drivebase const& a,Drivebase const& b){
 	return !(a==b);
 }
 
+//TODO: Rename units
 Drivebase::Output trapezoidal_speed_control(Drivebase::Status status, Drivebase::Goal goal){
 	Drivebase::Output out = {0,0};
-	const double MAX_OUT = 1.0;//in "volts" //TODO: Fix units
+	const double MAX_OUT = 1.0;//in "volts"
 	{//for ramping up (based on time)
-		const double K = 0.1 / 20; // in "volts"/ms //TODO: Rename, fix units, and currently arbitrary value
-		const double MAX_STEP = 0.2;// in "volts" //TODO: Fix units and currently arbitrary value
+		const double SPEED_UP_TIME = 200; //milliseconds
+		const double SLOPE = MAX_OUT / SPEED_UP_TIME; //"volts"/ms //TODO: currently arbitrary value
+		const double MAX_STEP = 0.2;//"volts" //TODO: currently arbitrary value
 		const double MILLISECONDS_PER_SECONDS = 1000 / 1;
 		
-		double step = clamp(status.dt * MILLISECONDS_PER_SECONDS * K,-MAX_STEP,MAX_STEP);// in "volts" //TODO: Fix units
+		double step = clamp(status.dt * MILLISECONDS_PER_SECONDS * SLOPE,-MAX_STEP,MAX_STEP);// in "volts" 
 		double l_step = copysign(step,goal.distances().l);
 		double r_step = copysign(step,goal.distances().r);
 		
@@ -467,20 +469,14 @@ Drivebase::Output trapezoidal_speed_control(Drivebase::Status status, Drivebase:
 	}	
 	{//for rampping down (based on distance)
 		Drivebase::Distances error = goal.distances() - status.distances;
-		const double SLOW_WITHIN_DISTANCE = 100; //inches
+		const double SLOW_WITHIN_DISTANCE = 10; //inches
+		const double SLOPE = MAX_OUT / SLOW_WITHIN_DISTANCE; //"volts"/inches //TODO: currently arbitrary value
 		
-		auto ramp_down = [=](double error){
-			const double K = .02; //percentage TODO: rename and currently arbitrary value
-			return clamp((error * K), -MAX_OUT, MAX_OUT);
-		};
-		
-		if(error.l < SLOW_WITHIN_DISTANCE){
-			out.l = ramp_down(error.l);
-		}
+		if(error.l < SLOW_WITHIN_DISTANCE)
+			out.l = clamp((error.l * SLOPE), -MAX_OUT, MAX_OUT);
 	
-		if(error.r < SLOW_WITHIN_DISTANCE){
-			out.r = ramp_down(error.r);
-		}
+		if(error.r < SLOW_WITHIN_DISTANCE)
+			out.r = clamp((error.r * SLOPE), -MAX_OUT, MAX_OUT);
 	}
 	
 	return out;
