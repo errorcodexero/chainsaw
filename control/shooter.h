@@ -10,15 +10,28 @@
 #include "nop.h"
 
 struct Shooter{
-	enum class Goal{FORWARD,OFF,REVERSE};
+	struct Goal{
+		double value;//percent power
+		Goal();
+		Goal(double);
+	};
 	
 	using Status_detail = Nop::Status_detail;
 	
 	using Status = Status_detail;
 
-	using Input = Nop::Input;
+	#define SHOOTER_INPUT_ITEMS(X)\
+		X(bool,enabled)
+	struct Input{
+		#define X(A,B) A B;
+		SHOOTER_INPUT_ITEMS(X)
+		#undef X
+	};
 
-	using Input_reader = Nop::Input_reader;
+	struct Input_reader{
+		Shooter::Input operator()(Robot_inputs const&)const;
+		Robot_inputs operator()(Robot_inputs,Shooter::Input)const;
+	};
 
 	using Output = Goal;
 	
@@ -27,7 +40,14 @@ struct Shooter{
 		Robot_outputs operator()(Robot_outputs,Output)const;
 	};
 
-	using Estimator = Nop::Estimator;
+	struct Estimator{
+		Shooter::Status_detail last;
+		Shooter::Output last_output;
+	
+		Shooter::Status_detail get()const;
+		void update(Time,Shooter::Input,Shooter::Output);
+		Estimator();
+	};
 
 	Input_reader input_reader;
 	Estimator estimator;
@@ -35,13 +55,33 @@ struct Shooter{
 };
 
 std::ostream& operator<<(std::ostream&,Shooter::Goal);
+std::ostream& operator<<(std::ostream&,Shooter::Input);
 std::ostream& operator<<(std::ostream&,Shooter);
+
+bool operator<(Shooter::Status_detail,Shooter::Status_detail);
+bool operator==(Shooter::Status_detail,Shooter::Status_detail);
+bool operator!=(Shooter::Status_detail,Shooter::Status_detail);
+
+bool operator==(Shooter::Input,Shooter::Input);
+bool operator!=(Shooter::Input,Shooter::Input);
+bool operator<(Shooter::Input,Shooter::Input);
+
+bool operator==(Shooter::Goal,Shooter::Goal);
+bool operator!=(Shooter::Goal,Shooter::Goal);
+bool operator<(Shooter::Goal,Shooter::Goal);
+
+bool operator==(Shooter::Input_reader,Shooter::Input_reader);
+bool operator<(Shooter::Input_reader,Shooter::Input_reader);
+
+bool operator==(Shooter::Estimator,Shooter::Estimator);
+bool operator!=(Shooter::Estimator,Shooter::Estimator);
 
 bool operator==(Shooter::Output_applicator,Shooter::Output_applicator);
 
 bool operator==(Shooter,Shooter);
 bool operator!=(Shooter,Shooter);
 
+std::set<Shooter::Input> examples(Shooter::Input*);
 std::set<Shooter::Goal> examples(Shooter::Goal*);
 
 Shooter::Status status(Shooter::Status_detail);

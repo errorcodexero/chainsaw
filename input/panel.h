@@ -38,7 +38,7 @@ struct Panel{
 	//10 *position switches:
 	int auto_select;//0-19
 	//Dials:
-	float speed_dial;//can't read dial
+	float speed_dial;
 	Panel();
 };
 

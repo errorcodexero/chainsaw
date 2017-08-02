@@ -11,7 +11,6 @@ struct Lights{
 	struct Goal{
 		Loading_indicator loading_indicator;
 		bool camera_light;
-		//TODO constructors
 	};
 	
 	using Input=Nop::Input;
@@ -53,7 +52,6 @@ std::ostream& operator<<(std::ostream&,Lights::Output);
 std::ostream& operator<<(std::ostream&,Lights);
 
 bool operator<(Lights::Goal,Lights::Goal);
-bool operator==(Lights::Goal,Lights::Goal);
 
 bool operator<(Lights::Output,Lights::Output);
 bool operator==(Lights::Output,Lights::Output);

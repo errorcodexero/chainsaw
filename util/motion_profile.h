@@ -18,7 +18,6 @@ class Motion_profile{
 	friend bool operator==(Motion_profile const& a,Motion_profile const& b);
 };
 
-double target_to_out_power(double);
 double target_to_out_power(double,double);
 
 bool operator==(Motion_profile const& a,Motion_profile const& b);

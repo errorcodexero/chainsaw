@@ -103,7 +103,7 @@ Toplevel::Output::Output():
 	drive(0.0,0.0),
 	collector(),
 	gear_collector(),
-	shooter(Shooter::Output::OFF),
+	shooter(),
 	lights()
 {}
 

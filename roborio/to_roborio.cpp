@@ -1,4 +1,4 @@
-	#include "WPILib.h"
+#include "WPILib.h"
 #include "../control/main.h"
 #include "dio_control.h"
 #include "talon_srx_control.h"
@@ -172,7 +172,7 @@ class To_roborio
 	AnalogInput *analog_in[Robot_inputs::ANALOG_INPUTS];
 	int error_code;
 	USER_CODE main;
-	Talon_srx_controls talon_srx_controls;
+	//Talon_srx_controls talon_srx_controls;
 	//DriverStationLCD *lcd;
 	//NetworkTable *table;
 	//Gyro *gyro;
@@ -194,7 +194,7 @@ public:
 			solenoid[i]=new Solenoid(i);//don't know of any way to determine module number, so just take the default one.
 			if(!solenoid[i]) error_code|=8;
 		}
-		talon_srx_controls.init();
+		//talon_srx_controls.init();
 		
 		for(unsigned i=0;i<Robot_outputs::PWMS;i++){
 			pwm[i]=new VictorSP(i);
@@ -272,12 +272,17 @@ public:
 
 	Camera read_camera(Robot_inputs /*r*/){
 		Camera c;
-		camera.enable();
-		if(camera.isNewData()) {
-			cam_data_recieved=true;
-			c.blocks=camera.getBlocks();
+		/*if(r.now<.5&&!cam_data_recieved) {
+			c.enabled=false;
+			camera.enable();
+			if(camera.isNewData()) cam_data_recieved=true;
+		} else */{
+			camera.enable();
+			//if (camera.isNewData() && ) ;
+			/*c.enabled=true;//cam_data_recieved&&camera.enable()&&r.robot_mode.enabled;
+			if(c.enabled && camera.isNewData()) c.blocks=camera.getBlocks();
+			else camera.disable();*/
 		}
-		c.enabled=cam_data_recieved;
 		return c;
 	}
 
@@ -361,34 +366,32 @@ public:
 			for(unsigned int i=0; i<Robot_outputs::TALON_SRX_OUTPUTS; i++){
 				enable_all[i]=true;
 			}
-			talon_srx_controls.set(out.talon_srx,enable_all); 
+			//talon_srx_controls.set(out.talon_srx,enable_all); 
 		}
 		return error_code;
 	}
 	
 
 	void run(Robot_inputs in){
-		//std::ostream print_stream=cout;//(in.ds_info.connected && (print_num%PRINT_SPEED)==0)?cout:null_stream;
-		Robot_outputs out=main(in/*,print_stream*/);
-		#if 1
 		const int PRINT_SPEED=10;
 		static int print_num=0;
+		//std::ostream print_stream=cout;//(in.ds_info.connected && (print_num%PRINT_SPEED)==0)?cout:null_stream;
+		Robot_outputs out=main(in/*,print_stream*/);
 		if(in.ds_info.connected && (print_num%PRINT_SPEED)==0){	
 			cout<<"in: "<<in<<"\n";
 			cout<<"main: "<<main<<"\n";
 			cout<<"out: "<<out<<"\n";
-			/*if(camera.isNewData()) {
+			if(camera.isNewData()) {
 				vector<Pixy::Block> blocks=camera.getBlocks();
 				cout<<"size: "<<blocks.size()<<" blocks: "<<blocks<<"\n";
 			}
-			else cout<<"No new data."<<in.now<<"\n";*/
+			else cout<<"No new data."<<in.now<<"\n";
 			cout<<"cam_data_recieved: "<<cam_data_recieved<<"\n";
 			cout<<"CLEAR_SCREEN\n";
 		}
-		print_num++;
-		#endif
 		int x=set_outputs(out,in.robot_mode.enabled);
 		if(x) cout<<"x was:"<<x<<"\n";
+		print_num++;
 	}
 	
 	void run(Robot_mode mode){
@@ -396,7 +399,7 @@ public:
 		Robot_inputs in=in1.first;
 		error_code|=in1.second;
 		in.digital_io=digital_io.get();
-		in.talon_srx=talon_srx_controls.get();
+		//in.talon_srx=talon_srx_controls.get();
 		/*if(gyro){
 			in.orientation=gyro->GetAngle();
 		}*/
@@ -463,7 +466,7 @@ class Robot_adapter: public SampleRobot{
 			r.autonomous=IsAutonomous();
 			u.run(r);
 
-			Wait(0.1);
+			Wait(0.005);
 		}
 	}
 };

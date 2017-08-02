@@ -6,8 +6,8 @@
 #include <cmath>
 
 using namespace std;
-static const unsigned int BALL_ARM_AXIS=2, BALL_INTAKE_AXIS=1, BALL_COLLECTOR_AXIS=0, SHOOTER_AXIS=3, GEAR_ARM_AXIS=5, GEAR_GRABBER_AXIS=4, AUTO_SELECTOR_AXIS=6, SPEED_DIAL_AXIS=7;//TODO: rename constants
-static const unsigned int BALL_COLLECT_LOC=0, LOADING_INDICATOR_LOC=1, SHOOT_LOC=2, PREP_COLLECT_GEAR_LOC=3, PREP_SCORE_GEAR_LOC=4, COLLECT_GEAR_LOC=5, SCORE_GEAR_LOC=6, CLIMB_LOC=7, LEARN_LOC=8, SHOOTER_BELT_AUTO_LOC=11, SHOOTER_BELT_ENABLED_LOC=12, BALL_LIFTER_IN_LOC=9, BALL_LIFTER_OUT_LOC=10;//TODO: rename constants 
+static const unsigned int BALL_ARM_AXIS=0, BALL_LIFT_AXIS=1, BALL_INTAKE_AXIS=2, SHOOTER_AXIS=3, GEAR_ARM_AXIS=5, GEAR_GRABBER_AXIS=4, AUTO_SELECTOR_AXIS=6, SPEED_DIAL_AXIS=7;//TODO: rename constants
+static const unsigned int BALL_COLLECT_LOC=0, LOADING_INDICATOR_LOC=1, SHOOT_LOC=2, PREP_COLLECT_GEAR_LOC=3, PREP_SCORE_GEAR_LOC=4, COLLECT_GEAR_LOC=5, SCORE_GEAR_LOC=6, CLIMB_LOC=7, LEARN_LOC=8, SHOOTER_BELT_AUTO_LOC=9, SHOOTER_BELT_ENABLED_LOC=10, BALL_COLLECTOR_DISABLED_LOC=11, BALL_COLLECTOR_AUTO_LOC=12;//TODO: rename constants 
 
 #define BUTTONS \
 	X(ball_collect) X(loading_indicator) X(shoot) X(gear_prep_collect) X(gear_prep_score) X(gear_collect) X(gear_score) X(climb) X(learn)
@@ -188,10 +188,18 @@ Panel interpret_oi(Joystick_data d){
 
 		float ball_intake = d.axis[BALL_INTAKE_AXIS];
 		p.ball_intake = [&]{
-			static const float AUTO=-1,OUT=0,IN=1;
-			if(set_button(ball_intake,AUTO,OUT,IN)) return Panel::Ball_intake::OUT;
-			if(set_button(ball_intake,OUT,IN,ARTIFICIAL_MAX)) return Panel::Ball_intake::IN;
+			static const float AUTO=-1,IN=0,OUT=1;
+			if(set_button(ball_intake,AUTO,IN,OUT)) return Panel::Ball_intake::IN;
+			if(set_button(ball_intake,IN,OUT,ARTIFICIAL_MAX)) return Panel::Ball_intake::OUT;
 			return Panel::Ball_intake::AUTO;
+		}();
+
+		float ball_lift = d.axis[BALL_LIFT_AXIS];
+		p.ball_lift = [&]{
+			static const float AUTO=-1,IN=0,OUT=1;
+			if(set_button(ball_lift,AUTO,IN,OUT)) return Panel::Ball_lift::IN;
+			if(set_button(ball_lift,IN,OUT,ARTIFICIAL_MAX)) return Panel::Ball_lift::OUT;
+			return Panel::Ball_lift::AUTO;
 		}();
 
 		bool shooter_belt_enabled = d.button[SHOOTER_BELT_ENABLED_LOC], shooter_belt_auto = d.button[SHOOTER_BELT_AUTO_LOC];
@@ -201,22 +209,12 @@ Panel interpret_oi(Joystick_data d){
 			return Panel::Shooter_belt::DISABLED;
 		}();
 
-		float ball_collector = d.axis[BALL_COLLECTOR_AXIS];
+		bool /*ball_collector_disabled = d.button[BALL_COLLECTOR_DISABLED_LOC],*/ ball_collector_auto = d.button[BALL_COLLECTOR_AUTO_LOC];
 		p.ball_collector = [&]{
-			static const float AUTO=-1,DISABLED=1;
-			if(set_button(ball_collector,AUTO,DISABLED,DISABLED)) return Panel::Ball_collector::DISABLED;
-			if(set_button(ball_collector,DISABLED,DISABLED,ARTIFICIAL_MAX)) return Panel::Ball_collector::DISABLED;
-			return Panel::Ball_collector::AUTO;
+			if(ball_collector_auto) return Panel::Ball_collector::AUTO;
+			return Panel::Ball_collector::DISABLED;
 		}();
-		
-		bool lift_in  = d.button[BALL_LIFTER_IN_LOC], lift_auto = d.button[BALL_LIFTER_OUT_LOC];
-		p.ball_lift = [&]{
-			if(lift_in) return Panel::Ball_lift::AUTO;
-			if(lift_auto) return Panel::Ball_lift::OUT;
-			return Panel::Ball_lift::IN;
-		}();
-	
-	}	
+	}
 	{//buttons
 		p.ball_collect=d.button[BALL_COLLECT_LOC];
 		p.loading_indicator=d.button[LOADING_INDICATOR_LOC];
@@ -285,9 +283,7 @@ Panel interpret_gamepad(Joystick_data d){
 		p.gear_collect = d.button[Gamepad_button::X];
 		p.gear_prep_collect = d.button[Gamepad_button::A];
 
-		cout<<"\nPOV:"<<d.pov<<"\n";
-
-		switch(pov_section(d.pov)){
+		switch(pov_section(d.axis[Gamepad_axis::DPAD])){
 			case POV_section::CENTER:
 				break;
 			case POV_section::UP:
@@ -321,8 +317,6 @@ Panel interpret_gamepad(Joystick_data d){
 		p.ball_lift=Panel::Ball_lift::AUTO;
 		p.shooter_belt=Panel::Shooter_belt::AUTO;
 		p.ball_collector=Panel::Ball_collector::AUTO;
-
-		p.ball_arm=Panel::Ball_arm::STOW;
 	} else {
 		p.ball_collector = d.button[Gamepad_button::RB] ? Panel::Ball_collector::DISABLED:Panel::Ball_collector::AUTO;
 
@@ -336,7 +330,7 @@ Panel interpret_gamepad(Joystick_data d){
 
 		p.ball_lift=Panel::Ball_lift::AUTO;
 		p.ball_intake=Panel::Ball_intake::AUTO;
-		switch(pov_section(d.pov)){
+		switch(pov_section(d.axis[Gamepad_axis::DPAD])){
 			case POV_section::CENTER:
 				break;
 			case POV_section::UP:
