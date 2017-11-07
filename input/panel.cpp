@@ -46,29 +46,6 @@ ostream& operator<<(ostream& o,Multistate_input<T> const& a){
 	return o;
 }
 
-template<typename T>
-bool Multistate_input<T>::operator==(T const& b)const{
-	return value == b.value;
-}
-
-template<typename T>
-bool Multistate_input<T>::operator<(T const& b)const{
-	return value < b.value;
-}
-
-template<typename T>
-bool Multistate_input<T>::operator==(Multistate_input<T> const& b)const{
-	return conversion == b.conversion && value == b.value;
-}
-
-template<typename T>
-bool Multistate_input<T>::operator<(Multistate_input<T> const& b)const{
-	#define CMP(NAME) if(NAME < b.NAME) return true; if(b.NAME < NAME) return false;
-	CMP(value) CMP(conversion)
-	#undef CMP
-	return false;
-}
-
 static const unsigned int ROLLER_CONTROL_AXIS=0, ROLLER_AXIS=1, ROLLER_ARM_AXIS=2, CLIMBER_MODE_AXIS=3, GEAR_GRABBER_AXIS=4, GEAR_ARM_AXIS=5, AUTO_SELECTOR_AXIS=6, SPEED_DIAL_AXIS=7;//TODO: rename constants
 static const unsigned int CAMERA_LIGHT_LOC=1, SHOOT_LOC=2, PREP_COLLECT_GEAR_LOC=3, PREP_SCORE_GEAR_LOC=4, COLLECT_GEAR_LOC=5, SCORE_GEAR_LOC=6, CLIMB_LOC=7, LEARN_LOC=8, GEAR_SENSING_FULL_AUTO_LOC=9, GEAR_SENSING_NO_AUTO_LOC=10;//TODO: rename constants 
 
@@ -81,6 +58,7 @@ static const unsigned int CAMERA_LIGHT_LOC=1, SHOOT_LOC=2, PREP_COLLECT_GEAR_LOC
 #define DIALS \
 	X(speed_dial)
 
+
 #define PANEL_ITEMS \
 	BUTTONS \
 	THREE_POS_SWITCHES \
@@ -92,13 +70,40 @@ Panel::Panel():
 	#define X(BUTTON) BUTTON(false),
 	BUTTONS
 	#undef X
-	roller_control(Roller_control::AUTO),
-	roller(Roller::AUTO),
-	roller_arm(Roller_arm::AUTO),
-	climber_mode(Climber_mode::STANDARD),
-	gear_grabber(Gear_grabber::CLOSED),
-	gear_arm(Gear_arm::DOWN),
-	gear_sensing(Gear_sensing::FULL_AUTO),
+	roller_control(Multistate_input<Panel::Roller_control>{{
+		Panel::Roller_control::AUTO,
+		Panel::Roller_control::OFF,
+		Panel::Roller_control::OFF
+	}}),
+	//roller_control(Roller_control::AUTOAUTO}oller(Roller::AUTO),
+	roller(Multistate_input<Panel::Roller>{{
+		Panel::Roller::AUTO,
+		Panel::Roller::IN,
+		Panel::Roller::OUT
+	}}),
+	roller_arm(Multistate_input<Panel::Roller_arm>{{
+		Panel::Roller_arm::AUTO,
+		Panel::Roller_arm::LOW,
+		Panel::Roller_arm::STOW
+	}}),
+	climber_mode(Multistate_input<Panel::Climber_mode>{{
+		Panel::Climber_mode::STANDARD,
+		Panel::Climber_mode::TURBO,
+		Panel::Climber_mode::RELEASE
+	}}),
+	gear_grabber(Multistate_input<Panel::Gear_grabber>{{
+		Panel::Gear_grabber::AUTO,
+		Panel::Gear_grabber::CLOSED,
+		Panel::Gear_grabber::OPEN
+	}}),
+	gear_arm(Multistate_input<Panel::Gear_arm>{{
+		Panel::Gear_arm::AUTO,
+		Panel::Gear_arm::DOWN,
+		Panel::Gear_arm::UP
+	}}),
+	gear_sensing(Multistate_input<Panel::Gear_sensing>{{
+		//TODO	
+	}}),
 	auto_select(0),
 	speed_dial(0)
 {}
@@ -197,7 +202,7 @@ bool get_in_use(Joystick_data d){
 
 Panel interpret_oi(Joystick_data d){
 	Panel p;
-	static const float ARTIFICIAL_MAX = 1.5;
+	//static const float ARTIFICIAL_MAX = 1.5;
 	{
 		p.in_use=get_in_use(d);
 		if(!p.in_use) return p;
@@ -210,53 +215,72 @@ Panel interpret_oi(Joystick_data d){
 	}
 	{//three position switches
 		float roller_control = d.axis[ROLLER_CONTROL_AXIS];
+		p.roller_control.interpret(roller_control);
+		/*
 		p.roller_control = [&]{
 			static const float AUTO=-1,OFF1=0,OFF2=1;
 			if(set_button(roller_control,AUTO,OFF1,OFF2)) return Panel::Roller_control::OFF;
 			if(set_button(roller_control,OFF1,OFF2,ARTIFICIAL_MAX)) return Panel::Roller_control::OFF;
 			return Panel::Roller_control::AUTO;
 		}();
-		
+		*/
+
 		float roller = d.axis[ROLLER_AXIS];
+		p.roller.interpret(roller);
+		/*
 		p.roller = [&]{
 			static const float AUTO=-1,IN=0,OUT=1;
 			if(set_button(roller,AUTO,IN,OUT)) return Panel::Roller::IN;
 			if(set_button(roller,IN,OUT,ARTIFICIAL_MAX)) return Panel::Roller::OUT;
 			return Panel::Roller::AUTO;
 		}();
+		*/
 
 		float roller_arm = d.axis[ROLLER_ARM_AXIS];
+		p.roller_arm.interpret(roller_arm);
+		/*
 		p.roller_arm = [&]{
 			static const float AUTO=-1,LOW=0,STOW=1;
 			if(set_button(roller_arm,AUTO,LOW,STOW)) return Panel::Roller_arm::LOW;
 			if(set_button(roller_arm,LOW,STOW,ARTIFICIAL_MAX)) return Panel::Roller_arm::STOW;
 			return Panel::Roller_arm::AUTO;
 		}();
+		*/
 
 		float climber_mode = d.axis[CLIMBER_MODE_AXIS];
+		p.climber_mode.interpret(climber_mode);
+		/*
 		p.climber_mode = [&]{
 			static const float STANDARD=-1,TURBO=0,RELEASE=1;
 			if(set_button(climber_mode,STANDARD,TURBO,RELEASE)) return Panel::Climber_mode::TURBO;
 			if(set_button(climber_mode,TURBO,RELEASE,ARTIFICIAL_MAX)) return Panel::Climber_mode::RELEASE;
 			return Panel::Climber_mode::STANDARD;
 		}();
+		*/
 
 		float gear_grabber = d.axis[GEAR_GRABBER_AXIS];
+		p.gear_grabber.interpret(gear_grabber);
+		/*
 		p.gear_grabber = [&]{
 			static const float AUTO=-1,CLOSED=0,OPEN=1;
 			if(set_button(gear_grabber,AUTO,CLOSED,OPEN)) return Panel::Gear_grabber::CLOSED;
 			if(set_button(gear_grabber,CLOSED,OPEN,ARTIFICIAL_MAX)) return Panel::Gear_grabber::OPEN;
 			return Panel::Gear_grabber::AUTO;
 		}();
-
+		*/
+		
 		float gear_arm = d.axis[GEAR_ARM_AXIS];
+		p.gear_arm.interpret(gear_arm);
+		/*
 		p.gear_arm = [&]{
 			static const float AUTO=-1,DOWN=0,UP=1;
 			if(set_button(gear_arm,AUTO,DOWN,UP)) return Panel::Gear_arm::DOWN;
 			if(set_button(gear_arm,DOWN,UP,ARTIFICIAL_MAX)) return Panel::Gear_arm::UP;
 			return Panel::Gear_arm::AUTO;
 		}();
-		
+		*/
+	
+		//TODO	
 		bool gear_sensing_full_auto = d.button[GEAR_SENSING_FULL_AUTO_LOC], gear_sensing_no_auto = d.button[GEAR_SENSING_NO_AUTO_LOC];
 		p.gear_sensing = [&]{
 			if(gear_sensing_full_auto) return Panel::Gear_sensing::FULL_AUTO;

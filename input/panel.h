@@ -5,7 +5,7 @@
 #include "../util/interface.h"
 #include <algorithm>
 
-template<typename T>
+template<typename T> //TODO: move to own file?
 class Multistate_input{
 	private:
 	Maybe<T> value;//value of input //TODO: do we want to handle default values not using Maybe?
@@ -14,12 +14,38 @@ class Multistate_input{
 	public:
 	template<typename U>
 	friend std::ostream& operator<<(std::ostream&,Multistate_input<U> const&);
-		
-	bool operator==(T const&)const;
-	bool operator<(T const&)const;
+	
+	Multistate_input<T>& operator=(T const& a){
+		value = a;
+		return *this;
+	}
 
-	bool operator==(Multistate_input<T> const&)const;
-	bool operator<(Multistate_input<T> const&)const;
+	bool operator==(T const& b)const{
+		return value == b;
+	}	
+
+	bool operator!=(T const& b)const{
+		return !(*this == b);
+	}
+
+	bool operator<(T const& b)const{
+		return value < b;
+	}
+
+	bool operator==(Multistate_input<T> const& b)const{
+		return conversion == b.conversion && value == b.value;
+	}
+	
+	bool operator!=(Multistate_input<T> const& b)const{
+		return !(*this == b);
+	}
+	
+	bool operator<(Multistate_input<T> const& b)const{
+		#define CMP(NAME) if(NAME < b.NAME) return true; if(b.NAME < NAME) return false;
+		CMP(value) CMP(conversion)
+		#undef CMP
+		return false;
+	}
 
 	void interpret(const double);
 	Maybe<T> get()const;
@@ -34,7 +60,7 @@ class Multistate_input{
 
 struct Panel{
 	static const unsigned PORT = 2;
-	bool in_use;
+	bool in_use;//TODO: make a function?
 	//*Buttons:
 	bool camera_light;
 	bool shoot;
@@ -47,19 +73,26 @@ struct Panel{
 	//2 position swicthes:
 	//3 position switches:
 	enum class Roller_control{OFF,AUTO};
-	Roller_control roller_control;
+	Multistate_input<Roller_control> roller_control;
+	//Roller_control roller_control;
 	enum class Roller{OUT,IN,AUTO};
-	Roller roller;
+	Multistate_input<Roller> roller;
+	//Roller roller;
 	enum class Roller_arm{STOW,LOW,AUTO};
-	Roller_arm roller_arm;
+	Multistate_input<Roller_arm> roller_arm;
+	//Roller_arm roller_arm;
 	enum class Climber_mode{TURBO,STANDARD,RELEASE};
-	Climber_mode climber_mode;
+	Multistate_input<Climber_mode> climber_mode;
+	//Climber_mode climber_mode;
 	enum class Gear_grabber{OPEN,CLOSED,AUTO};
-	Gear_grabber gear_grabber;
+	Multistate_input<Gear_grabber> gear_grabber;
+	//Gear_grabber gear_grabber;
 	enum class Gear_arm{UP,DOWN,AUTO};
-	Gear_arm gear_arm;
+	Multistate_input<Gear_arm> gear_arm;
+	//Gear_arm gear_arm;
 	enum class Gear_sensing{NO_AUTO,SEMI_AUTO,FULL_AUTO};
-	Gear_sensing gear_sensing;
+	Multistate_input<Gear_sensing> gear_sensing;
+	//Gear_sensing gear_sensing;
 	//10 *position switches:
 	int auto_select;//0-19
 	//Dials:
