@@ -3,6 +3,34 @@
 
 #include "../util/maybe.h"
 #include "../util/interface.h"
+#include <algorithm>
+
+template<typename T>
+class Multistate_input{
+	private:
+	Maybe<T> value;//value of input //TODO: do we want to handle default values not using Maybe?
+	std::vector<T> conversion;//used to map position along axis to T
+	
+	public:
+	template<typename U>
+	friend std::ostream& operator<<(std::ostream&,Multistate_input<U> const&);
+		
+	bool operator==(T const&)const;
+	bool operator<(T const&)const;
+
+	bool operator==(Multistate_input<T> const&)const;
+	bool operator<(Multistate_input<T> const&)const;
+
+	void interpret(const double);
+	Maybe<T> get()const;
+	
+	Multistate_input<T>(std::vector<T> c):value(Maybe<T>{}),conversion(c){}
+	Multistate_input<T>(std::vector<T> c,bool invert):value(Maybe<T>{}),conversion(c){//pass in true to invert value mapping
+		if(invert){
+			std::reverse(conversion.begin(),conversion.end());
+		}
+	}
+};
 
 struct Panel{
 	static const unsigned PORT = 2;

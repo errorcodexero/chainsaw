@@ -4,8 +4,71 @@
 #include "util.h"
 #include "../util/util.h"
 #include <cmath>
+#include <iomanip>
 
 using namespace std;
+
+template<typename T>
+void Multistate_input<T>::interpret(const double AXIS_INPUT){
+	const double AXIS_MIN = -1.0, AXIS_MAX = 1.0;
+	
+	{
+		//ensure the axis value is within the accepted range
+		const double E = 1E-14;
+		assert(AXIS_INPUT >= AXIS_MIN - E && AXIS_INPUT <= AXIS_MAX + E);
+	}
+	
+	const double STEP = (AXIS_MAX - AXIS_MIN) / (double)(conversion.size() - 1);//step size between axis values of each position is the range of axis values divided by the number of steps
+	const double TOLERANCE = 0.5 * STEP;//the allowed deviation between each expected axis value - here it's the maximum deviation
+	
+	double position_on_axis = AXIS_MIN;//the value to compare the axis input against
+	
+	for(unsigned i = 0; i < conversion.size(); i++){
+		if(AXIS_INPUT >= (position_on_axis - TOLERANCE) && AXIS_INPUT < (position_on_axis + TOLERANCE)){
+			value = conversion[i];
+			return;
+		}
+		position_on_axis += STEP;
+	}
+	nyi;
+}
+
+template<typename T>
+Maybe<T> Multistate_input<T>::get()const{
+	return value;
+}
+
+template<typename T>
+ostream& operator<<(ostream& o,Multistate_input<T> const& a){
+	o<<"Multistate_input(";
+	o<<"value:"<<a.value;
+	o<<")";
+	return o;
+}
+
+template<typename T>
+bool Multistate_input<T>::operator==(T const& b)const{
+	return value == b.value;
+}
+
+template<typename T>
+bool Multistate_input<T>::operator<(T const& b)const{
+	return value < b.value;
+}
+
+template<typename T>
+bool Multistate_input<T>::operator==(Multistate_input<T> const& b)const{
+	return conversion == b.conversion && value == b.value;
+}
+
+template<typename T>
+bool Multistate_input<T>::operator<(Multistate_input<T> const& b)const{
+	#define CMP(NAME) if(NAME < b.NAME) return true; if(b.NAME < NAME) return false;
+	CMP(value) CMP(conversion)
+	#undef CMP
+	return false;
+}
+
 static const unsigned int ROLLER_CONTROL_AXIS=0, ROLLER_AXIS=1, ROLLER_ARM_AXIS=2, CLIMBER_MODE_AXIS=3, GEAR_GRABBER_AXIS=4, GEAR_ARM_AXIS=5, AUTO_SELECTOR_AXIS=6, SPEED_DIAL_AXIS=7;//TODO: rename constants
 static const unsigned int CAMERA_LIGHT_LOC=1, SHOOT_LOC=2, PREP_COLLECT_GEAR_LOC=3, PREP_SCORE_GEAR_LOC=4, COLLECT_GEAR_LOC=5, SCORE_GEAR_LOC=6, CLIMB_LOC=7, LEARN_LOC=8, GEAR_SENSING_FULL_AUTO_LOC=9, GEAR_SENSING_NO_AUTO_LOC=10;//TODO: rename constants 
 
@@ -403,6 +466,39 @@ int main(){
 		interpret_oi(driver_station_input_rand());
 	}
 	cout<<p<<"\n";
+	
+	{
+		Multistate_input<Panel::Roller> a = {{
+			{Panel::Roller::AUTO},
+			{Panel::Roller::IN},
+			{Panel::Roller::OUT}
+		}};
+		Joystick_data d = {};
+		Panel p = {};
+		for(double i = -1.0; i < 1.01; i += 0.01){
+			d.axis[ROLLER_AXIS] = i;
+			a.interpret(i);
+			p = interpret_oi(d);
+			cout<<fixed<<setprecision(2)<<i<<"  new:"<<a.get()<<" versus old:"<<p.roller;
+			if(a.get() == Panel::Roller::OUT) cout<<"   roll out";
+			switch(*a.get()){
+				case Panel::Roller::IN:
+					cout<<" a";
+					break;
+				case Panel::Roller::OUT:
+					cout<<" b";
+					break;
+				case Panel::Roller::AUTO:
+					cout<<" c";
+					break;
+				default:
+					nyi
+			}
+			cout<<"\n";
+		}
+	}
+	
+
 	return 0;
 }
 #endif
